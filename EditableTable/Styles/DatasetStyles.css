@@ -1,0 +1,45 @@
+.container {
+  width: 100%;
+  position: relative;
+  color:black;
+  text-align: center;
+  flex-wrap: wrap;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  z-index: 1;
+  background-color: #6666664a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.ms-DetailsRow-cell {
+  padding: 0px;
+  /* margin: 0px 2px; */
+}
+
+.ms-Button--commandBar:hover .ms-Button-icon {
+  color: red;
+}
+
+@media screen and (max-width: 500px) {
+  .ms-Button--commandBar{
+    font-size: 11px;
+  }
+}
+
+@media screen and (max-width: 350px) {
+  .ms-Button--commandBar{
+    font-size: 8px;
+  }
+  .ms-Button-textContainer{
+    font-size: 10px;
+  }
+}
