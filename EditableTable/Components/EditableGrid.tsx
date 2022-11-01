@@ -13,7 +13,7 @@ import { DateTimePicker } from './DatePicker';
 import { InputNumber } from './InputNumber';
 import { WholeFormat } from './WholeFormat';
 import { Loading } from './Loading';
-import { Record } from '../Utils/RecordModel';
+import { Record } from '../Models/Record';
 import DataverseService from '../Services/DataverseService';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
@@ -22,9 +22,8 @@ type DataSet = ComponentFramework.PropertyTypes.DataSet;
 export interface IDataSetProps {
   dataset: DataSet;
   targetEntityType: string;
-  width?: number;
-  height?: number;
-  isLoading: boolean;
+  width: number;
+  height: number;
 }
 
 // eslint-disable-next-line react/display-name
@@ -44,34 +43,30 @@ export const EditableGrid = React.memo(
       return dataset.refresh();
     };
 
-    React.useEffect(() => {     
-      setIsLoading(false);
-    }, [isLoading]);
-
     React.useEffect(() => {
-      const datasetColumns = dataset.columns.sort((column1, column2) =>
-        column1.order - column2.order).map(column => ({
-        name: column.displayName,
-        fieldName: column.name,
-        minWidth: column.visualSizeFactor,
-        key: column.name,
-        isResizable: true,
-        data: column.dataType,
-      }));
+      const datasetColumns = dataset.columns
+        .sort((column1, column2) => column1.order - column2.order)
+        .map<IColumn>((column) : IColumn => ({
+          name: column.displayName,
+          fieldName: column.name,
+          minWidth: column.visualSizeFactor,
+          key: column.name,
+          isResizable: true,
+          data: column.dataType,
+        }));
       setColumns(datasetColumns);
 
       const datasetItems = dataset.sortedRecordIds.map(id => {
-        const entityId = dataset.records[id];
-        const attributes = dataset.columns.map(column => ({ [column.name]:
-          entityId.getFormattedValue(column.name) }));
+        const record = dataset.records[id];
+        const attributes = dataset.columns.map(column => ({
+          [column.name]: record.getFormattedValue(column.name) })
+        );
 
         return Object.assign({
-          key: entityId.getRecordId(),
-          raw: entityId,
+          key: record.getRecordId(),
+          raw: record,
         }, ...attributes);
       });
-      // const emptyAttributes = dataset.columns.map((column:any) => ({[column.name]: ""}));
-      // items.unshift(Object.assign({key: 0, raw: ""}, ...emptyAttributes));
 
       setItems(datasetItems);
     }, [dataset]);
@@ -225,13 +220,12 @@ export const EditableGrid = React.memo(
     }
 
     const setLoading = (e: any) => {
-      console.log(e);
       setIsLoading(true);
     }
 
     return <div className='container'>
       <Stack>
-        <Loading isLoading={isLoading} />
+        {isLoading && <Loading />}
         <Stack horizontal horizontalAlign="end" className={dataSetStyles.buttons}>
           <CommandBar
             isDisabled={isLoading}

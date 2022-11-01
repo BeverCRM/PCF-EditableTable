@@ -8,7 +8,3 @@ export class Record {
     }
   ]
 }
-
-export interface Data {
-  [key: string] : any
-}

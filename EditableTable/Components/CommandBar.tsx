@@ -3,7 +3,7 @@ import * as React from 'react';
 import DataverseService from '../Services/DataverseService';
 import { CommandBarButtonStyles } from '../Styles/DataSetStyles';
 import { addIcon, refreshIcon, deleteIcon, saveIcon } from '../Styles/DataSetStyles';
-import { Record } from '../Utils/RecordModel';
+import { Record } from '../Models/Record';
 
 export interface ICommandBarProps {
   isDisabled: boolean;
@@ -12,7 +12,7 @@ export interface ICommandBarProps {
   changedRecordIds: Record[];
   entityName: string;
   newRow: any;
-  setLoading: any
+  setLoading: any;
 }
 
 export const CommandBar = ({ isDisabled, refreshGrid,

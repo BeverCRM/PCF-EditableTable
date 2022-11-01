@@ -1,6 +1,6 @@
 import { IInputs } from '../generated/ManifestTypes';
 import { IComboBoxOption } from '@fluentui/react';
-import { Record } from '../Utils/RecordModel';
+import { Record } from '../Models/Record';
 
 export let _context: ComponentFramework.Context<IInputs>;
 export let _targetEntityType: string;
@@ -10,12 +10,10 @@ export let entityNameFieldName: string;
 // type Entity = ComponentFramework.WebApi.Entity;
 
 export default {
-  setContext(context: ComponentFramework.Context<IInputs>,
-    targetEntityType: string,
-    entityMetadata: ComponentFramework.PropertyHelper.EntityMetadata) {
+  setContext(context: ComponentFramework.Context<IInputs>) {
     _context = context;
-    _targetEntityType = targetEntityType;
-    _entityMetadata = entityMetadata;
+    _targetEntityType = context.parameters.dataset.getTargetEntityType();
+    _entityMetadata = context.utils.getEntityMetadata(_targetEntityType);
   },
 
   async getTargetEntityDisplayName() {
