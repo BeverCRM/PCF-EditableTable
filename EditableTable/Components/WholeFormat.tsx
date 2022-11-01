@@ -11,7 +11,8 @@ export interface IWholeFormatProps {
 
 export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProps) => {
   const comboBoxStyles: Partial<IComboBoxStyles> = {
-    optionsContainer: { maxHeight: 260, maxWidth: 300 },
+    optionsContainer: { maxHeight: 260, maxWidth: 300 }, 
+    container: { maxWidth: '200px' }
   };
   const [options, setOptions] = React.useState<IComboBoxOption[]>([]);
   const [selectedKey, setSelectedKey] = React.useState<string | number | undefined>('');

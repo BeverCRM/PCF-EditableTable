@@ -42,15 +42,60 @@ export default {
       });
   },
 
-  async deleteSelectedNotes(noteIds: string[]): Promise<void> {
-    try {
-      for (const id of noteIds) {
-        await _context.webAPI.deleteRecord('annotation', id);
+  getRelationshipName(schemaName: string) {
+    // @ts-ignore
+    const clientUrl = `${_context.page.getClientUrl()}/api/data/v9.2/`;
+    const request = `${clientUrl}RelationshipDefinitions?$filter=SchemaName eq '${schemaName}'`;
+    let relationshipName = '';
+    const req = new XMLHttpRequest();
+    req.open('GET', request, false);
+    req.setRequestHeader('OData-MaxVersion', '4.0');
+    req.setRequestHeader('OData-Version', '4.0');
+    req.setRequestHeader('Accept', 'application/json');
+    req.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+    req.setRequestHeader('Prefer', 'odata.include-annotations="*"');
+    req.onreadystatechange = function() {
+      if (this.readyState === 4) {
+        req.onreadystatechange = null;
+        if (this.status === 200) {
+          const result = JSON.parse(this.response);
+          console.log(result);
+          relationshipName = result.value[0].ReferencingEntityNavigationPropertyName;
+        }
+        else {
+          console.log(this.statusText);
+        }
       }
-    }
-    catch (e) {
-      console.log(e);
-    }
+    };
+    req.send();
+    return relationshipName;
+  },
+
+  createNewRecord(data: {}): void {
+    console.log(data);
+    //@ts-ignore
+    const relationshipNameRef = _context.mode._customControlProperties.dynamicData.parameters.dataset.previousDataSetDefinition.RelationshipName;
+    const relationshipName = relationshipNameRef !== null ? this.getRelationshipName(relationshipNameRef) : relationshipNameRef;
+    //@ts-ignore
+    const parentEntityId = _context.mode.contextInfo.entityId;
+    //@ts-ignore
+    const parentEntityName = _context.mode.contextInfo.entityTypeName;
+
+    this.getEntitySetName(parentEntityName).then(entitySetName => {
+      if( relationshipName !== null && parentEntityName !== null && entitySetName !== null ) {
+        data = Object.assign({
+          [`${relationshipName}@odata.bind`] : `/${entitySetName}(${parentEntityId})`
+        }, data);
+        console.log(data);
+      }
+      _context.webAPI.createRecord(_targetEntityType, data).then( (success: any) => {
+        console.log(success); 
+        _context.parameters.dataset.refresh();
+      },
+      (error: any) => {
+        console.log(error);
+      });
+    });
   },
 
   deleteSelectedRecords(recordIds: string[]): void {
@@ -86,18 +131,22 @@ export default {
   saveRecords(changedRecords: Record[]): void {
     changedRecords.forEach(record => {
       const data = record.data.reduce((obj, recordData) =>
-        Object.assign(obj, recordData.fieldType === 'lookup'
-          ? { [`${recordData.fieldName}@odata.bind`]: recordData.newValue }
-          : { [recordData.fieldName]: recordData.newValue }), {});
-
-      _context.webAPI.updateRecord(_targetEntityType, record.id, data).then(
-        (success: any) => {
-          console.log(success);
-          _context.parameters.dataset.refresh();
-        },
-        (error: any) => {
-          console.log(error);
-        });
+      Object.assign(obj, recordData.fieldType === 'lookup'
+      ? { [`${recordData.fieldName}@odata.bind`]: recordData.newValue }
+      : { [recordData.fieldName]: recordData.newValue }), {});
+      if(record.id === '0') {
+        this.createNewRecord(data);
+      } 
+      else {
+        _context.webAPI.updateRecord(_targetEntityType, record.id, data).then(
+          (success: any) => {
+            console.log(success);
+            _context.parameters.dataset.refresh();
+          },
+          (error: any) => {
+            console.log(error);
+          });
+      }
     });
   },
 
@@ -117,7 +166,7 @@ export default {
   },
 
   getRelationships(entityName: string) {
-    const relationships: Array<{fieldNameRef: string, entityNameRef: string}> = [];
+    const relationships: Array<{fieldNameRef: string, entityNameRef: string, entityNavigation?: string}> = [];
     // const relReq = `https://beversandbox.crm4.dynamics.com/api/data/v8.2/RelationshipDefinitions?`;
     // @ts-ignore
     const clientUrl = `${_context.page.getClientUrl()}/api/data/v9.2/`;
@@ -139,13 +188,15 @@ export default {
             const rels = results.OneToManyRelationships;
             const entityNameRef = rels[i].ReferencedEntity;
             const fieldNameRef = rels[i].ReferencingAttribute;
-            relationships.push({ fieldNameRef, entityNameRef });
+            const entityNavigation = rels[i].ReferencingEntityNavigationPropertyName;
+            relationships.push({ fieldNameRef, entityNameRef, entityNavigation });
           }
           for (let i = 0; i < results.ManyToOneRelationships?.length; i++) {
             const rels = results.ManyToOneRelationships;
             const entityNameRef = rels[i].ReferencedEntity;
             const fieldNameRef = rels[i].ReferencingAttribute;
-            relationships.push({ fieldNameRef, entityNameRef });
+            const entityNavigation = rels[i].ReferencingEntityNavigationPropertyName;
+            relationships.push({ fieldNameRef, entityNameRef, entityNavigation });
           }
           for (let i = 0; i < results.ManyToManyRelationships?.length; i++) {
             const rels = results.ManyToManyRelationships;
@@ -263,5 +314,10 @@ export default {
   formatTime(inputDateValue: any) {
     return _context.formatting.formatTime(inputDateValue, 3);
   },
+
+  getColumns() {
+    //@ts-ignore
+    return _context.mode._customControlProperties.dynamicData.parameters.dataset.columnsForEmptyDataset;
+  }
 
 };

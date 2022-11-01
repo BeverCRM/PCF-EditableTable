@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { DetailsList, DetailsListLayoutMode, IColumn,
+  IDetailsList,
   IDetailsListProps, Stack, TextField } from '@fluentui/react';
 import { GridFooter } from './Footer';
 import { useSelection } from './Selection';
@@ -13,6 +14,7 @@ import { InputNumber } from './InputNumber';
 import { WholeFormat } from './WholeFormat';
 import { Loading } from './Loading';
 import { Record } from '../Utils/RecordModel';
+import DataverseService from '../Services/DataverseService';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 // type Entity = ComponentFramework.WebApi.Entity;
@@ -34,13 +36,15 @@ export const EditableGrid = React.memo(
     const [changedRecords, setChangedRecords] = React.useState<Record[]>([]);
 
     const { selection, selectedRecordIds, onItemInvoked } = useSelection(dataset);
+    const listRef = React.useRef<IDetailsList | null>(null);
 
     const refreshGrid = () => {
       setIsLoading(true);
+      listRef.current?.forceUpdate();
       return dataset.refresh();
     };
 
-    React.useEffect(() => {
+    React.useEffect(() => {     
       setIsLoading(false);
     }, [isLoading]);
 
@@ -66,6 +70,8 @@ export const EditableGrid = React.memo(
           raw: entityId,
         }, ...attributes);
       });
+      // const emptyAttributes = dataset.columns.map((column:any) => ({[column.name]: ""}));
+      // items.unshift(Object.assign({key: 0, raw: ""}, ...emptyAttributes));
 
       setItems(datasetItems);
     }, [dataset]);
@@ -93,15 +99,17 @@ export const EditableGrid = React.memo(
       width,
     }), [width, height]);
 
-    const _renderItemColumn: IDetailsListProps['onRenderItemColumn'] =
+    const _renderItemColumn: IDetailsListProps['onRenderItemColumn'] = 
     (item: any, index: number | undefined, column: IColumn | undefined) => {
       const fieldContent = item[column?.fieldName as keyof any] as any;
       const fieldKey = item.raw?._record?.fields[column?.fieldName as keyof any]?.value;
+      const lookupReference = item.raw?._record?.fields[column?.fieldName as keyof any]?.reference?.etn;
 
       if (column !== undefined && fieldContent !== undefined) {
         switch (column.data) {
           case 'SingleLine.Text':
             return <TextField defaultValue={fieldContent}
+              styles={{root: {maxWidth: '300px'}}}
               onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
                 newValue?: string) => changedValue(item.key,
                 column?.fieldName || '', '', newValue || '')}/>;
@@ -130,8 +138,9 @@ export const EditableGrid = React.memo(
           case 'Lookup.Simple':
             return <Lookup fieldName={column?.fieldName ? column?.fieldName : ''}
               defaultValue={fieldContent}
-              _onChange={changedValue.bind('', item.key, column?.fieldName || '', 'lookup')}
-              entityName={targetEntityType} />;
+              _onChange={changedValue.bind('', item.key)}
+              entityName={targetEntityType}
+              lookupReference={lookupReference} />;
 
           case 'TwoOptions':
             return <DropDown entityName={targetEntityType}
@@ -160,6 +169,7 @@ export const EditableGrid = React.memo(
 
           case 'Multiple':
             return <TextField defaultValue={fieldContent}
+              styles={{root: {maxWidth: '400px'}}}
               onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
                 newValue?: string) => changedValue(item.key,
                 column?.fieldName || '', '', newValue || '')}/>;
@@ -191,6 +201,7 @@ export const EditableGrid = React.memo(
 
           default:
             return <TextField defaultValue={fieldContent}
+              styles={{root: {maxWidth: '300px'}}}
               onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
                 newValue?: string) => changedValue(item.key,
                 column?.fieldName || '', '', newValue || '')}/>;
@@ -200,18 +211,36 @@ export const EditableGrid = React.memo(
 
     if (items.length === 0) showMessage();
 
-    if (isLoading) {
-      return <Loading isLoading={isLoading} />;
+    const newRow = () => {
+      console.log(targetEntityType);
+      setIsLoading(true);
+      console.log(listRef.current);
+
+      const emptyColumns = DataverseService.getColumns();
+      const emptyAttributes = emptyColumns.map((column:any) => ({[column.name]: ''}));
+      items.unshift(Object.assign({key: '0', raw: ''}, ...emptyAttributes));
+      setItems(items);
+
+      listRef.current?.forceUpdate();
+    }
+
+    const setLoading = (e: any) => {
+      console.log(e);
+      setIsLoading(true);
     }
 
     return <div className='container'>
       <Stack>
+        <Loading isLoading={isLoading} />
         <Stack horizontal horizontalAlign="end" className={dataSetStyles.buttons}>
           <CommandBar
             isDisabled={isLoading}
             refreshGrid={refreshGrid}
             selectedRecordIds={selectedRecordIds}
             changedRecordIds={changedRecords}
+            entityName={targetEntityType}
+            newRow={newRow}
+            setLoading={setLoading.bind(this)}
           ></CommandBar>
         </Stack>
         <Stack style={rootContainerStyle}>
@@ -224,6 +253,9 @@ export const EditableGrid = React.memo(
             onRenderRow={_onRenderRow}
             onRenderDetailsHeader={_onRenderDetailsHeader}
             layoutMode={DetailsListLayoutMode.fixedColumns}
+            onActiveItemChanged={()=> console.log('clicked')}
+            componentRef={listRef}
+            styles={{ contentWrapper: {display: isLoading ? 'none' : 'flex' }}}
           >
           </DetailsList>
           <GridFooter dataset={dataset} selectedCount={selection.count}></GridFooter>

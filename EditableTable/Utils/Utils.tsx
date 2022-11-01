@@ -38,7 +38,7 @@ export const _onRenderRow: IDetailsListProps['onRenderRow'] = props => {
       fontSize: '14px',
       color: 'black',
       borderTop: '1px solid rgb(250, 250, 250)',
-      borderBottom: '1px solid rgb(219 219 219)',
+      borderBottom: '1px solid rgb(219 219 219)'
     };
 
     return <DetailsRow {...props} styles={customStyles} />;

@@ -124,12 +124,14 @@ export const DropDown =
           options={options}
           defaultSelectedKey={selectedOption}
           onChange={_onDropdownChange}
+          styles={{ dropdown:{maxWidth: '200px'} }}
         />
         : <ComboBox
           options={options}
           multiSelect
           selectedKey={selectedOptions}
           onChange={_onComboChange}
+          styles={{container: { maxWidth: '200px' }}}
         />
       }
     </Stack>

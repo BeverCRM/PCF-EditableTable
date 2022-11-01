@@ -7,31 +7,50 @@ export interface ILookupProps {
   fieldName: string;
   defaultValue: string;
   _onChange: any,
-  entityName: any
+  entityName: any,
+  lookupReference: string
 }
 
 class LogicalName {
   fieldNameRef: string;
-  entityNameRef: string
+  entityNameRef: string;
+  entityNavigation?: string;
 }
 
-export const Lookup = ({ fieldName, entityName, defaultValue, _onChange } : ILookupProps) => {
+export const Lookup = ({ fieldName, entityName, lookupReference, defaultValue, _onChange } : ILookupProps) => {
   const [options, setOptions] = React.useState<ITag[]>([]);
   const [selectedOption, setSelectedOption] = React.useState<ITag[] | undefined>();
   const [entityPluralName, setPluralName] = React.useState<string>('');
   const [logicalNames, setLogicalNames] = React.useState<LogicalName[]>([]);
+  const [lookupRef, setLookupRef] = React.useState<LogicalName>();
 
   React.useMemo(() => {
-    setLogicalNames(DataverseService.getRelationships(entityName));
+    // if(lookupReference) {
+    //   setLogicalNames([{fieldNameRef: fieldName, entityNameRef: lookupReference }])
+    // } else {
+      setLogicalNames(DataverseService.getRelationships(entityName));
+    // }
   }, [entityName]);
 
   React.useEffect(() => {
     if (fieldName !== null && fieldName !== undefined) {
       if (logicalNames.length > 0) {
-        const lookupRef = logicalNames.find(
-          (ref: { fieldNameRef: string; entityNameRef: string}) => {
+        let lookupRef: LogicalName | undefined;
+
+        if(lookupReference){
+          lookupRef = logicalNames.find(
+            (ref: { fieldNameRef: string; entityNameRef: string; entityNavigation?: string }) => {
+              if (ref.entityNameRef === lookupReference) return true;
+          });
+        }
+        else{
+          lookupRef = logicalNames.find(
+          (ref: { fieldNameRef: string; entityNameRef: string; entityNavigation?: string }) => {
             if (ref.fieldNameRef === fieldName) return true;
           });
+        }
+        setLookupRef(lookupRef);
+        
         const lookupLogicalName = lookupRef?.entityNameRef || '';
         if (lookupLogicalName !== '') {
           _context.utils.getEntityMetadata(lookupLogicalName).then(metadata => {
@@ -107,7 +126,7 @@ export const Lookup = ({ fieldName, entityName, defaultValue, _onChange } : ILoo
 
   const onChange = (items?: ITag[] | undefined): void => {
     setSelectedOption(items);
-    if (items !== undefined) _onChange(`/${entityPluralName}(${items[0].key})`);
+    if (items !== undefined) _onChange( lookupRef?.entityNavigation,'lookup',`/${entityPluralName}(${items[0].key})`);
     else _onChange('');
   };
 
@@ -120,6 +139,7 @@ export const Lookup = ({ fieldName, entityName, defaultValue, _onChange } : ILoo
         onEmptyResolveSuggestions={initialValues}
         itemLimit={1}
         pickerSuggestionsProps={{ noResultsFoundText: 'No Results Found' }}
+        styles={{text: {minWidth: '30px'}, root: { maxWidth: '300px'}}}
       />
     </Stack>
   );

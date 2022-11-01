@@ -2,7 +2,6 @@
   width: 100%;
   position: relative;
   color:black;
-  text-align: center;
   flex-wrap: wrap;
 }
 
@@ -20,9 +19,13 @@
   flex-direction: column;
 }
 
+.ms-DetailsHeader-cell{
+  margin: 0px 2px; 
+}
+
 .ms-DetailsRow-cell {
   padding: 0px;
-  /* margin: 0px 2px; */
+  margin: 0px 2px;
 }
 
 .ms-Button--commandBar:hover .ms-Button-icon {

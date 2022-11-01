@@ -12,7 +12,7 @@ export interface IInputNumberProps {
 
 export const InputNumber = ({ entityName, fieldName,
   defaultValue, type, onNumberChange } : IInputNumberProps) => {
-  const styles: Partial<ISpinButtonStyles> = { arrowButtonsContainer: { display: 'none' } };
+  const styles: Partial<ISpinButtonStyles> = { arrowButtonsContainer: { display: 'none' }, spinButtonWrapper: { maxWidth: '150px' } };
   const [number, setNumber] =
   React.useState<{precision: number, minValue: number, maxValue: number }>();
   const [val, setVal] = React.useState<string>(defaultValue);

@@ -1,29 +1,10 @@
 import { IIconProps } from '@fluentui/react/lib/components/Icon/Icon.types';
-import { FontWeights, getTheme, mergeStyles, mergeStyleSets } from '@fluentui/react/lib/Styling';
+import { FontWeights, getTheme, mergeStyleSets } from '@fluentui/react/lib/Styling';
 
 const theme = getTheme();
 
 export const notesIcon: IIconProps = { iconName: 'EditNote' };
 export const cancelIcon: IIconProps = { iconName: 'Cancel' };
-
-export const notesButtonStyles = mergeStyles({
-  backgroundColor: 'transparent',
-  color: 'black',
-  paddingBottom: '10px',
-});
-
-export const noteColumnStyles = mergeStyleSets({
-  buttons: {
-    backgroundColor: 'transparent',
-  },
-  cellName: {
-    fontSize: '12px',
-  },
-  root: {
-    textAlign: 'center',
-  },
-
-});
 
 export const modalStyles = mergeStyleSets({
   container: {
@@ -41,6 +22,7 @@ export const modalStyles = mergeStyleSets({
       alignItems: 'center',
       fontWeight: FontWeights.semilight,
       padding: '12px 12px 14px 24px',
+      margin: '0 2px'
     },
   ],
   body: {
@@ -64,6 +46,7 @@ export const modalStyles = mergeStyleSets({
     width: 270,
     maxHeight: 325,
     fontWeight: FontWeights.regular,
+    margin: '0 2px'
   },
   title: {
     marginBottom: 12,
