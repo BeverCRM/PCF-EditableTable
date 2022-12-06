@@ -1,10 +1,12 @@
 import { Dropdown, IDropdownOption, Stack } from '@fluentui/react';
 import { ComboBox, IComboBox, IComboBoxOption } from '@fluentui/react';
 import * as React from 'react';
-import { _context } from '../Services/DataverseService';
+import { shallowEqual } from 'react-redux';
+// import { shallowEqual } from 'react-redux';
+import { useAppSelector } from '../Store/Hooks';
+// import { useAppSelector } from '../Store/Hooks';
 
 export interface IDropDownProps {
-  entityName: string;
   fieldName: string | undefined;
   defaultValue: string;
   isMultiple: boolean;
@@ -13,69 +15,27 @@ export interface IDropDownProps {
 }
 
 export const DropDown =
-({ entityName, fieldName, defaultValue, isMultiple,
+({ fieldName, defaultValue, isMultiple,
   isTwoOptions, onOptionChange } : IDropDownProps) => {
   const [options, setOptions] = React.useState<IDropdownOption[]>([]);
-  const [selectedOption, setSelectedOption] = React.useState<string | number | undefined>('');
-  const [selectedOptions, setSelectedOptions] = React.useState<string[]>([]);
-
+  const [currentOption, setCurrentOption] = React.useState<string | number | undefined>('');
+  const [currentOptions, setCurrentOptions] = React.useState<string[]>([]);
+  
+  const dropdowns = useAppSelector(state => state.dropdown.dropdowns, shallowEqual);
+  // const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName == fieldName);
+  // const options = currentDropdown ? currentDropdown.options : [];
+  
   React.useEffect(() => {
-    // @ts-ignore
-    const clientUrl = `${_context.page.getClientUrl()}/api/data/v9.2/`;
-    let attributeType = 'PicklistAttributeMetadata';
-
-    if (isTwoOptions) attributeType = 'BooleanAttributeMetadata';
-
-    if (isMultiple) attributeType = 'MultiSelectPicklistAttributeMetadata';
-
-    if (fieldName === 'statuscode') attributeType = 'StatusAttributeMetadata';
-
-    if (fieldName === 'statecode') attributeType = 'StateAttributeMetadata';
-
-    // eslint-disable-next-line max-len
-    const request = `${clientUrl}EntityDefinitions(LogicalName='${entityName}')/Attributes/Microsoft.Dynamics.CRM.${attributeType}?$select=LogicalName&$filter=LogicalName eq '${fieldName}'&$expand=OptionSet`;
-    const options: IDropdownOption[] = [];
-    const req = new XMLHttpRequest();
-    req.open('GET', request, true);
-    req.setRequestHeader('OData-MaxVersion', '4.0');
-    req.setRequestHeader('OData-Version', '4.0');
-    req.setRequestHeader('Accept', 'application/json');
-    req.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-    req.setRequestHeader('Prefer', 'odata.include-annotations="*"');
-    req.onreadystatechange = function() {
-      if (this.readyState === 4) {
-        req.onreadystatechange = null;
-        if (this.status === 200) {
-          const results = JSON.parse(this.response);
-          if (!isTwoOptions) {
-            for (let i = 0; i < results.value[0].OptionSet.Options.length; i++) {
-              const key = results.value[0].OptionSet.Options[i].Value;
-              const text = results.value[0].OptionSet.Options[i].Label.UserLocalizedLabel.Label;
-              options.push({ key, text });
-            }
-          }
-          else {
-            const trueKey = results.value[0].OptionSet.TrueOption.Value;
-            const trueText = results.value[0].OptionSet.TrueOption.Label.UserLocalizedLabel.Label;
-            options.push({ key: trueKey, text: trueText });
-            const falseKey = results.value[0].OptionSet.FalseOption.Value;
-            const falseText = results.value[0].OptionSet.FalseOption.Label.UserLocalizedLabel.Label;
-            options.push({ key: falseKey, text: falseText });
-          }
-          setOptions(options);
-        }
-        else {
-          console.log(this.statusText);
-        }
-      }
-    };
-    req.send();
-  }, [entityName]);
-
+    const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName == fieldName);
+    setOptions(currentDropdown ? currentDropdown.options : []); 
+    console.log('DROPDOWN: ', currentDropdown?.fieldName, fieldName ,options);
+  }, [dropdowns]);
+  
   React.useMemo(() => {
     if (!isMultiple) {
-      const selectedValue = options.find(opt => opt.text === defaultValue);
-      setSelectedOption(selectedValue?.key);
+      const selectedOption = options.find(opt => opt.text === defaultValue);
+      console.log(selectedOption ? selectedOption.key : '');
+      setCurrentOption(selectedOption ? selectedOption.key : '');
     }
     else {
       const values = defaultValue?.split('; ');
@@ -83,15 +43,13 @@ export const DropDown =
         if (val === opt.text) return true;
       }));
       const selectedOptions = selectedValues.map(value => value.key as string);
-      setSelectedOptions(selectedOptions);
+      console.log(selectedOptions);
+      setCurrentOptions(selectedOptions);
     }
   }, [options]);
 
-  // React.useEffect(() => {
-  //   onOptionChange(selectedOptions.join(', '));
-  // }, [selectedOptions]);
 
-  const _onDropdownChange =
+  const onSingleOptionChange =
   (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption | undefined) => {
     if (isTwoOptions) {
       onOptionChange(option?.key === 1);
@@ -101,39 +59,33 @@ export const DropDown =
     }
   };
 
-  const _onComboChange =
+  const onMultipleOptionChange =
   (event: React.FormEvent<IComboBox>, option?: IComboBoxOption | undefined) => {
     if (option?.selected) {
-      setSelectedOptions([...selectedOptions, option.key as string]);
-      // setSelectedOptions(
-      //   option.selected ? [...selectedOptions, option.key as string]
-      //     : selectedOptions.filter(key => key !== option.key),
-      // );
-      onOptionChange([...selectedOptions, option.key as string].join(', '));
+      setCurrentOptions([...currentOptions, option.key as string]);
+      onOptionChange([...currentOptions, option.key as string].join(', '));
     }
     else {
-      setSelectedOptions(selectedOptions.filter(key => key !== option?.key));
-      onOptionChange(selectedOptions.filter(key => key !== option?.key).join(', '));
+      setCurrentOptions(currentOptions.filter(key => key !== option?.key));
+      onOptionChange(currentOptions.filter(key => key !== option?.key).join(', '));
     }
   };
 
-  return (
-    <Stack>
+  return <Stack>
       {!isMultiple
         ? <Dropdown
           options={options}
-          defaultSelectedKey={selectedOption}
-          onChange={_onDropdownChange}
+          defaultSelectedKey={currentOption}
+          onChange={onSingleOptionChange}
           styles={{ dropdown:{maxWidth: '200px'} }}
         />
         : <ComboBox
           options={options}
           multiSelect
-          selectedKey={selectedOptions}
-          onChange={_onComboChange}
+          selectedKey={currentOptions}
+          onChange={onMultipleOptionChange}
           styles={{container: { maxWidth: '200px' }}}
         />
       }
     </Stack>
-  );
 };

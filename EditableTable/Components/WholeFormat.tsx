@@ -1,6 +1,6 @@
 import { ComboBox, IComboBox, IComboBoxOption, IComboBoxStyles, Stack } from '@fluentui/react';
 import * as React from 'react';
-import DataverseService from '../Services/DataverseService';
+import { useAppSelector } from '../Store/Hooks';
 import { durationList } from '../Utils/DurationList';
 
 export interface IWholeFormatProps {
@@ -16,23 +16,30 @@ export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProp
   };
   const [options, setOptions] = React.useState<IComboBoxOption[]>([]);
   const [selectedKey, setSelectedKey] = React.useState<string | number | undefined>('');
+  
+  let timezoneList : IComboBoxOption[] = [];
+  let languages : IComboBoxOption[] = [];
 
-  React.useMemo(
+  if (type === 'timezone') {
+    timezoneList = useAppSelector(state => state.wholeFormat.timezones);
+  }
+  if (type === 'language') {
+    languages = useAppSelector(state => state.wholeFormat.languages);
+  }
+
+  React.useEffect(
     () => {
       if (type === 'duration') {
         setOptions(durationList);
       }
       if (type === 'timezone') {
-        const timezoneList = DataverseService.getTimeZones();
         setOptions(timezoneList);
       }
       if (type === 'language') {
-        DataverseService.getLanguages().then(languages => {
-          setOptions(languages);
-        });
+        setOptions(languages);
       }
     },
-    [type],
+    [type, languages, timezoneList]
   );
 
   React.useEffect(
@@ -46,7 +53,7 @@ export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProp
         setSelectedKey(selectedOpt?.key);
       }
     },
-    [options],
+    [options]
   );
 
   const onChange = React.useCallback(
@@ -55,7 +62,7 @@ export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProp
       setSelectedKey(key);
       _onChange(key);
     },
-    [defaultValue],
+    [defaultValue]
   );
 
   return (

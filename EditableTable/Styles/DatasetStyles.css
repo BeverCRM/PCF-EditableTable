@@ -1,3 +1,7 @@
+.appWrapper {
+  position: relative;
+}
+
 .container {
   width: 100%;
   position: relative;
@@ -17,6 +21,10 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+}
+
+.ms-DetailsList {
+  z-index: 2;
 }
 
 .ms-DetailsHeader-cell{
@@ -45,4 +53,33 @@
   .ms-Button-textContainer{
     font-size: 10px;
   }
+}
+
+.noDataContainer {
+  position: absolute;
+  width: -webkit-fill-available;
+  height: -webkit-fill-available;
+  justify-content: center;
+  align-content: center;
+  z-index: 0;
+}
+
+.nodata {
+  margin : 50px;
+  font-size : 14px;
+  text-align: center;
+}
+
+.loading {
+  display: block;
+  position: absolute;
+  width: -webkit-fill-available;
+  height: -webkit-fill-available;
+  align-content: center;
+  text-align: center;
+  top: 0;
+  padding: 106px 469px;
+  background-color: white;
+  opacity: 80%;
+  z-index: 1;
 }

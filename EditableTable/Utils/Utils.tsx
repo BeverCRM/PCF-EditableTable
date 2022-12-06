@@ -2,12 +2,14 @@ import { IDetailsListProps, IDetailsHeaderStyles, CheckboxVisibility,
   IDetailsRowStyles, DetailsHeader, DetailsRow } from '@fluentui/react';
 import * as React from 'react';
 
-export function showMessage() {
+//remove
+export function showNoDataMessage() {
   const messageElement = document.querySelector<HTMLElement>('.ms-SelectionZone')!;
   if (messageElement) {
-    messageElement.innerHTML = 'There is no data';
-    messageElement.style.marginTop = '10px';
-    messageElement.style.fontSize = '20px';
+    messageElement.innerHTML = 'No data available';
+    messageElement.style.margin = '50px';
+    messageElement.style.fontSize = '14px';
+    messageElement.style.textAlign = 'center';
   }
 }
 

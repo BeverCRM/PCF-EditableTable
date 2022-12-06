@@ -1,49 +1,61 @@
 import { CommandBarButton } from '@fluentui/react';
 import * as React from 'react';
-import DataverseService from '../Services/DataverseService';
+import { setLoading } from '../Store/Features/LoadingSlice';
+import { saveRecords } from '../Store/Features/RecordSlice';
+import { useAppDispatch } from '../Store/Hooks';
+// import { saveRecords } from '../Store/Services';
 import { CommandBarButtonStyles } from '../Styles/DataSetStyles';
 import { addIcon, refreshIcon, deleteIcon, saveIcon } from '../Styles/DataSetStyles';
-import { Record } from '../Models/Record';
 
 export interface ICommandBarProps {
-  isDisabled: boolean;
   refreshGrid: any;
   selectedRecordIds: string[];
-  changedRecordIds: Record[];
   entityName: string;
   newRow: any;
-  setLoading: any;
+  deleteRecords: any
 }
+// const dispatch = useDispatch();
 
-export const CommandBar = ({ isDisabled, refreshGrid,
-  selectedRecordIds, changedRecordIds, newRow, setLoading } : ICommandBarProps) => <>
-  <CommandBarButton
-    maxLength={1}
-    disabled = { isDisabled }
-    iconProps={addIcon}
-    styles={CommandBarButtonStyles}
-    text={`New`}
-    onClick={() => {setLoading(); newRow()}}
-  />
-  <CommandBarButton
-    disabled = { isDisabled }
-    iconProps={refreshIcon}
-    styles={CommandBarButtonStyles}
-    text="Refresh"
-    onClick={() => {setLoading(); refreshGrid() }}
-  />
-  <CommandBarButton
-    disabled = { isDisabled }
-    iconProps={deleteIcon}
-    styles={CommandBarButtonStyles}
-    text="Delete"
-    onClick={() => { DataverseService.openRecordDeleteDialog(selectedRecordIds); }}
-  />
-  <CommandBarButton
-    disabled = { isDisabled }
-    iconProps={saveIcon}
-    styles={CommandBarButtonStyles}
-    text="Save"
-    onClick={() => { setLoading(); DataverseService.saveRecords(changedRecordIds); }}
-  />
-</>;
+export const CommandBar = ({ refreshGrid,
+  newRow, deleteRecords } : ICommandBarProps) => {
+  const isLoading = false; // store.getState().isLoading.loading;
+  const dispatch = useAppDispatch();
+  
+  return (<>
+    <CommandBarButton
+      maxLength={1}
+      disabled = { isLoading }
+      iconProps={addIcon}
+      styles={CommandBarButtonStyles}
+      text={`New`}
+      onClick={() => { dispatch(setLoading(true)); newRow()}} // ;
+    />
+    <CommandBarButton
+      disabled = { isLoading }
+      iconProps={refreshIcon}
+      styles={CommandBarButtonStyles}
+      text='Refresh'
+      onClick={() => { refreshGrid(); }}
+    />
+    <CommandBarButton
+      disabled = { isLoading }
+      iconProps={deleteIcon}
+      styles={CommandBarButtonStyles}
+      text='Delete'
+      onClick={() => { deleteRecords(); }}
+    />
+    <CommandBarButton
+      disabled = { isLoading }
+      iconProps={saveIcon}
+      styles={CommandBarButtonStyles}
+      text='Save'
+      onClick={() => { 
+        dispatch(setLoading(true));
+        dispatch(saveRecords()).unwrap()
+        .then(() => {
+          dispatch(setLoading(false));
+        });
+      }}
+    />
+  </>)
+};

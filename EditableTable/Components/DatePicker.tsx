@@ -4,10 +4,10 @@ import { DatePicker, IDatePicker, mergeStyleSets,
 import { ComboBox, IComboBox, IComboBoxOption, IComboBoxStyles, Stack } from '@fluentui/react';
 import { timesList } from '../Utils/TimeList';
 import { stackComboBox } from '../Styles/ComboBoxStyles';
-import DataverseService from '../Services/DataverseService';
+import { useAppSelector } from '../Store/Hooks';
+import { shallowEqual } from 'react-redux';
 
 export interface IDatePickerProps {
-  entityName: string,
   fieldName: string,
   dateOnly : boolean,
   defaultValue : Date,
@@ -30,9 +30,7 @@ const formatTime = (date? : Date): string => !date ? ''
   });
 // .replace(/([\d]+:[\d]{2})(:[\d]{2})(.*)/, '$1$3');
 
-export const DateTimePicker = ({ entityName, fieldName, dateOnly, defaultValue,
-  _onChange }: IDatePickerProps) => {
-  
+export const DateTimePicker = ({ fieldName, dateOnly, defaultValue, _onChange }: IDatePickerProps) => {
   const left = dateOnly? 0 : '-1px';
   const comboBoxStyles: Partial<IComboBoxStyles> = {
     optionsContainer: { maxHeight: 260},
@@ -47,18 +45,27 @@ export const DateTimePicker = ({ entityName, fieldName, dateOnly, defaultValue,
   const [dateBehavior, setDateBehavior] = React.useState<string>('');
   const datePickerRef = React.useRef<IDatePicker>(null);
 
-  React.useMemo(() => {
-    const dateBehavior = DataverseService.getDateMetadata(entityName, fieldName);
-    setDateBehavior(DataverseService.getDateMetadata(entityName, fieldName));
-    console.log(`default value: ${defaultValue}`);
-    
+  const dates = useAppSelector(state => state.date.dates, shallowEqual);
+
+  React.useEffect(() => {
+    const currentDate = dates.find(date => {return date.fieldName === fieldName});
+    setDateBehavior(currentDate? currentDate.dateBehavior : '');
+    console.log(currentDate);
+  }, [dates]);
+  
+  React.useEffect(() => {
     if (!isNaN(defaultValue.getTime()) && dateBehavior === 'TimeZoneIndependent') {
       const newDate = new Date(defaultValue.getUTCFullYear(), defaultValue.getUTCMonth(), defaultValue.getUTCDate(),
       defaultValue.getUTCHours(), defaultValue.getUTCMinutes(), defaultValue.getUTCSeconds());
       console.log(`UTC: ${newDate}`);
       setValue(newDate);
     }
-  }, [fieldName]);
+  }, [dateBehavior])
+
+  // React.useEffect(() => {
+  //   console.log(`default value: ${defaultValue}`);
+    
+  // }, [fieldName]);
 
   React.useEffect(() => { // set keys for date and time
     if (selectedValue !== undefined && !isNaN(selectedValue.getTime())) {
@@ -72,8 +79,7 @@ export const DateTimePicker = ({ entityName, fieldName, dateOnly, defaultValue,
     else {
       setSelectedKey(undefined);
     }
-  }, [selectedValue],
-  );
+  }, [selectedValue]);
 
   const onParseDateFromString = React.useCallback( // when date is typed
     (newValue: string): Date => {

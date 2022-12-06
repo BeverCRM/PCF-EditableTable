@@ -1,106 +1,46 @@
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
 import { Stack } from '@fluentui/react';
 import * as React from 'react';
-import DataverseService, { _context } from '../Services/DataverseService';
+import { useAppSelector } from '../Store/Hooks';
+import { Lookup as CurrentLookup} from '../Store/Features/LookupSlice';
+import { shallowEqual } from 'react-redux';
 
 export interface ILookupProps {
   fieldName: string;
   defaultValue: string;
   _onChange: any,
-  entityName: any,
-  lookupReference: string
+  lookupReference: string,
 }
 
-class LogicalName {
+export class LogicalName {
   fieldNameRef: string;
   entityNameRef: string;
   entityNavigation?: string;
 }
 
-export const Lookup = ({ fieldName, entityName, lookupReference, defaultValue, _onChange } : ILookupProps) => {
+export const Lookup = ({ fieldName, defaultValue, _onChange } : ILookupProps) => {
   const [options, setOptions] = React.useState<ITag[]>([]);
-  const [selectedOption, setSelectedOption] = React.useState<ITag[] | undefined>();
-  const [entityPluralName, setPluralName] = React.useState<string>('');
-  const [logicalNames, setLogicalNames] = React.useState<LogicalName[]>([]);
-  const [lookupRef, setLookupRef] = React.useState<LogicalName>();
+  const [currentOption, setCurrentOption] = React.useState<ITag[] | undefined>();
+  const [currentLookup, setCurrentLookup] = React.useState<CurrentLookup>();
+  // const [entityPluralName, setPluralName] = React.useState<string>('');
+  // const [lookupRef, setLookupRef] = React.useState<LogicalName>();
 
-  React.useMemo(() => {
-    // if(lookupReference) {
-    //   setLogicalNames([{fieldNameRef: fieldName, entityNameRef: lookupReference }])
-    // } else {
-      setLogicalNames(DataverseService.getRelationships(entityName));
-    // }
-  }, [entityName]);
+  const lookups = useAppSelector(state => state.lookup.lookups, shallowEqual);
+  
+  React.useEffect(() => {
+    const currentLookup = lookups.find(lookup => lookup.logicalName == fieldName);
+    setCurrentLookup(currentLookup);
+    const options = currentLookup ? currentLookup.options : []; 
+    console.log('LOOKUP: ', currentLookup?.logicalName, fieldName, options);
+    setOptions(options);
+  }, [lookups]);
 
   React.useEffect(() => {
-    if (fieldName !== null && fieldName !== undefined) {
-      if (logicalNames.length > 0) {
-        let lookupRef: LogicalName | undefined;
-
-        if(lookupReference){
-          lookupRef = logicalNames.find(
-            (ref: { fieldNameRef: string; entityNameRef: string; entityNavigation?: string }) => {
-              if (ref.entityNameRef === lookupReference) return true;
-          });
-        }
-        else{
-          lookupRef = logicalNames.find(
-          (ref: { fieldNameRef: string; entityNameRef: string; entityNavigation?: string }) => {
-            if (ref.fieldNameRef === fieldName) return true;
-          });
-        }
-        setLookupRef(lookupRef);
-        
-        const lookupLogicalName = lookupRef?.entityNameRef || '';
-        if (lookupLogicalName !== '') {
-          _context.utils.getEntityMetadata(lookupLogicalName).then(metadata => {
-            const lookups: ITag[] = [];
-            setPluralName(metadata.EntitySetName);
-            const entityNameFieldName = metadata.PrimaryNameAttribute;
-            const entityIdFieldName = metadata.PrimaryIdAttribute;
-            // @ts-ignore
-            const clientUrl = `${_context.page.getClientUrl()}/api/data/v9.2/`;
-            // eslint-disable-next-line max-len
-            const request = `${clientUrl}${metadata.EntitySetName}?$select=${entityIdFieldName},${entityNameFieldName}`;
-            const req = new XMLHttpRequest();
-            req.open('GET', request, false);
-            req.setRequestHeader('OData-MaxVersion', '4.0');
-            req.setRequestHeader('OData-Version', '4.0');
-            req.setRequestHeader('Accept', 'application/json');
-            req.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-            req.setRequestHeader('Prefer', 'odata.include-annotations="*"');
-            req.onreadystatechange = function() {
-              if (this.readyState === 4) {
-                req.onreadystatechange = null;
-                if (this.status === 200) {
-                  const results = JSON.parse(this.response);
-                  for (let i = 0; i < results.value.length; i++) {
-                    const name = results.value[i][entityNameFieldName];
-                    const key = results.value[i][entityIdFieldName];
-                    lookups.push({ key, name });
-                  }
-                  setOptions(lookups);
-                }
-                else {
-                  const error = JSON.parse(this.response);
-                  console.log(error.message);
-                }
-              }
-            };
-            req.send();
-          });
-        }
-      }
-    }
-  }, [logicalNames]);
-
-  React.useMemo(() => {
-    if (defaultValue !== undefined && defaultValue !== null) {
+    if (defaultValue !== null) {
       const selectedOption = options.filter(opt => opt.name === defaultValue);
-      setSelectedOption(selectedOption);
+      setCurrentOption(selectedOption);
     }
-  },
-  [options]);
+  }, [options]);
 
   const initialValues = (selectedItems?: ITag[]): ITag[] => {
     console.log(selectedItems);
@@ -110,12 +50,18 @@ export const Lookup = ({ fieldName, entityName, lookupReference, defaultValue, _
     return options;
   };
 
+  const showMoreResults = (filter: string, selectedItems?: ITag[] | undefined) : ITag[] => {
+    console.log(filter, selectedItems);
+    const moreOptions = [...options];
+    return moreOptions; 
+  };
+
   const listContainsTagList = (tag: ITag, tagList?: ITag[]) => {
-    if (!tagList || !tagList.length || tagList.length === 0) {
+    if (!tagList || !tagList.length) {
       return false;
     }
     return tagList.some(compareTag => compareTag.key === tag.key);
-  };
+  };  
 
   const filterSuggestedTags = (filterText: string, selectedItems?: ITag[]): ITag[] => filterText
     ? options.filter(
@@ -125,24 +71,23 @@ export const Lookup = ({ fieldName, entityName, lookupReference, defaultValue, _
     : [];
 
   const onChange = (items?: ITag[] | undefined): void => {
-    setSelectedOption(items);
-    if (items !== undefined) _onChange( lookupRef?.entityNavigation,'lookup',`/${entityPluralName}(${items[0].key})`);
+    setCurrentOption(items);
+    if (items !== undefined) _onChange( currentLookup?.reference?.entityNavigation,'lookup',`/${currentLookup?.entityPluralName}(${items[0].key})`);
     else _onChange('');
   };
 
-  return (
-    <Stack>
+  return <Stack>
       <TagPicker
-        selectedItems={selectedOption}
+        selectedItems={currentOption}
         onChange={onChange}
         onResolveSuggestions={filterSuggestedTags}
         onEmptyResolveSuggestions={initialValues}
         itemLimit={1}
-        pickerSuggestionsProps={{ noResultsFoundText: 'No Results Found' }}
+        pickerSuggestionsProps={{ noResultsFoundText: 'No Results Found', searchForMoreText: 'Search for more' }}
         styles={{text: {minWidth: '30px'}, root: { maxWidth: '300px'}}}
+        onGetMoreResults={showMoreResults}
       />
     </Stack>
-  );
 };
 
 // CSS fix

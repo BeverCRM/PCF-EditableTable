@@ -13,7 +13,7 @@ export const usePagination = (dataset: DataSet) => {
     if (!dataset.paging.hasPreviousPage) {
       setPageSize(dataset.sortedRecordIds.length);
       setCurrentPage(1);
-      setTotalRecords(dataset.sortedRecordIds.length);
+      setTotalRecords(dataset.paging.totalResultCount);
     }
     setFirstItemNumber((currentPage - 1) * pageSize + 1);
     setLastItemNumber((currentPage - 1) * pageSize + dataset.sortedRecordIds.length);
