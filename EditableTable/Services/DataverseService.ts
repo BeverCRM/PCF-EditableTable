@@ -211,6 +211,15 @@ export default {
     return number;
   },
 
+  async getCurrencySymbol(recordId: string): Promise<string> {
+    console.log(recordId);
+
+    const fetchedCurrency = await _context.webAPI.retrieveRecord(_targetEntityType, recordId, '?$select=_transactioncurrencyid_value&$expand=transactioncurrencyid($select=currencysymbol)');
+    console.log(fetchedCurrency);
+
+    return fetchedCurrency.transactioncurrencyid.currencysymbol;
+  },
+
   async getRelationships() {
     const relationships: Relationship[] = [];
     const request = `${_clientUrl}EntityDefinitions(LogicalName='${_targetEntityType}')?$expand=ManyToManyRelationships,ManyToOneRelationships,OneToManyRelationships`;

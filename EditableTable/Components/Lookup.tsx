@@ -72,8 +72,8 @@ export const Lookup = ({ fieldName, defaultValue, _onChange } : ILookupProps) =>
 
   const onChange = (items?: ITag[] | undefined): void => {
     setCurrentOption(items);
-    if (items !== undefined) _onChange( currentLookup?.reference?.entityNavigation,'lookup',`/${currentLookup?.entityPluralName}(${items[0].key})`);
-    else _onChange('');
+    if (items !== undefined && items.length > 0) _onChange( currentLookup?.reference?.entityNavigation,'lookup',`/${currentLookup?.entityPluralName}(${items[0].key})`);
+    else _onChange(currentLookup?.reference?.entityNavigation, '', null);
   };
 
   return <Stack>

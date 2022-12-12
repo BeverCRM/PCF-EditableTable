@@ -9,14 +9,22 @@ export type Number = {
   minValue: number, 
   maxValue: number,
   attributeType: string,
-  selection: string 
+  selection: string,
+  symbol: string | undefined
+}
+
+export type CurrencySymbol = {
+  recordId: string, 
+  symbol: string
 }
 
 interface INumberState {
-  numbers: Number[]
+  numbers: Number[],
+  currencySymbols: CurrencySymbol[]
 }
 const initialState: INumberState = {
-  numbers: []
+  numbers: [],
+  currencySymbols: []
 }
 
 const NumberSlice = createSlice({
@@ -33,6 +41,13 @@ const NumberSlice = createSlice({
     builder.addCase(setNumber.rejected, (state, action) => {
       console.log(state, action);
       state.numbers = [];
+    }),
+    builder.addCase(setCurrencySymbols.fulfilled, (state, action) => {
+      state.currencySymbols = [...action.payload];
+    }),
+    builder.addCase(setCurrencySymbols.rejected, (state, action) => {
+      console.log(action.error);
+      state.currencySymbols = [];
     })
   },
 });
@@ -72,15 +87,26 @@ export const setNumber = createAsyncThunk<Number[], IColumn[], AsyncThunkConfig>
       return {fieldName: number.fieldName, attributeType, selection} as Number;
     });
 
-    let allNumbers = await Promise.all(numbers.map(async number => { let currentNumber = await DataverseService.getNumber(number.fieldName, number.attributeType, number.selection)
+    await Promise.all(numbers.map(async number => { let currentNumber = await DataverseService.getNumber(number.fieldName, number.attributeType, number.selection)
       // number = {fieldName: number.fieldName, attributeType: number.attributeType, selection: number.selection, ...currentNumber}; 
       number = Object.assign(number,currentNumber);
     }));
-    console.log(allNumbers);
     return numbers;
   }   
 );
 
+export const setCurrencySymbols = createAsyncThunk<CurrencySymbol[], string[], AsyncThunkConfig>(
+  'record/setCurrencySymbols', 
+  async (recordIds, thunkApi) => {
+    console.log(recordIds, thunkApi);
+    const currencySymbols: CurrencySymbol[] = [];
+
+    await Promise.all(recordIds.map(async recordId => { let currentSymbol = await DataverseService.getCurrencySymbol(recordId);
+      currencySymbols.push({recordId, symbol: currentSymbol});
+    }));
+    return currencySymbols;
+  }   
+);
 
 // export const { } = NumberSlice.actions;
 

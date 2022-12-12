@@ -15,7 +15,7 @@ import { DateTimePicker } from './DatePicker';
 import { setLogicalNames, setLookups } from '../Store/Features/LookupSlice';
 import { getDropdowns } from '../Store/Features/DropdownSlice';
 import { LookupField } from '../Store/Features/LookupSlice';
-import { setNumber } from '../Store/Features/NumberSlice';
+import { setCurrencySymbols, setNumber } from '../Store/Features/NumberSlice';
 import { getLanguages, getTimeZones } from '../Store/Features/WholeFormatSlice';
 import { WholeFormat } from './WholeFormat';
 import { getDateBehavior } from '../Store/Features/DateSlice';
@@ -138,6 +138,9 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
       if(numberFields.length > 0) {
         console.log(numberFields);
         dispatch(setNumber(numberFields));
+        if(numberFields.some(field => { return field.data === 'Currency' })) {
+          dispatch(setCurrencySymbols(datasetItems.map(item => {return item.key})));       
+        }
         // for currency symbol go to record by id and get transactioncurrencyid field (lookup)
       }
 
@@ -216,7 +219,7 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
 
           case 'Currency':
             return <InputNumber fieldName={column?.fieldName ? column?.fieldName : ''}
-              defaultValue={fieldContent} type={'currency'}
+              defaultValue={fieldContent} type={'currency'} rowId={item.key}
               onNumberChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
 
           case 'FP':
