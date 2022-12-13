@@ -9,6 +9,7 @@ export let _targetEntityType: string;
 export let entityIdFieldName: string;
 export let entityNameFieldName: string;
 export let _clientUrl: string;
+export let _userTimeZoneUtcOffsetMinutes: number
 // type Entity = ComponentFramework.WebApi.Entity;
 
 export default {
@@ -18,6 +19,8 @@ export default {
     // _entityMetadata = context.utils.getEntityMetadata(_targetEntityType);
     //@ts-ignore
     _clientUrl = `${_context.page.getClientUrl()}/api/data/v9.2/`;
+    //@ts-ignore
+    _userTimeZoneUtcOffsetMinutes = _context.client.userTimeZoneUtcOffsetMinutes;
   },
 
   async getTargetEntityDisplayName() {
@@ -162,16 +165,28 @@ export default {
   },
 
   async getLookupOptions(entityName: string, entityIdFieldName: string, entityNameFieldName: string) {
-    const fetchedOptions = await _context.webAPI.retrieveMultipleRecords(entityName, `?$select=${entityIdFieldName},${entityNameFieldName}`);
+    const fetchedOptions = await this.retrieveAllRecords(entityName, `?$select=${entityIdFieldName},${entityNameFieldName}`);
     const options: ITag[] = [];
-    if(fetchedOptions.entities.length > 0) {
-      fetchedOptions.entities.forEach(option => {
+    if(fetchedOptions.length > 0) {
+      fetchedOptions.forEach(option => {
         const name = option[entityNameFieldName];
         const key = option[entityIdFieldName];
         options.push({ key, name });
       })
     }
     return options;
+  },
+
+  async retrieveAllRecords(entityName: string, options: string) {
+    let entities = [];
+    let result = await _context.webAPI.retrieveMultipleRecords(entityName, options);
+    entities.push(...result.entities);
+    while (result.nextLink !== undefined) {
+        options = result.nextLink.slice(result.nextLink.indexOf("?"));
+        result = await _context.webAPI.retrieveMultipleRecords(entityName, options);
+        entities.push(...result.entities);
+    }
+    return entities;
   },
 
   async getDropdownOptions(fieldName: string, attributeType: string, isTwoOptions: boolean ) {
@@ -287,9 +302,9 @@ export default {
     return results.value[0].DateTimeBehavior.Value;
   },
 
-  formatTime(inputDateValue: any) {
-    return _context.formatting.formatTime(inputDateValue, 3);
-  },
+  // formatTime(inputDateValue: any) {
+  //   return _context.formatting.formatTime(inputDateValue, 3);
+  // },
 
   getColumns() {
     //@ts-ignore

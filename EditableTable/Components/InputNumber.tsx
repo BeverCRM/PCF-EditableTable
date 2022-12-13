@@ -47,7 +47,8 @@ export const InputNumber = ({ fieldName,
   const _onChange = (event: React.SyntheticEvent<HTMLElement>, newValue?: string) => {
     console.log(newValue);
     if (newValue !== undefined && newValue !== null) {
-      setVal(currentCurrency?.symbol + parseFloat(newValue).toFixed(currentNumber?.precision));
+      setVal(currentCurrency?.symbol !== undefined ? currentCurrency?.symbol : '' 
+        + parseFloat(newValue).toFixed(currentNumber?.precision));
       onNumberChange(parseFloat(parseFloat(newValue).toFixed(currentNumber?.precision)));
     }
   };
@@ -55,7 +56,7 @@ export const InputNumber = ({ fieldName,
   return (
     <Stack>
       <SpinButton
-        defaultValue={currentCurrency?.symbol + defaultValue}
+        defaultValue={currentCurrency?.symbol !== undefined ? currentCurrency?.symbol : '' + defaultValue}
         min={currentNumber?.minValue}
         max={currentNumber?.maxValue}
         precision={currentNumber?.precision}

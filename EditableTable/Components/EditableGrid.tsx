@@ -60,7 +60,8 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
     };
 
     const deleteRecords = () => {
-      console.log('delete');
+      console.log('delete: ', selectedRecordIds);
+      //when there is new records, the selectedRecordIds is blank
       dispatch(deleteSelectedRecords(selectedRecordIds)).unwrap()
       .then(() => {
         dataset.refresh();

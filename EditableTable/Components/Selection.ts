@@ -10,7 +10,10 @@ export const useSelection = (dataset: DataSet) => {
   const [selectedRecordIds, setSelectedRecordIds] = React.useState<any>([]);
   const [selection] = React.useState(new Selection({
     onSelectionChanged: () => {
-      const recordIds = selection.getSelection().map((item : Entity) => item.key);
+      const recordIds = selection.getSelection().filter((row: Entity) => {
+        return row.key.length > 15
+      }).map((item : Entity) => item.key);
+      
       dataset.setSelectedRecordIds(recordIds);
       setSelectedCount(recordIds.length);
       setSelectedItems(selection.getSelection());
