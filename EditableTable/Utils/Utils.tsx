@@ -2,17 +2,6 @@ import { IDetailsListProps, IDetailsHeaderStyles, CheckboxVisibility,
   IDetailsRowStyles, DetailsHeader, DetailsRow } from '@fluentui/react';
 import * as React from 'react';
 
-//remove
-export function showNoDataMessage() {
-  const messageElement = document.querySelector<HTMLElement>('.ms-SelectionZone')!;
-  if (messageElement) {
-    messageElement.innerHTML = 'No data available';
-    messageElement.style.margin = '50px';
-    messageElement.style.fontSize = '14px';
-    messageElement.style.textAlign = 'center';
-  }
-}
-
 export const _onRenderDetailsHeader: IDetailsListProps['onRenderDetailsHeader'] = props => {
   const customStyles: Partial<IDetailsHeaderStyles> = {};
 
@@ -40,7 +29,7 @@ export const _onRenderRow: IDetailsListProps['onRenderRow'] = props => {
       fontSize: '14px',
       color: 'black',
       borderTop: '1px solid rgb(250, 250, 250)',
-      borderBottom: '1px solid rgb(219 219 219)'
+      borderBottom: '1px solid rgb(219 219 219)',
     };
 
     return <DetailsRow {...props} styles={customStyles} />;

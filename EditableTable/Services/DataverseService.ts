@@ -1,6 +1,6 @@
 import { IInputs } from '../generated/ManifestTypes';
 import { IComboBoxOption, IDropdownOption, ITag } from '@fluentui/react';
-import { Record } from '../Models/Record';
+import { Record } from '../Store/Features/RecordSlice';
 import { Relationship } from '../Store/Features/LookupSlice';
 
 export let _context: ComponentFramework.Context<IInputs>;
@@ -9,7 +9,7 @@ export let _targetEntityType: string;
 export let entityIdFieldName: string;
 export let entityNameFieldName: string;
 export let _clientUrl: string;
-export let _userTimeZoneUtcOffsetMinutes: number
+export let _userTimeZoneUtcOffsetMinutes: number;
 // type Entity = ComponentFramework.WebApi.Entity;
 
 export default {
@@ -17,9 +17,9 @@ export default {
     _context = context;
     _targetEntityType = context.parameters.dataset.getTargetEntityType();
     // _entityMetadata = context.utils.getEntityMetadata(_targetEntityType);
-    //@ts-ignore
+    // @ts-ignore
     _clientUrl = `${_context.page.getClientUrl()}/api/data/v9.2/`;
-    //@ts-ignore
+    // @ts-ignore
     _userTimeZoneUtcOffsetMinutes = _context.client.userTimeZoneUtcOffsetMinutes;
   },
 
@@ -56,36 +56,32 @@ export default {
   async getRelationshipName(schemaName: string) {
     const request = `${_clientUrl}RelationshipDefinitions?$filter=SchemaName eq '${schemaName}'`;
     const result = await this.getResponse(request);
-        
+
     return result.value[0].ReferencingEntityNavigationPropertyName;
   },
 
   async createNewRecord(data: {}): Promise<void> {
     console.log(data);
-    //@ts-ignore
-    const relationshipNameRef = _context.mode._customControlProperties.dynamicData.parameters.dataset.previousDataSetDefinition.RelationshipName;
-    const relationshipName = relationshipNameRef !== null ? await this.getRelationshipName(relationshipNameRef) : relationshipNameRef;
-    //@ts-ignore
+    // @ts-ignore
+    const relationshipNameRef = _context.mode._customControlProperties.dynamicData
+      .parameters.dataset.previousDataSetDefinition.RelationshipName;
+    const relationshipName = relationshipNameRef !== null
+      ? await this.getRelationshipName(relationshipNameRef)
+      : relationshipNameRef;
+    // @ts-ignore
     const parentEntityId = _context.mode.contextInfo.entityId;
-    //@ts-ignore
+    // @ts-ignore
     const parentEntityName = _context.mode.contextInfo.entityTypeName;
 
-    this.getEntitySetName(parentEntityName).then(entitySetName => {
-      //create relation to an entity for related grid records
-      if( relationshipName !== null && parentEntityName !== null && entitySetName !== null ) {
-        data = Object.assign({
-          [`${relationshipName}@odata.bind`] : `/${entitySetName}(${parentEntityId})`
-        }, data);
-        console.log(data);
-      }
-      _context.webAPI.createRecord(_targetEntityType, data).then( (success: any) => {
-        console.log(success); 
-        _context.parameters.dataset.refresh();
-      },
-      (error: any) => {
-        console.log(error);
-      });
-    });
+    const entitySetName = await this.getEntitySetName(parentEntityName);
+    // create relation to an entity for related grid records
+    if (relationshipName !== null && parentEntityName !== null && entitySetName !== null) {
+      data = {
+        ...data,
+        [`${relationshipName}@odata.bind`]: `/${entitySetName}(${parentEntityId})`,
+      };
+    }
+    await _context.webAPI.createRecord(_targetEntityType, data);
   },
 
   async deleteSelectedRecords(recordId: string): Promise<void> {
@@ -102,52 +98,23 @@ export default {
     const confirmStrings = { text: `Do you want to delete this ${entityMetadata._displayName}?
      You can't undo this action.`, title: 'Confirm Deletion' };
     const confirmOptions = { height: 200, width: 450 };
-    let response = await _context.navigation.openConfirmDialog(confirmStrings, confirmOptions);
-    
+    const response = await _context.navigation.openConfirmDialog(confirmStrings, confirmOptions);
+
     return response;
   },
 
   async saveRecords(record: Record): Promise<void> {
-    //change to await 
-    // only creates one record or adds one more
-    
     const data = record.data.reduce((obj, recordData) =>
       Object.assign(obj, recordData.fieldType === 'lookup'
-      ? { [`${recordData.fieldName}@odata.bind`]: recordData.newValue }
-      : { [recordData.fieldName]: recordData.newValue }), {});
-    if(record.id.length < 15 ) {
-      this.createNewRecord(data);
-    } 
+        ? { [`${recordData.fieldName}@odata.bind`]: recordData.newValue }
+        : { [recordData.fieldName]: recordData.newValue }), {});
+    if (record.id.length < 15) {
+      await this.createNewRecord(data);
+    }
     else {
       await _context.webAPI.updateRecord(_targetEntityType, record.id, data);
-      _context.parameters.dataset.refresh();
     }
   },
-
-  // saveRecords(changedRecords: Record[]): void {
-  //   //change to await 
-  //   // only creates one record or adds one more
-    
-  //   changedRecords.forEach(record => {
-  //     const data = record.data.reduce((obj, recordData) =>
-  //     Object.assign(obj, recordData.fieldType === 'lookup'
-  //     ? { [`${recordData.fieldName}@odata.bind`]: recordData.newValue }
-  //     : { [recordData.fieldName]: recordData.newValue }), {});
-  //     if(record.id === '0') {
-  //       this.createNewRecord(data);
-  //     } 
-  //     else {
-  //       _context.webAPI.updateRecord(_targetEntityType, record.id, data).then(
-  //         (success: any) => {
-  //           console.log(success);
-  //           _context.parameters.dataset.refresh();
-  //         },
-  //         (error: any) => {
-  //           console.log(error);
-  //         });
-  //     }
-  //   });
-  // },
 
   onCalloutItemInvoked(item: any): void {
     const entityFormOptions = {
@@ -164,33 +131,36 @@ export default {
       });
   },
 
-  async getLookupOptions(entityName: string, entityIdFieldName: string, entityNameFieldName: string) {
-    const fetchedOptions = await this.retrieveAllRecords(entityName, `?$select=${entityIdFieldName},${entityNameFieldName}`);
+  async getLookupOptions(
+    entityName: string, entityIdFieldName: string, entityNameFieldName: string) {
+
+    const fetchedOptions = await this.retrieveAllRecords(entityName,
+      `?$select=${entityIdFieldName},${entityNameFieldName}`);
     const options: ITag[] = [];
-    if(fetchedOptions.length > 0) {
+    if (fetchedOptions.length > 0) {
       fetchedOptions.forEach(option => {
         const name = option[entityNameFieldName];
         const key = option[entityIdFieldName];
         options.push({ key, name });
-      })
+      });
     }
     return options;
   },
 
   async retrieveAllRecords(entityName: string, options: string) {
-    let entities = [];
+    const entities = [];
     let result = await _context.webAPI.retrieveMultipleRecords(entityName, options);
     entities.push(...result.entities);
     while (result.nextLink !== undefined) {
-        options = result.nextLink.slice(result.nextLink.indexOf("?"));
-        result = await _context.webAPI.retrieveMultipleRecords(entityName, options);
-        entities.push(...result.entities);
+      options = result.nextLink.slice(result.nextLink.indexOf('?'));
+      result = await _context.webAPI.retrieveMultipleRecords(entityName, options);
+      entities.push(...result.entities);
     }
     return entities;
   },
 
-  async getDropdownOptions(fieldName: string, attributeType: string, isTwoOptions: boolean ) {
-    console.log("Target Entity type", _targetEntityType);
+  async getDropdownOptions(fieldName: string, attributeType: string, isTwoOptions: boolean) {
+    // eslint-disable-next-line max-len
     const request = `${_clientUrl}EntityDefinitions(LogicalName='${_targetEntityType}')/Attributes/Microsoft.Dynamics.CRM.${attributeType}?$select=LogicalName&$filter=LogicalName eq '${fieldName}'&$expand=OptionSet`;
     const options: IDropdownOption[] = [];
     const results = await this.getResponse(request);
@@ -212,7 +182,8 @@ export default {
     return options;
   },
 
-  async getNumber(fieldName: string, attributeType: string, selection: string ) {
+  async getNumber(fieldName: string, attributeType: string, selection: string) {
+    // eslint-disable-next-line max-len
     const request = `${_clientUrl}EntityDefinitions(LogicalName='${_targetEntityType}')/Attributes/Microsoft.Dynamics.CRM.${attributeType}?$select=${selection}&$filter=LogicalName eq '${fieldName}'`;
     let number = { precision: 0, minValue: 0, maxValue: 0 };
     const results = await this.getResponse(request);
@@ -227,8 +198,7 @@ export default {
   },
 
   async getCurrencySymbol(recordId: string): Promise<string> {
-    console.log(recordId);
-
+    // eslint-disable-next-line max-len
     const fetchedCurrency = await _context.webAPI.retrieveRecord(_targetEntityType, recordId, '?$select=_transactioncurrencyid_value&$expand=transactioncurrencyid($select=currencysymbol)');
     console.log(fetchedCurrency);
 
@@ -237,6 +207,7 @@ export default {
 
   async getRelationships() {
     const relationships: Relationship[] = [];
+    // eslint-disable-next-line max-len
     const request = `${_clientUrl}EntityDefinitions(LogicalName='${_targetEntityType}')?$expand=ManyToManyRelationships,ManyToOneRelationships,OneToManyRelationships`;
     const results = await this.getResponse(request);
 
@@ -267,7 +238,7 @@ export default {
   async getTimeZones() {
     const request = `${_clientUrl}timezonedefinitions`;
     const results = await this.getResponse(request);
-   
+
     const timezoneList : IComboBoxOption[] = [];
 
     for (let i = 0; i < results.value.length; i++) {
@@ -275,7 +246,7 @@ export default {
       const timezoneName = results.value[i].userinterfacename;
       timezoneList.push({ key: timezoneCode, text: timezoneName });
     }
-       
+
     return timezoneList;
   },
 
@@ -283,7 +254,7 @@ export default {
     const localeLanguageCodes = await _context.webAPI.retrieveMultipleRecords('languagelocale');
     const request = `${_clientUrl}RetrieveProvisionedLanguages`;
     const results = await this.getResponse(request);
-    
+
     const languages : IComboBoxOption[] = [];
 
     for (let i = 0; i < results.RetrieveProvisionedLanguages.length; i++) {
@@ -291,14 +262,15 @@ export default {
       const language = localeLanguageCodes.entities.find(lang => lang.localeid === key);
       languages.push({ key, text: language?.name });
     }
-       
+
     return languages;
   },
 
   async getDateMetadata(fieldName: string) {
+    // eslint-disable-next-line max-len
     const request = `${_clientUrl}EntityDefinitions(LogicalName='${_targetEntityType}')/Attributes/Microsoft.Dynamics.CRM.DateTimeAttributeMetadata?$filter=LogicalName eq '${fieldName}'`;
     const results = await this.getResponse(request);
-    
+
     return results.value[0].DateTimeBehavior.Value;
   },
 
@@ -307,13 +279,14 @@ export default {
   // },
 
   getColumns() {
-    //@ts-ignore
+    // @ts-ignore
+    // eslint-disable-next-line max-len
     return _context.mode._customControlProperties.dynamicData.parameters.dataset.columnsForEmptyDataset;
-  }, 
+  },
 
   getEntityTypeName() {
-    //@ts-ignore
-    return _context.mode._customControlProperties.dynamicData.parameters.dataset.contextToken.parentContextToken.entityTypeName
-  }
-
+    // @ts-ignore
+    // eslint-disable-next-line max-len
+    return _context.mode._customControlProperties.dynamicData.parameters.dataset.contextToken.parentContextToken.entityTypeName;
+  },
 };

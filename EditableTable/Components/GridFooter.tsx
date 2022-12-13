@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IconButton } from '@fluentui/react/lib/Button';
-import { usePagination } from './Pagination';
+import { usePagination } from '../Hooks/Pagination';
 import { BackIcon, footerButtonStyles, footerStyles,
   ForwardIcon, PreviousIcon } from '../Styles/FooterStyles';
 

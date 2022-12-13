@@ -12,11 +12,11 @@ const store = configureStore({
     lookup: lookupReducer,
     dropdown: dropdownReducer,
     number: numberReducer,
-    loading: loadingReducer, 
+    loading: loadingReducer,
     record: recordReducer,
     wholeFormat: wholeFormatReducer,
-    date: dateReducer
-  }
+    date: dateReducer,
+  },
 });
 
 export type RootState = ReturnType<typeof store.getState>;

@@ -20,17 +20,15 @@ export const DropDown =
   const [options, setOptions] = React.useState<IDropdownOption[]>([]);
   const [currentOption, setCurrentOption] = React.useState<string | number | undefined>('');
   const [currentOptions, setCurrentOptions] = React.useState<string[]>([]);
-  
+
   const dropdowns = useAppSelector(state => state.dropdown.dropdowns, shallowEqual);
-  // const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName == fieldName);
-  // const options = currentDropdown ? currentDropdown.options : [];
-  
+
   React.useEffect(() => {
-    const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName == fieldName);
-    setOptions(currentDropdown ? currentDropdown.options : []); 
-    console.log('DROPDOWN: ', currentDropdown?.fieldName, fieldName ,options);
+    const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
+    setOptions(currentDropdown ? currentDropdown.options : []);
+    console.log('DROPDOWN: ', currentDropdown?.fieldName, fieldName, options);
   }, [dropdowns]);
-  
+
   React.useMemo(() => {
     if (!isMultiple) {
       const selectedOption = options.find(opt => opt.text === defaultValue);
@@ -47,7 +45,6 @@ export const DropDown =
       setCurrentOptions(selectedOptions);
     }
   }, [options]);
-
 
   const onSingleOptionChange =
   (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption | undefined) => {
@@ -72,20 +69,20 @@ export const DropDown =
   };
 
   return <Stack>
-      {!isMultiple
-        ? <Dropdown
-          options={options}
-          defaultSelectedKey={currentOption}
-          onChange={onSingleOptionChange}
-          styles={{ dropdown:{maxWidth: '200px'} }}
-        />
-        : <ComboBox
-          options={options}
-          multiSelect
-          selectedKey={currentOptions}
-          onChange={onMultipleOptionChange}
-          styles={{container: { maxWidth: '200px' }}}
-        />
-      }
-    </Stack>
+    {!isMultiple
+      ? <Dropdown
+        options={options}
+        defaultSelectedKey={currentOption}
+        onChange={onSingleOptionChange}
+        styles={{ dropdown: { maxWidth: '200px' } }}
+      />
+      : <ComboBox
+        options={options}
+        multiSelect
+        selectedKey={currentOptions}
+        onChange={onMultipleOptionChange}
+        styles={{ container: { maxWidth: '200px' } }}
+      />
+    }
+  </Stack>;
 };

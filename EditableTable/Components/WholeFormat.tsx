@@ -11,12 +11,12 @@ export interface IWholeFormatProps {
 
 export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProps) => {
   const comboBoxStyles: Partial<IComboBoxStyles> = {
-    optionsContainer: { maxHeight: 260, maxWidth: 300 }, 
-    container: { maxWidth: '200px' }
+    optionsContainer: { maxHeight: 260, maxWidth: 300 },
+    container: { maxWidth: '200px' },
   };
   const [options, setOptions] = React.useState<IComboBoxOption[]>([]);
   const [selectedKey, setSelectedKey] = React.useState<string | number | undefined>('');
-  
+
   let timezoneList : IComboBoxOption[] = [];
   let languages : IComboBoxOption[] = [];
 
@@ -39,7 +39,7 @@ export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProp
         setOptions(languages);
       }
     },
-    [type, languages, timezoneList]
+    [type, languages, timezoneList],
   );
 
   React.useEffect(
@@ -53,7 +53,7 @@ export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProp
         setSelectedKey(selectedOpt?.key);
       }
     },
-    [options]
+    [options],
   );
 
   const onChange = React.useCallback(
@@ -62,7 +62,7 @@ export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProp
       setSelectedKey(key);
       _onChange(key);
     },
-    [defaultValue]
+    [defaultValue],
   );
 
   return (

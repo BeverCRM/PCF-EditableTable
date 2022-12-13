@@ -22,7 +22,7 @@ export const modalStyles = mergeStyleSets({
       alignItems: 'center',
       fontWeight: FontWeights.semilight,
       padding: '12px 12px 14px 24px',
-      margin: '0 2px'
+      margin: '0 2px',
     },
   ],
   body: {
@@ -46,7 +46,7 @@ export const modalStyles = mergeStyleSets({
     width: 270,
     maxHeight: 325,
     fontWeight: FontWeights.regular,
-    margin: '0 2px'
+    margin: '0 2px',
   },
   title: {
     marginBottom: 12,

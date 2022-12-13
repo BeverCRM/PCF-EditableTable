@@ -1,61 +1,45 @@
 import { CommandBarButton } from '@fluentui/react';
 import * as React from 'react';
-import { setLoading } from '../Store/Features/LoadingSlice';
-import { saveRecords } from '../Store/Features/RecordSlice';
-import { useAppDispatch } from '../Store/Hooks';
-// import { saveRecords } from '../Store/Services';
+import { useAppSelector } from '../Store/Hooks';
 import { CommandBarButtonStyles } from '../Styles/DataSetStyles';
 import { addIcon, refreshIcon, deleteIcon, saveIcon } from '../Styles/DataSetStyles';
+import { IIconProps } from '@fluentui/react/lib/components/Icon/Icon.types';
 
 export interface ICommandBarProps {
-  refreshGrid: any;
-  selectedRecordIds: string[];
-  entityName: string;
-  newRow: any;
-  deleteRecords: any
+  refreshButtonHandler: () => void;
+  newButtonHandler: () => void;
+  deleteButtonHandler: () => void;
+  saveButtonHandler: () => void;
 }
-// const dispatch = useDispatch();
 
-export const CommandBar = ({ refreshGrid,
-  newRow, deleteRecords } : ICommandBarProps) => {
-  const isLoading = false; // store.getState().isLoading.loading;
-  const dispatch = useAppDispatch();
-  
-  return (<>
+type ButtonProps = {
+  order: number,
+  text: string,
+  icon: IIconProps,
+  onClick: () => void
+}
+
+export const CommandBar = (props: ICommandBarProps) => {
+  const isLoading = useAppSelector(state => state.loading.isLoading);
+
+  const buttons: ButtonProps[] = [
+    { order: 1, text: 'New', icon: addIcon, onClick: props.newButtonHandler },
+    { order: 2, text: 'Refresh', icon: refreshIcon, onClick: props.refreshButtonHandler },
+    { order: 3, text: 'Delete', icon: deleteIcon, onClick: props.deleteButtonHandler },
+    { order: 4, text: 'Save', icon: saveIcon, onClick: props.saveButtonHandler },
+  ];
+
+  const listButtons = buttons.map(button =>
     <CommandBarButton
-      maxLength={1}
-      disabled = { isLoading }
-      iconProps={addIcon}
+      key={button.order}
+      disabled={isLoading}
+      iconProps={button.icon}
       styles={CommandBarButtonStyles}
-      text={`New`}
-      onClick={() => { dispatch(setLoading(true)); newRow()}} // ;
-    />
-    <CommandBarButton
-      disabled = { isLoading }
-      iconProps={refreshIcon}
-      styles={CommandBarButtonStyles}
-      text='Refresh'
-      onClick={() => { refreshGrid(); }}
-    />
-    <CommandBarButton
-      disabled = { isLoading }
-      iconProps={deleteIcon}
-      styles={CommandBarButtonStyles}
-      text='Delete'
-      onClick={() => { deleteRecords(); }}
-    />
-    <CommandBarButton
-      disabled = { isLoading }
-      iconProps={saveIcon}
-      styles={CommandBarButtonStyles}
-      text='Save'
-      onClick={() => { 
-        dispatch(setLoading(true));
-        dispatch(saveRecords()).unwrap()
-        .then(() => {
-          dispatch(setLoading(false));
-        });
-      }}
-    />
-  </>)
+      text={button.text}
+      onClick={button.onClick}
+    />);
+
+  return <>
+    {listButtons}
+  </>;
 };

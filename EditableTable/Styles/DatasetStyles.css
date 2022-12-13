@@ -9,20 +9,6 @@
   flex-wrap: wrap;
 }
 
-.loading-overlay {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
-  z-index: 1;
-  background-color: #6666664a;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
 .ms-DetailsList {
   z-index: 2;
 }
@@ -81,5 +67,5 @@
   padding: 106px 469px;
   background-color: white;
   opacity: 80%;
-  z-index: 1;
+  z-index: 10;
 }
