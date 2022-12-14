@@ -167,8 +167,10 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
     (item: any, index: number | undefined, column: IColumn | undefined) => {
       const fieldContent = item[column?.fieldName as keyof any] as any;
       const fieldKey = item.raw?._record?.fields[column?.fieldName as keyof any]?.value;
-      const lookupRecord = item.raw?.getValue(column?.fieldName!);
-      const lookupReference = lookupRecord?.etn;
+      const currentRecord = item[column?.fieldName!] === '' || item[column?.fieldName!] === null
+        ? '' : item?.raw?.getValue(column?.fieldName!);
+
+      const lookupReference = currentRecord?.etn;
 
       if (column !== undefined && fieldContent !== undefined) {
         switch (column.data) {
@@ -199,7 +201,7 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
 
           case 'Lookup.Simple':
             return <Lookup fieldName={column?.fieldName ? column?.fieldName : ''}
-              defaultValue={lookupRecord?.id?.guid}
+              defaultValue={currentRecord?.id?.guid}
               _onChange={changedValue.bind('', item.key)}
               lookupReference={lookupReference} />;
 
@@ -251,7 +253,7 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
               _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
 
           case 'Whole.TimeZone':
-            return <WholeFormat defaultValue={fieldContent} type={'timezone'}
+            return <WholeFormat defaultValue={fieldKey} type={'timezone'}
               _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
 
           default:

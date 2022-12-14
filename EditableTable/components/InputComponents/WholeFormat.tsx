@@ -44,14 +44,8 @@ export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProp
 
   React.useEffect(
     () => {
-      if (type === 'timezone') {
-        const selectedOpt = options.find(opt => opt.text === defaultValue);
-        setSelectedKey(selectedOpt?.key);
-      }
-      else {
-        const selectedOpt = options.find(opt => opt.key === defaultValue);
-        setSelectedKey(selectedOpt?.key);
-      }
+      const selectedOpt = options.find(opt => opt.key === defaultValue);
+      setSelectedKey(selectedOpt?.key);
     },
     [options],
   );
