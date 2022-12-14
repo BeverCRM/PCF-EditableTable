@@ -2,7 +2,7 @@ import * as React from 'react';
 import { DatePicker, IDatePicker, mergeStyleSets,
   defaultDatePickerStrings } from '@fluentui/react';
 import { ComboBox, IComboBox, IComboBoxOption, IComboBoxStyles, Stack } from '@fluentui/react';
-import { timesList } from '../../utils/TimeList';
+import { timesList } from './timeList';
 import { stackComboBox } from '../../styles/ComboBoxStyles';
 import { useAppSelector } from '../../store/hooks';
 import { shallowEqual } from 'react-redux';
@@ -30,7 +30,7 @@ const formatTime = (date? : Date): string => !date ? ''
   });
 // .replace(/([\d]+:[\d]{2})(:[\d]{2})(.*)/, '$1$3');
 
-export const DateTimePicker = (
+export const DateTimeFormat = (
   { fieldName, dateOnly, defaultValue, _onChange }: IDatePickerProps) => {
   const left = dateOnly ? 0 : '-1px';
   const comboBoxStyles: Partial<IComboBoxStyles> = {

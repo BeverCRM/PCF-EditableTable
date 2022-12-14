@@ -18,7 +18,7 @@ export type LogicalName = {
   entityNavigation?: string;
 }
 
-export const Lookup = ({ fieldName, defaultValue, _onChange } : ILookupProps) => {
+export const LookupFormat = ({ fieldName, defaultValue, _onChange } : ILookupProps) => {
   const [options, setOptions] = React.useState<ITag[]>([]);
   const [currentOption, setCurrentOption] = React.useState<ITag[] | undefined>();
   const [currentLookup, setCurrentLookup] = React.useState<CurrentLookup>();

@@ -30,7 +30,7 @@ export const saveRecords = createAsyncThunk<void, undefined, AsyncThunkConfig>(
   'record/saveRecords',
   async (a, thunkApi) => {
     const recordsToSave = thunkApi.getState().record.changedRecords;
-    await Promise.all(recordsToSave.map(record => DataverseService.saveRecords(record)));
+    await Promise.all(recordsToSave.map(record => DataverseService.saveRecord(record)));
   },
 );
 
@@ -40,7 +40,7 @@ export const deleteSelectedRecords = createAsyncThunk<Array<string>, any, AsyncT
     const response = await DataverseService.openRecordDeleteDialog();
     if (response.confirmed) {
       await Promise.all(selectedRecordIds.map(async (id: string) => {
-        await DataverseService.deleteSelectedRecords(id);
+        await DataverseService.deleteRecord(id);
       }));
     }
     else {

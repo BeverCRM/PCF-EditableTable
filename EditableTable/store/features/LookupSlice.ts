@@ -1,7 +1,7 @@
 // import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IColumn, ITag } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import DataverseService, { _context } from '../../services/DataverseService';
+import DataverseService from '../../services/DataverseService';
 import { RootState } from '../store';
 
 export type LookupField = {
@@ -71,14 +71,8 @@ export const setLookups = createAsyncThunk<Lookup[], LookupField[], AsyncThunkCo
 
     await Promise.all(lookups.map(async lookup => {
       const entityName = lookup.reference ? lookup.reference.entityNameRef : '';
-      const metadata = await _context.utils.getEntityMetadata(entityName);
-      const entityNameFieldName = metadata.PrimaryNameAttribute;
-      const entityIdFieldName = metadata.PrimaryIdAttribute;
-      lookup.entityPluralName = metadata.EntitySetName;
-      const options = await DataverseService.getLookupOptions(
-        entityName,
-        entityIdFieldName,
-        entityNameFieldName);
+      lookup.entityPluralName = await DataverseService.getEntityPluralName(entityName);
+      const options = await DataverseService.getLookupOptions(entityName);
       lookup.options = [...options];
     }));
     console.log(lookups);

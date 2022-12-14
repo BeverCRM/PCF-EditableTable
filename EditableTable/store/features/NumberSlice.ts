@@ -1,16 +1,12 @@
 import { IColumn } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import DataverseService from '../../services/DataverseService';
-import { RootState } from '../store';
 
-export type Number = {
+export type NumberFieldMetadata = {
   fieldName: string,
   precision: number,
   minValue: number,
   maxValue: number,
-  attributeType: string,
-  selection: string,
-  symbol: string | undefined
 }
 
 export type CurrencySymbol = {
@@ -19,27 +15,22 @@ export type CurrencySymbol = {
 }
 
 interface INumberState {
-  numbers: Number[],
+  numberFieldsMetadata: NumberFieldMetadata[],
   currencySymbols: CurrencySymbol[]
 }
 
 const initialState: INumberState = {
-  numbers: [],
+  numberFieldsMetadata: [],
   currencySymbols: [],
 };
 
-type AsyncThunkConfig = {
-  state: RootState
-};
+export const getNumberFieldsMetadata = createAsyncThunk<NumberFieldMetadata[], IColumn[]>(
+  'record/getNumberFieldsMetadata',
+  async numberFields =>
+    await Promise.all(numberFields.map(async numberField => {
+      let attributeType, selection: string;
 
-export const setNumber = createAsyncThunk<Number[], IColumn[], AsyncThunkConfig>(
-  'record/setNumber',
-  async (numberFields, thunkApi) => {
-    console.log(numberFields, thunkApi);
-    const numbers = numberFields.map(number => {
-      let attributeType, selection : string;
-
-      switch (number.data) {
+      switch (numberField.data) {
         case 'Currency':
           attributeType = 'MoneyAttributeMetadata';
           selection = 'PrecisionSource,MaxValue,MinValue';
@@ -60,54 +51,43 @@ export const setNumber = createAsyncThunk<Number[], IColumn[], AsyncThunkConfig>
           selection = 'MaxValue,MinValue';
       }
 
-      return { fieldName: number.fieldName, attributeType, selection } as Number;
-    });
-
-    await Promise.all(
-      numbers.map(async number => {
-        const currentNumber = await DataverseService.getNumber(
-          number.fieldName,
-          number.attributeType,
-          number.selection);
-        number = Object.assign(number, currentNumber);
-      }));
-
-    return numbers;
-  },
+      const currentNumber = await DataverseService.getNumberFieldMetadata(
+        numberField.fieldName!,
+        attributeType,
+        selection);
+      return <NumberFieldMetadata>currentNumber;
+    })),
 );
 
-export const setCurrencySymbols = createAsyncThunk<CurrencySymbol[], string[], AsyncThunkConfig>(
+export const getCurrencySymbols = createAsyncThunk<CurrencySymbol[], string[]>(
   'record/setCurrencySymbols',
-  async recordIds => {
-    const currencySymbols: CurrencySymbol[] = [];
-
-    await Promise.all(
-      recordIds.map(async recordId => {
-        const currentSymbol = await DataverseService.getCurrencySymbol(recordId);
-        currencySymbols.push({ recordId, symbol: currentSymbol });
-      }));
-    return currencySymbols;
-  },
+  async recordIds =>
+    await Promise.all(recordIds.map(async recordId => {
+      const currentSymbol = await DataverseService.getCurrencySymbol(recordId);
+      return {
+        recordId,
+        symbol: currentSymbol,
+      };
+    })),
 );
 
 const NumberSlice = createSlice({
   name: 'number',
   initialState,
-  reducers: {
-  },
+  reducers: {},
   extraReducers(builder) {
-    builder.addCase(setNumber.fulfilled, (state, action) => {
-      state.numbers = [...action.payload];
-      console.table(state.numbers);
+    builder.addCase(getNumberFieldsMetadata.fulfilled, (state, action) => {
+      state.numberFieldsMetadata = [...action.payload];
+      console.table(state.numberFieldsMetadata);
     });
-    builder.addCase(setNumber.rejected, (state, action) => {
+    builder.addCase(getNumberFieldsMetadata.rejected, (state, action) => {
       console.log(state, action);
-      state.numbers = [];
+      state.numberFieldsMetadata = [];
     });
-    builder.addCase(setCurrencySymbols.fulfilled, (state, action) => {
+    builder.addCase(getCurrencySymbols.fulfilled, (state, action) => {
       state.currencySymbols = [...action.payload];
     });
-    builder.addCase(setCurrencySymbols.rejected, (state, action) => {
+    builder.addCase(getCurrencySymbols.rejected, (state, action) => {
       console.log(action.error);
       state.currencySymbols = [];
     });

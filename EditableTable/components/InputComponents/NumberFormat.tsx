@@ -1,7 +1,6 @@
 import { ISpinButtonStyles, SpinButton, Stack } from '@fluentui/react';
 import * as React from 'react';
-import { shallowEqual } from 'react-redux';
-import { CurrencySymbol, Number } from '../../store/features/NumberSlice';
+import { CurrencySymbol, NumberFieldMetadata } from '../../store/features/NumberSlice';
 import { useAppSelector } from '../../store/hooks';
 
 export interface IInputNumberProps {
@@ -12,7 +11,7 @@ export interface IInputNumberProps {
   onNumberChange: any
 }
 
-export const InputNumber = ({ fieldName,
+export const NumberFormat = ({ fieldName,
   defaultValue, rowId, onNumberChange } : IInputNumberProps) => {
   const styles: Partial<ISpinButtonStyles> = {
     arrowButtonsContainer: {
@@ -22,13 +21,12 @@ export const InputNumber = ({ fieldName,
       maxWidth: '150px',
     },
   };
-  const [val, setVal] = React.useState<string>(defaultValue);
-  const [currentNumber, setCurrentNumber] = React.useState<Number>();
+  const [val, setVal] = React.useState(defaultValue);
+  const [currentNumber, setCurrentNumber] = React.useState<NumberFieldMetadata>();
   const [currentCurrency, setCurrentCurrency] = React.useState<CurrencySymbol>();
 
-  const numbers: Number[] = useAppSelector(state => state.number.numbers, shallowEqual);
-  const currencySymbols: CurrencySymbol[] =
-    useAppSelector(state => state.number.currencySymbols, shallowEqual);
+  const numbers = useAppSelector(state => state.number.numberFieldsMetadata);
+  const currencySymbols = useAppSelector(state => state.number.currencySymbols);
 
   React.useEffect(() => {
     const number = numbers.find(num => num.fieldName === fieldName);

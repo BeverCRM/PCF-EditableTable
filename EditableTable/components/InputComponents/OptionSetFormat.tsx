@@ -12,7 +12,7 @@ export interface IDropDownProps {
   onOptionChange: any
 }
 
-export const DropDown =
+export const OptionSetFormat =
 ({ fieldName, defaultValue, isMultiple,
   isTwoOptions, onOptionChange } : IDropDownProps) => {
   const [options, setOptions] = React.useState<IDropdownOption[]>([]);

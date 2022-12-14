@@ -1,7 +1,7 @@
-import { ComboBox, IComboBox, IComboBoxOption, IComboBoxStyles, Stack } from '@fluentui/react';
+import { ComboBox, IComboBox, IComboBoxOption, Stack } from '@fluentui/react';
 import * as React from 'react';
 import { useAppSelector } from '../../store/hooks';
-import { durationList } from '../../utils/DurationList';
+import { durationList } from './durationList';
 
 export interface IWholeFormatProps {
   defaultValue: string;
@@ -10,54 +10,33 @@ export interface IWholeFormatProps {
 }
 
 export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProps) => {
-  const comboBoxStyles: Partial<IComboBoxStyles> = {
-    optionsContainer: { maxHeight: 260, maxWidth: 300 },
-    container: { maxWidth: '200px' },
-  };
-  const [options, setOptions] = React.useState<IComboBoxOption[]>([]);
   const [selectedKey, setSelectedKey] = React.useState<string | number | undefined>('');
+  const timezones = useAppSelector(state => state.wholeFormat.timezones);
+  const lagnauges = useAppSelector(state => state.wholeFormat.languages);
 
-  let timezoneList : IComboBoxOption[] = [];
-  let languages : IComboBoxOption[] = [];
+  let options: IComboBoxOption[] = [];
+  switch (type) {
+    case 'timezone':
+      options = timezones;
+      break;
 
-  if (type === 'timezone') {
-    timezoneList = useAppSelector(state => state.wholeFormat.timezones);
+    case 'language':
+      options = lagnauges;
+      break;
+
+    case 'duration':
+      options = durationList;
+      break;
   }
-  if (type === 'language') {
-    languages = useAppSelector(state => state.wholeFormat.languages);
-  }
 
-  React.useEffect(
-    () => {
-      if (type === 'duration') {
-        setOptions(durationList);
-      }
-      if (type === 'timezone') {
-        setOptions(timezoneList);
-      }
-      if (type === 'language') {
-        setOptions(languages);
-      }
-    },
-    [type, languages, timezoneList],
-  );
+  const selectedOption = options.find(opt => opt.key === defaultValue);
+  setSelectedKey(selectedOption?.key);
 
-  React.useEffect(
-    () => {
-      const selectedOpt = options.find(opt => opt.key === defaultValue);
-      setSelectedKey(selectedOpt?.key);
-    },
-    [options],
-  );
-
-  const onChange = React.useCallback(
-    (event: React.FormEvent<IComboBox>, option?: IComboBoxOption): void => {
-      const key = option?.key;
-      setSelectedKey(key);
-      _onChange(key);
-    },
-    [defaultValue],
-  );
+  const onChange = (event: React.FormEvent<IComboBox>, option?: IComboBoxOption): void => {
+    const key = option?.key;
+    setSelectedKey(key);
+    _onChange(key);
+  };
 
   return (
     <Stack>
@@ -65,7 +44,15 @@ export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProp
         options={options}
         onChange={onChange}
         selectedKey={selectedKey}
-        styles={comboBoxStyles}
+        styles={{
+          optionsContainer: {
+            maxHeight: 260,
+            maxWidth: 300,
+          },
+          container: {
+            maxWidth: 200,
+          },
+        }}
       />
     </Stack>
   );
