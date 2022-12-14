@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IconButton } from '@fluentui/react/lib/Button';
-import { usePagination } from '../../hooks/Pagination';
+import { usePagination } from '../../hooks/usePagination';
 import { BackIcon, footerButtonStyles, footerStyles,
   ForwardIcon, PreviousIcon } from '../../styles/FooterStyles';
 
@@ -11,58 +11,46 @@ export interface IGridFooterProps {
     selectedCount: number;
 }
 
-// type IconButtonProps = {
-//   order: number,
-//   icon: IIconProps,
-//   onClick: () => void,
-//   disabled: boolean
-// }
-
 export const GridFooter = ({ dataset, selectedCount } : IGridFooterProps) => {
   const {
+    totalRecords,
     currentPage,
+    hasPreviousPage,
+    hasNextPage,
     firstItemNumber,
     lastItemNumber,
-    totalRecords,
     moveToFirst,
     movePrevious,
     moveNext,
   } = usePagination(dataset);
 
-  const { hasPreviousPage } = dataset.paging;
-  const { hasNextPage } = dataset.paging;
-
   const selected = `${firstItemNumber} - ${lastItemNumber} of ${totalRecords}
     ${selectedCount !== 0 ? `(${selectedCount} Selected)` : ''}`;
-  const page = `Page ${currentPage}`;
 
-  // const buttons: IconButtonProps[] = [
-  //   { order: 1, icon: PreviousIcon, onClick: moveToFirst, disabled: !hasPreviousPage },
-  //   { order: 2, icon: BackIcon, onClick: movePrevious, disabled: !hasPreviousPage },
-  //   { order: 3, icon: ForwardIcon, onClick: moveNext, disabled: !hasNextPage },
-  // ];
-
-  // const listButtons = buttons.map(button =>
-  //   <IconButton
-  //     key={button.order}
-  //     styles = {footerButtonStyles}
-  //     iconProps={button.icon}
-  //     onClick={button.onClick}
-  //     disabled={button.disabled}
-  //   />);
-
-  return <div>
+  return (
     <div className={footerStyles.content}>
-      <span > {selected} </span>
+      <span>{selected}</span>
       <div>
-        <IconButton styles = {footerButtonStyles} iconProps={PreviousIcon}
-          onClick={moveToFirst} disabled={!hasPreviousPage}/>
-        <IconButton styles = {footerButtonStyles} iconProps={BackIcon}
-          onClick={movePrevious} disabled={!hasPreviousPage}/>
-        <span> {page} </span>
-        <IconButton styles = {footerButtonStyles} iconProps={ForwardIcon}
-          onClick={moveNext} disabled={!hasNextPage}/>
+        <IconButton
+          styles={footerButtonStyles}
+          iconProps={PreviousIcon}
+          onClick={moveToFirst}
+          disabled={!hasPreviousPage}
+        />
+        <IconButton
+          styles={footerButtonStyles}
+          iconProps={BackIcon}
+          onClick={movePrevious}
+          disabled={!hasPreviousPage}
+        />
+        <span>Page {currentPage}</span>
+        <IconButton
+          styles={footerButtonStyles}
+          iconProps={ForwardIcon}
+          onClick={moveNext}
+          disabled={!hasNextPage}
+        />
       </div>
     </div>
-  </div>;
+  );
 };

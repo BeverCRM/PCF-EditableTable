@@ -8,7 +8,7 @@ import {
   Stack,
   TextField,
 } from '@fluentui/react';
-import { useSelection } from '../../hooks/Selection';
+import { useSelection } from '../../hooks/useSelection';
 import { dataSetStyles } from '../../styles/DataSetStyles';
 import { _onRenderDetailsHeader, _onRenderRow } from '../../utils/Utils';
 import { CommandBar } from './CommandBar';
@@ -45,7 +45,7 @@ export interface IDataSetProps {
 
 export const EditableGrid = ({ dataset, targetEntityType, height, width }: IDataSetProps) => {
   const [items, setItems] = React.useState<any[]>([]);
-  const { selection, selectedRecordIds, onItemInvoked } = useSelection(dataset);
+  const { selection, selectedRecordIds } = useSelection(dataset);
   const listRef = React.useRef<IDetailsList>(null);
 
   const dispatch = useAppDispatch();
@@ -167,8 +167,8 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
     (item: any, index: number | undefined, column: IColumn | undefined) => {
       const fieldContent = item[column?.fieldName as keyof any] as any;
       const fieldKey = item.raw?._record?.fields[column?.fieldName as keyof any]?.value;
-      const lookupRecord = item.raw.getValue(column?.fieldName!);
-      const lookupReference = lookupRecord.etn;
+      const lookupRecord = item.raw?.getValue(column?.fieldName!);
+      const lookupReference = lookupRecord?.etn;
 
       if (column !== undefined && fieldContent !== undefined) {
         switch (column.data) {
@@ -199,7 +199,7 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
 
           case 'Lookup.Simple':
             return <Lookup fieldName={column?.fieldName ? column?.fieldName : ''}
-              defaultValue={lookupRecord.id.guid}
+              defaultValue={lookupRecord?.id?.guid}
               _onChange={changedValue.bind('', item.key)}
               lookupReference={lookupReference} />;
 
@@ -281,7 +281,6 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
         items={items}
         columns={columns}
         onRenderItemColumn={_renderItemColumn}
-        onItemInvoked={onItemInvoked}
         selection={selection}
         onRenderRow={_onRenderRow}
         onRenderDetailsHeader={_onRenderDetailsHeader}
