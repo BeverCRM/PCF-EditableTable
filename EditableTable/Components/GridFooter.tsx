@@ -11,6 +11,13 @@ export interface IGridFooterProps {
     selectedCount: number;
 }
 
+// type IconButtonProps = {
+//   order: number,
+//   icon: IIconProps,
+//   onClick: () => void,
+//   disabled: boolean
+// }
+
 export const GridFooter = ({ dataset, selectedCount } : IGridFooterProps) => {
   const {
     currentPage,
@@ -28,6 +35,21 @@ export const GridFooter = ({ dataset, selectedCount } : IGridFooterProps) => {
   const selected = `${firstItemNumber} - ${lastItemNumber} of ${totalRecords}
     ${selectedCount !== 0 ? `(${selectedCount} Selected)` : ''}`;
   const page = `Page ${currentPage}`;
+
+  // const buttons: IconButtonProps[] = [
+  //   { order: 1, icon: PreviousIcon, onClick: moveToFirst, disabled: !hasPreviousPage },
+  //   { order: 2, icon: BackIcon, onClick: movePrevious, disabled: !hasPreviousPage },
+  //   { order: 3, icon: ForwardIcon, onClick: moveNext, disabled: !hasNextPage },
+  // ];
+
+  // const listButtons = buttons.map(button =>
+  //   <IconButton
+  //     key={button.order}
+  //     styles = {footerButtonStyles}
+  //     iconProps={button.icon}
+  //     onClick={button.onClick}
+  //     disabled={button.disabled}
+  //   />);
 
   return <div>
     <div className={footerStyles.content}>

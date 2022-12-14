@@ -12,7 +12,7 @@ export interface ILookupProps {
   lookupReference: string,
 }
 
-export class LogicalName {
+export type LogicalName = {
   fieldNameRef: string;
   entityNameRef: string;
   entityNavigation?: string;
@@ -36,7 +36,7 @@ export const Lookup = ({ fieldName, defaultValue, _onChange } : ILookupProps) =>
 
   React.useEffect(() => {
     if (defaultValue !== null) {
-      const selectedOption = options.filter(opt => opt.name === defaultValue);
+      const selectedOption = options.filter(opt => opt.key === defaultValue);
       setCurrentOption(selectedOption);
     }
   }, [options]);

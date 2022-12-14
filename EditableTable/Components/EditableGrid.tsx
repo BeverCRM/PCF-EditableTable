@@ -167,7 +167,8 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
     (item: any, index: number | undefined, column: IColumn | undefined) => {
       const fieldContent = item[column?.fieldName as keyof any] as any;
       const fieldKey = item.raw?._record?.fields[column?.fieldName as keyof any]?.value;
-      const lookupReference = item.raw?._record?.fields[column?.fieldName!]?.reference?.etn;
+      const lookupRecord = item.raw.getValue(column?.fieldName!);
+      const lookupReference = lookupRecord.etn;
 
       if (column !== undefined && fieldContent !== undefined) {
         switch (column.data) {
@@ -198,7 +199,7 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
 
           case 'Lookup.Simple':
             return <Lookup fieldName={column?.fieldName ? column?.fieldName : ''}
-              defaultValue={fieldContent}
+              defaultValue={lookupRecord.id.guid}
               _onChange={changedValue.bind('', item.key)}
               lookupReference={lookupReference} />;
 
@@ -289,6 +290,7 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
         componentRef={listRef}
         styles={{ contentWrapper: { padding: items.length === 0 ? '50px' : '0' } }}
         onRowDidMount={(item?: any, index?: any) => {
+          console.log(item);
           if (index === (items.length - 1)) dispatch(setLoading(false));
         }}
       >

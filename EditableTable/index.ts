@@ -6,6 +6,7 @@ import { Wrapper } from './Components/AppWrapper';
 
 export class EditableTable implements ComponentFramework.ReactControl<IInputs, IOutputs> {
   private notifyOutputChanged: () => void;
+
   private context: ComponentFramework.Context<IInputs>;
 
   constructor() { }
