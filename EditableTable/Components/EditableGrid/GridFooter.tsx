@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { IconButton } from '@fluentui/react/lib/Button';
-import { usePagination } from '../Hooks/Pagination';
+import { usePagination } from '../../hooks/Pagination';
 import { BackIcon, footerButtonStyles, footerStyles,
-  ForwardIcon, PreviousIcon } from '../Styles/FooterStyles';
+  ForwardIcon, PreviousIcon } from '../../styles/FooterStyles';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 

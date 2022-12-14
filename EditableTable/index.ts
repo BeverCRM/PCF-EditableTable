@@ -1,12 +1,11 @@
 import { IInputs, IOutputs } from './generated/ManifestTypes';
 import * as React from 'react';
-import DataverseService from './Services/DataverseService';
-import { IDataSetProps } from './Components/EditableGrid';
-import { Wrapper } from './Components/AppWrapper';
+import DataverseService from './services/DataverseService';
+import { IDataSetProps } from './components/EditableGrid/EditableGrid';
+import { Wrapper } from './components/AppWrapper';
 
 export class EditableTable implements ComponentFramework.ReactControl<IInputs, IOutputs> {
   private notifyOutputChanged: () => void;
-
   private context: ComponentFramework.Context<IInputs>;
 
   constructor() { }

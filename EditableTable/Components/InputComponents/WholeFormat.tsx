@@ -1,7 +1,7 @@
 import { ComboBox, IComboBox, IComboBoxOption, IComboBoxStyles, Stack } from '@fluentui/react';
 import * as React from 'react';
-import { useAppSelector } from '../Store/Hooks';
-import { durationList } from '../Utils/DurationList';
+import { useAppSelector } from '../../store/hooks';
+import { durationList } from '../../utils/DurationList';
 
 export interface IWholeFormatProps {
   defaultValue: string;

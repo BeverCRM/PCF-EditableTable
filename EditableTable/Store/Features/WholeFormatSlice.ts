@@ -1,6 +1,6 @@
 import { IComboBoxOption } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import DataverseService from '../../Services/DataverseService';
+import DataverseService from '../../services/DataverseService';
 
 interface IWholeFormatState {
   timezones: IComboBoxOption[];

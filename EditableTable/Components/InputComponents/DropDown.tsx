@@ -2,9 +2,7 @@ import { Dropdown, IDropdownOption, Stack } from '@fluentui/react';
 import { ComboBox, IComboBox, IComboBoxOption } from '@fluentui/react';
 import * as React from 'react';
 import { shallowEqual } from 'react-redux';
-// import { shallowEqual } from 'react-redux';
-import { useAppSelector } from '../Store/Hooks';
-// import { useAppSelector } from '../Store/Hooks';
+import { useAppSelector } from '../../store/hooks';
 
 export interface IDropDownProps {
   fieldName: string | undefined;

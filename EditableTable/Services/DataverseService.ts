@@ -1,7 +1,7 @@
 import { IInputs } from '../generated/ManifestTypes';
 import { IComboBoxOption, IDropdownOption, ITag } from '@fluentui/react';
-import { Record } from '../Store/Features/RecordSlice';
-import { Relationship } from '../Store/Features/LookupSlice';
+import { Record } from '../store/features/RecordSlice';
+import { Relationship } from '../store/features/LookupSlice';
 
 export let _context: ComponentFramework.Context<IInputs>;
 export let _targetEntityType: string;

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Provider } from 'react-redux';
-import store from '../Store/Store';
-import { EditableGrid, IDataSetProps } from './EditableGrid';
+import store from '../store/store';
+import { EditableGrid, IDataSetProps } from './EditableGrid/EditableGrid';
 import { Loading } from './Loading';
 
 export const Wrapper = (props: IDataSetProps) =>

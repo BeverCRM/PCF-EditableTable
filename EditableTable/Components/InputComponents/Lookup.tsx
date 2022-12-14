@@ -1,8 +1,8 @@
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
 import { Stack } from '@fluentui/react';
 import * as React from 'react';
-import { useAppSelector } from '../Store/Hooks';
-import { Lookup as CurrentLookup } from '../Store/Features/LookupSlice';
+import { useAppSelector } from '../../store/hooks';
+import { Lookup as CurrentLookup } from '../../store/features/LookupSlice';
 import { shallowEqual } from 'react-redux';
 
 export interface ILookupProps {

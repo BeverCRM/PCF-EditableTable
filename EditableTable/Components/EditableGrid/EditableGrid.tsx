@@ -8,31 +8,31 @@ import {
   Stack,
   TextField,
 } from '@fluentui/react';
-import { useSelection } from '../Hooks/Selection';
-import { dataSetStyles } from '../Styles/DataSetStyles';
-import { _onRenderDetailsHeader, _onRenderRow } from '../Utils/Utils';
+import { useSelection } from '../../hooks/Selection';
+import { dataSetStyles } from '../../styles/DataSetStyles';
+import { _onRenderDetailsHeader, _onRenderRow } from '../../utils/Utils';
 import { CommandBar } from './CommandBar';
-import DataverseService from '../Services/DataverseService';
+import DataverseService from '../../services/DataverseService';
 import { GridFooter } from './GridFooter';
-import { useAppDispatch } from '../Store/Hooks';
+import { useAppDispatch } from '../../store/hooks';
 import {
   deleteSelectedRecords,
   setChangedRecords,
   saveRecords,
-} from '../Store/Features/RecordSlice';
-import { Lookup } from './Lookup';
-import { InputNumber } from './InputNumber';
-import { DropDown } from './DropDown';
-import { DateTimePicker } from './DatePicker';
-import { setLogicalNames, setLookups } from '../Store/Features/LookupSlice';
-import { getDropdowns } from '../Store/Features/DropdownSlice';
-import { LookupField } from '../Store/Features/LookupSlice';
-import { setCurrencySymbols, setNumber } from '../Store/Features/NumberSlice';
-import { getLanguages, getTimeZones } from '../Store/Features/WholeFormatSlice';
-import { WholeFormat } from './WholeFormat';
-import { getDateBehavior } from '../Store/Features/DateSlice';
-import { setLoading } from '../Store/Features/LoadingSlice';
-import { mapDataSetColumns, mapDataSetItems } from '../Mappers/dataSetMapper';
+} from '../../store/features/RecordSlice';
+import { Lookup } from '../InputComponents/Lookup';
+import { InputNumber } from '../InputComponents/InputNumber';
+import { DropDown } from '../InputComponents/DropDown';
+import { DateTimePicker } from '../InputComponents/DatePicker';
+import { setLogicalNames, setLookups } from '../../store/features/LookupSlice';
+import { getDropdowns } from '../../store/features/DropdownSlice';
+import { LookupField } from '../../store/features/LookupSlice';
+import { setCurrencySymbols, setNumber } from '../../store/features/NumberSlice';
+import { getLanguages, getTimeZones } from '../../store/features/WholeFormatSlice';
+import { WholeFormat } from '../InputComponents/WholeFormat';
+import { getDateBehavior } from '../../store/features/DateSlice';
+import { setLoading } from '../../store/features/LoadingSlice';
+import { mapDataSetColumns, mapDataSetItems } from '../../mappers/dataSetMapper';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 

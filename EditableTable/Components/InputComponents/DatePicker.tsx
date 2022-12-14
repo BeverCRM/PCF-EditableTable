@@ -2,9 +2,9 @@ import * as React from 'react';
 import { DatePicker, IDatePicker, mergeStyleSets,
   defaultDatePickerStrings } from '@fluentui/react';
 import { ComboBox, IComboBox, IComboBoxOption, IComboBoxStyles, Stack } from '@fluentui/react';
-import { timesList } from '../Utils/TimeList';
-import { stackComboBox } from '../Styles/ComboBoxStyles';
-import { useAppSelector } from '../Store/Hooks';
+import { timesList } from '../../utils/TimeList';
+import { stackComboBox } from '../../styles/ComboBoxStyles';
+import { useAppSelector } from '../../store/hooks';
 import { shallowEqual } from 'react-redux';
 
 export interface IDatePickerProps {

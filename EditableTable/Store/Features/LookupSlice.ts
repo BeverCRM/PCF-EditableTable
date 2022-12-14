@@ -1,8 +1,8 @@
 // import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IColumn, ITag } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import DataverseService, { _context } from '../../Services/DataverseService';
-import { RootState } from '../Store';
+import DataverseService, { _context } from '../../services/DataverseService';
+import { RootState } from '../store';
 
 export type LookupField = {
   lookupColumn: IColumn;

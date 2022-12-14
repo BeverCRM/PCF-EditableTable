@@ -1,7 +1,7 @@
 import { IColumn, IDropdownOption } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import DataverseService from '../../Services/DataverseService';
-import { RootState } from '../Store';
+import DataverseService from '../../services/DataverseService';
+import { RootState } from '../store';
 
 export type Dropdown = {
   fieldName: string,

@@ -1,7 +1,7 @@
 import { Spinner, SpinnerSize, Stack } from '@fluentui/react';
 import * as React from 'react';
-import { useAppSelector } from '../Store/Hooks';
-import { modalStyles } from '../Styles/ModalStyles';
+import { useAppSelector } from '../store/hooks';
+import { modalStyles } from '../styles/ModalStyles';
 
 export const Loading = () => {
   const loading = useAppSelector(state => state.loading.isLoading);

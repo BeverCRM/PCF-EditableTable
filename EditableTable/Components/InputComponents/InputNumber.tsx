@@ -1,8 +1,8 @@
 import { ISpinButtonStyles, SpinButton, Stack } from '@fluentui/react';
 import * as React from 'react';
 import { shallowEqual } from 'react-redux';
-import { CurrencySymbol, Number } from '../Store/Features/NumberSlice';
-import { useAppSelector } from '../Store/Hooks';
+import { CurrencySymbol, Number } from '../../store/features/NumberSlice';
+import { useAppSelector } from '../../store/hooks';
 
 export interface IInputNumberProps {
   fieldName: string | undefined;

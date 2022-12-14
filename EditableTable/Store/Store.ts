@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-import lookupReducer from './Features/LookupSlice';
-import loadingReducer from './Features/LoadingSlice';
-import recordReducer from './Features/RecordSlice';
-import dropdownReducer from './Features/DropdownSlice';
-import numberReducer from './Features/NumberSlice';
-import wholeFormatReducer from './Features/WholeFormatSlice';
-import dateReducer from './Features/DateSlice';
+import lookupReducer from './features/LookupSlice';
+import loadingReducer from './features/LoadingSlice';
+import recordReducer from './features/RecordSlice';
+import dropdownReducer from './features/DropdownSlice';
+import numberReducer from './features/NumberSlice';
+import wholeFormatReducer from './features/WholeFormatSlice';
+import dateReducer from './features/DateSlice';
 
 const store = configureStore({
   reducer: {
