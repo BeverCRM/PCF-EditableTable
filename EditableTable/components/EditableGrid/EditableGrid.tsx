@@ -25,7 +25,7 @@ import { NumberFormat } from '../InputComponents/NumberFormat';
 import { OptionSetFormat } from '../InputComponents/OptionSetFormat';
 import { DateTimeFormat } from '../InputComponents/DateTimeFormat';
 import { setLogicalNames, setLookups } from '../../store/features/LookupSlice';
-import { getDropdowns } from '../../store/features/DropdownSlice';
+import { getDropdownsOptions } from '../../store/features/DropdownSlice';
 import { LookupField } from '../../store/features/LookupSlice';
 import { getCurrencySymbols, getNumberFieldsMetadata } from '../../store/features/NumberSlice';
 import { getLanguages, getTimeZones } from '../../store/features/WholeFormatSlice';
@@ -132,7 +132,7 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
 
     const dropdownColumns = getColumnsOfType(['OptionSet', 'TwoOptions', 'MultiSelectPicklist']);
     if (dropdownColumns.length > 0) {
-      dispatch(getDropdowns(dropdownColumns));
+      dispatch(getDropdownsOptions(dropdownColumns));
     }
 
     const numberColumns = getColumnsOfType(['Decimal', 'Currency', 'FP', 'Whole.None']);

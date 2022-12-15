@@ -141,7 +141,7 @@ export default {
       const falseText = results.value[0].OptionSet.FalseOption.Label.UserLocalizedLabel.Label;
       options.push({ key: falseKey, text: falseText });
     }
-    return options;
+    return { fieldName, options };
   },
 
   async getNumberFieldMetadata(fieldName: string, attributeType: string, selection: string) {
@@ -150,6 +150,7 @@ export default {
     const results = await getFetchResponse(request);
 
     return {
+      fieldName,
       precision: results.value[0]?.PrecisionSource ?? results.value[0]?.Precision,
       minValue: results.value[0].MinValue,
       maxValue: results.value[0].MaxValue,
@@ -166,49 +167,41 @@ export default {
     return fetchedCurrency.transactioncurrencyid.currencysymbol;
   },
 
-  async getRelationships() {
-    const relationships: Relationship[] = [];
+  async getRelationships(): Promise<Relationship[]> {
+    // et relationships: Relationship[] = [];
     // eslint-disable-next-line max-len
     const request = `${_clientUrl}EntityDefinitions(LogicalName='${_targetEntityType}')?$expand=ManyToManyRelationships,ManyToOneRelationships,OneToManyRelationships`;
     const results = await getFetchResponse(request);
 
-    for (let i = 0; i < results.OneToManyRelationships?.length; i++) {
-      const rels = results.OneToManyRelationships;
-      const entityNameRef = rels[i].ReferencedEntity;
-      const fieldNameRef = rels[i].ReferencingAttribute;
-      const entityNavigation = rels[i].ReferencingEntityNavigationPropertyName;
-      relationships.push({ fieldNameRef, entityNameRef, entityNavigation });
-    }
-    for (let i = 0; i < results.ManyToOneRelationships?.length; i++) {
-      const rels = results.ManyToOneRelationships;
-      const entityNameRef = rels[i].ReferencedEntity;
-      const fieldNameRef = rels[i].ReferencingAttribute;
-      const entityNavigation = rels[i].ReferencingEntityNavigationPropertyName;
-      relationships.push({ fieldNameRef, entityNameRef, entityNavigation });
-    }
-    for (let i = 0; i < results.ManyToManyRelationships?.length; i++) {
-      const rels = results.ManyToManyRelationships;
-      const entityNameRef = rels[i].ReferencedEntity;
-      const fieldNameRef = rels[i].ReferencingAttribute;
-      relationships.push({ fieldNameRef, entityNameRef });
-    }
-
-    return relationships;
+    return [
+      ...results.OneToManyRelationships.map((relationship : any) => <Relationship>{
+        fieldNameRef: relationship.ReferencingAttribute,
+        entityNameRef: relationship.ReferencedEntity,
+        entityNavigation: relationship.ReferencingEntityNavigationPropertyName,
+      },
+      ),
+      ...results.ManyToOneRelationships.map((relationship:any) => <Relationship>{
+        fieldNameRef: relationship.ReferencingAttribute,
+        entityNameRef: relationship.ReferencedEntity,
+        entityNavigation: relationship.ReferencingEntityNavigationPropertyName,
+      },
+      ),
+      ...results.ManyToManyRelationships.map((relationship:any) => <Relationship>{
+        fieldNameRef: relationship.ReferencingAttribute,
+        entityNameRef: relationship.ReferencedEntity,
+      },
+      ),
+    ];
   },
 
   async getTimeZones() {
     const request = `${_clientUrl}timezonedefinitions`;
     const results = await getFetchResponse(request);
 
-    const timezoneList : IComboBoxOption[] = [];
-
-    for (let i = 0; i < results.value.length; i++) {
-      const timezoneCode = results.value[i].timezonecode;
-      const timezoneName = results.value[i].userinterfacename;
-      timezoneList.push({ key: timezoneCode, text: timezoneName });
-    }
-
-    return timezoneList;
+    return results.value.map((timezone: any) => <IComboBoxOption>{
+      key: timezone.timezonecode,
+      text: timezone.userinterfacename,
+    });
   },
 
   async getLanguages() {
@@ -216,15 +209,10 @@ export default {
     const request = `${_clientUrl}RetrieveProvisionedLanguages`;
     const results = await getFetchResponse(request);
 
-    const languages : IComboBoxOption[] = [];
-
-    for (let i = 0; i < results.RetrieveProvisionedLanguages.length; i++) {
-      const key = results.RetrieveProvisionedLanguages[i];
-      const language = localeLanguageCodes.entities.find(lang => lang.localeid === key);
-      languages.push({ key, text: language?.name });
-    }
-
-    return languages;
+    return results.RetrieveProvisionedLanguages.map((language: any) => <IComboBoxOption>{
+      key: language,
+      text: localeLanguageCodes.entities.find(lang => lang.localeid === language)?.name,
+    });
   },
 
   async getDateMetadata(fieldName: string) {
@@ -234,10 +222,6 @@ export default {
 
     return results.value[0].DateTimeBehavior.Value;
   },
-
-  // formatTime(inputDateValue: any) {
-  //   return _context.formatting.formatTime(inputDateValue, 3);
-  // },
 
   getColumns() {
     // @ts-ignore

@@ -14,16 +14,20 @@ export type Record = {
   ]
 }
 
-type RecordState = {
+interface IRecordState {
   changedRecords: Record[],
   items: any,
   columns: IColumn[]
 }
 
-const initialState: RecordState = {
+const initialState: IRecordState = {
   changedRecords: [],
   items: [],
   columns: [],
+};
+
+type AsyncThunkConfig = {
+  state: RootState
 };
 
 export const saveRecords = createAsyncThunk<void, undefined, AsyncThunkConfig>(
@@ -45,10 +49,7 @@ export const deleteSelectedRecords = createAsyncThunk<Array<string>, any, AsyncT
     }
     else {
       selectedRecordIds = [];
-      console.log(`Delete denied! 
-        New Array: ${selectedRecordIds}`);
     }
-
     return selectedRecordIds;
   },
 );
@@ -106,10 +107,6 @@ const RecordSlice = createSlice({
     });
   },
 });
-
-type AsyncThunkConfig = {
-  state: RootState
-};
 
 export const { setChangedRecords } = RecordSlice.actions;
 

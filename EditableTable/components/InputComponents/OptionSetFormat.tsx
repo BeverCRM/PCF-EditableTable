@@ -19,7 +19,7 @@ export const OptionSetFormat =
   const [currentOption, setCurrentOption] = React.useState<string | number | undefined>('');
   const [currentOptions, setCurrentOptions] = React.useState<string[]>([]);
 
-  const dropdowns = useAppSelector(state => state.dropdown.dropdowns, shallowEqual);
+  const dropdowns = useAppSelector(state => state.dropdown.dropdownFields, shallowEqual);
 
   React.useEffect(() => {
     const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);

@@ -29,8 +29,10 @@ export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProp
       break;
   }
 
-  const selectedOption = options.find(opt => opt.key === defaultValue);
-  setSelectedKey(selectedOption?.key);
+  React.useEffect(() => {
+    const selectedOption = options.find(opt => opt.key === defaultValue);
+    setSelectedKey(selectedOption?.key);
+  }, [options]);
 
   const onChange = (event: React.FormEvent<IComboBox>, option?: IComboBoxOption): void => {
     const key = option?.key;

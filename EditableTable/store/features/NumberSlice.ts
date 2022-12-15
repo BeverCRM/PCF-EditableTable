@@ -25,7 +25,7 @@ const initialState: INumberState = {
 };
 
 export const getNumberFieldsMetadata = createAsyncThunk<NumberFieldMetadata[], IColumn[]>(
-  'record/getNumberFieldsMetadata',
+  'number/getNumberFieldsMetadata',
   async numberFields =>
     await Promise.all(numberFields.map(async numberField => {
       let attributeType, selection: string;
@@ -60,7 +60,7 @@ export const getNumberFieldsMetadata = createAsyncThunk<NumberFieldMetadata[], I
 );
 
 export const getCurrencySymbols = createAsyncThunk<CurrencySymbol[], string[]>(
-  'record/setCurrencySymbols',
+  'number/setCurrencySymbols',
   async recordIds =>
     await Promise.all(recordIds.map(async recordId => {
       const currentSymbol = await DataverseService.getCurrencySymbol(recordId);

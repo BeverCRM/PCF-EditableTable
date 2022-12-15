@@ -13,20 +13,18 @@ const initialState: IWholeFormatState = {
 };
 
 export const getTimeZones = createAsyncThunk(
-  'record/getTimeZones',
+  'wholeFormat/getTimeZones',
   async (a, thunkApi) => {
     console.log(a, thunkApi);
     const timezones = await DataverseService.getTimeZones();
-    console.log(timezones);
     return timezones;
   },
 );
 
 export const getLanguages = createAsyncThunk(
-  'record/getLanguages',
+  'wholeFormat/getLanguages',
   async () => {
     const languages = await DataverseService.getLanguages();
-    console.log(languages);
     return languages;
   },
 );

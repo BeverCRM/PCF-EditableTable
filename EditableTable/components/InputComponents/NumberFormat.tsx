@@ -41,10 +41,9 @@ export const NumberFormat = ({ fieldName,
     }
   });
 
-  const _onValidate = (value: string, event?: React.SyntheticEvent<HTMLElement>): string | void => {
-    console.log(event);
+  const _onValidate = (value: string): string | void => {
     if (value.slice(0, 1) === currentCurrency?.symbol) {
-      value.slice(1);
+      value = value.slice(1);
     }
     return String(parseFloat(value).toFixed(currentNumber?.precision));
   };
@@ -53,8 +52,8 @@ export const NumberFormat = ({ fieldName,
     console.log(newValue);
     if (newValue !== undefined && newValue !== null) {
       setVal(currentCurrency?.symbol !== undefined
-        ? currentCurrency?.symbol
-        : `${parseFloat(newValue).toFixed(currentNumber?.precision)}`);
+        ? currentCurrency?.symbol + newValue
+        : newValue);
       onNumberChange(parseFloat(parseFloat(newValue).toFixed(currentNumber?.precision)));
     }
   };

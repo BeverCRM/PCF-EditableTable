@@ -1,85 +1,75 @@
 import { IColumn, IDropdownOption } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import DataverseService from '../../services/DataverseService';
-import { RootState } from '../store';
 
-export type Dropdown = {
+export type DropdownField = {
   fieldName: string,
-  isMultiple: boolean,
-  isTwoOptions: boolean,
-  attributeType: string,
   options: IDropdownOption[]
 }
 
 interface IDropdownState {
-  dropdowns: Dropdown[]
+  dropdownFields: DropdownField[]
 }
 
 const initialState: IDropdownState = {
-  dropdowns: [],
+  dropdownFields: [],
 };
 
-type AsyncThunkConfig = {
-  state: RootState,
-  rejectValue: string
-};
+export const getDropdownsOptions = createAsyncThunk<DropdownField[], IColumn[]>(
+  'dropdown/getDropdownsOptions',
+  async dropdownFields =>
+    await Promise.all(dropdownFields.map(async dropdownField => {
+      let attributeType: string;
+      let isTwoOptions: boolean;
 
-export const getDropdowns = createAsyncThunk<Dropdown[], IColumn[], AsyncThunkConfig>(
-  'dropdown/getDropdowns', async dropdownFields => {
-    const dropdowns = dropdownFields.map(dropdown => {
-      let attributeType = 'PicklistAttributeMetadata';
-      let isTwoOptions = false;
-      let isMultiple = false;
+      switch (dropdownField.data) {
+        case 'TwoOptions':
+          attributeType = 'BooleanAttributeMetadata';
+          isTwoOptions = true;
+          break;
 
-      if (dropdown.data === 'TwoOptions') {
-        attributeType = 'BooleanAttributeMetadata';
-        isTwoOptions = true;
+        case 'MultiSelectPicklist':
+          attributeType = 'MultiSelectPicklistAttributeMetadata';
+          isTwoOptions = false;
+          break;
+
+        case 'statuscode':
+          attributeType = 'StatusAttributeMetadata';
+          isTwoOptions = false;
+          break;
+
+        case 'statecode':
+          attributeType = 'StateAttributeMetadata';
+          isTwoOptions = false;
+          break;
+
+        default:
+          attributeType = 'PicklistAttributeMetadata';
+          isTwoOptions = false;
       }
-      if (dropdown.data === 'MultiSelectPicklist') {
-        attributeType = 'MultiSelectPicklistAttributeMetadata';
-        isMultiple = true;
-      }
-      if (dropdown.fieldName === 'statuscode') attributeType = 'StatusAttributeMetadata';
 
-      if (dropdown.fieldName === 'statecode') attributeType = 'StateAttributeMetadata';
-      console.log(attributeType);
-      return {
-        fieldName: dropdown.fieldName,
-        isMultiple,
-        isTwoOptions,
+      const currentDropdown = await DataverseService.getDropdownOptions(
+        dropdownField.fieldName!,
         attributeType,
-        options: [],
-      } as Dropdown;
-    });
-
-    await Promise.all(
-      dropdowns.map(async dropdown => {
-        const options = await DataverseService.getDropdownOptions(
-          dropdown.fieldName,
-          dropdown.attributeType,
-          dropdown.isTwoOptions);
-        dropdown.options = [...options];
-      }));
-
-    return dropdowns;
-  },
+        isTwoOptions);
+      return <DropdownField>currentDropdown;
+    })),
 );
 
-export const dropdownSlice = createSlice({
-  name: 'lookup',
+const DropdownSlice = createSlice({
+  name: 'dropdown',
   initialState,
-  reducers: {
-  },
+  reducers: {},
   extraReducers: builder => {
-    builder.addCase(getDropdowns.fulfilled, (state, action) => {
-      console.log(state, action);
-      state.dropdowns = [...action.payload];
+    builder.addCase(getDropdownsOptions.fulfilled, (state, action) => {
+      state.dropdownFields = [...action.payload];
+      console.table(state.dropdownFields);
     });
-    builder.addCase(getDropdowns.rejected, (state, action) => {
+    builder.addCase(getDropdownsOptions.rejected, (state, action) => {
       console.log(action.payload);
-      state.dropdowns = [];
+      state.dropdownFields = [];
     });
   },
 });
 
-export default dropdownSlice.reducer;
+export default DropdownSlice.reducer;

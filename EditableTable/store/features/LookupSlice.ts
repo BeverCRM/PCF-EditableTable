@@ -37,48 +37,38 @@ type AsyncThunkConfig = {
 };
 
 export const setLogicalNames = createAsyncThunk<Relationship[], string, AsyncThunkConfig>(
-  'lookup/setLogicalNames', async () => {
-    const relationships = await DataverseService.getRelationships();
-    return relationships;
-  },
+  'lookup/setLogicalNames', async () => await DataverseService.getRelationships(),
 );
 
 export const setLookups = createAsyncThunk<Lookup[], LookupField[], AsyncThunkConfig>(
-  'lookup/setLookups', async (lookupFields, thunkApi) => {
-    const { logicalNames } = thunkApi.getState().lookup;
-    const lookups: Lookup[] = [];
+  'lookup/setLookups',
+  async (lookupFields, thunkApi) =>
+    await Promise.all(lookupFields.map(async lookupField => {
+      const { logicalNames } = thunkApi.getState().lookup;
+      const { lookupRefEntity } = lookupField;
+      const { fieldName } = lookupField.lookupColumn;
 
-    lookupFields.forEach(lookup => {
-      const { lookupRefEntity } = lookup;
-      console.log(lookupRefEntity);
+      const lookupRef: Relationship | undefined =
+        logicalNames.find((ref: Relationship) => {
+          if (lookupRefEntity) {
+            if (ref.entityNameRef === lookupRefEntity) return true;
+          }
+          else if (ref.fieldNameRef === fieldName) {
+            return true;
+          }
+        });
 
-      const fieldName = lookup.lookupColumn.fieldName || '';
-
-      if (logicalNames.length > 0) {
-        const lookupRef: Relationship | undefined =
-          logicalNames.find((ref: Relationship) => {
-            if (lookupRefEntity) {
-              if (ref.entityNameRef === lookupRefEntity) return true;
-            }
-            else if (ref.fieldNameRef === fieldName) {
-              return true;
-            }
-          });
-        lookups.push({ logicalName: fieldName, reference: lookupRef, options: [] });
-      }
-    });
-    console.log(lookupFields);
-
-    await Promise.all(lookups.map(async lookup => {
-      const entityName = lookup.reference ? lookup.reference.entityNameRef : '';
-      lookup.entityPluralName = await DataverseService.getEntityPluralName(entityName);
+      const entityName = lookupRef ? lookupRef.entityNameRef : '';
+      const entityPluralName = await DataverseService.getEntityPluralName(entityName);
       const options = await DataverseService.getLookupOptions(entityName);
-      lookup.options = [...options];
-    }));
-    console.log(lookups);
 
-    return lookups;
-  },
+      return <Lookup>{
+        logicalName: fieldName,
+        reference: lookupRef,
+        entityPluralName,
+        options,
+      };
+    })),
 );
 
 export const lookupSlice = createSlice({

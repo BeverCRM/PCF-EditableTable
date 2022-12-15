@@ -10,8 +10,8 @@ import dateReducer from './features/DateSlice';
 const store = configureStore({
   reducer: {
     lookup: lookupReducer,
-    dropdown: dropdownReducer,
     number: numberReducer,
+    dropdown: dropdownReducer,
     loading: loadingReducer,
     record: recordReducer,
     wholeFormat: wholeFormatReducer,
