@@ -78,7 +78,6 @@ const NumberSlice = createSlice({
   extraReducers(builder) {
     builder.addCase(getNumberFieldsMetadata.fulfilled, (state, action) => {
       state.numberFieldsMetadata = [...action.payload];
-      console.table(state.numberFieldsMetadata);
     });
     builder.addCase(getNumberFieldsMetadata.rejected, (state, action) => {
       console.log(state, action);

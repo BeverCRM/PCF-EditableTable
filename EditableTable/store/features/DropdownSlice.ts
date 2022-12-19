@@ -63,7 +63,6 @@ const DropdownSlice = createSlice({
   extraReducers: builder => {
     builder.addCase(getDropdownsOptions.fulfilled, (state, action) => {
       state.dropdownFields = [...action.payload];
-      console.table(state.dropdownFields);
     });
     builder.addCase(getDropdownsOptions.rejected, (state, action) => {
       console.log(action.payload);

@@ -30,7 +30,7 @@ export const LookupFormat = ({ fieldName, defaultValue, _onChange } : ILookupPro
     const currentLookup = lookups.find(lookup => lookup.logicalName === fieldName);
     setCurrentLookup(currentLookup);
     const options = currentLookup ? currentLookup.options : [];
-    console.log('LOOKUP: ', currentLookup?.logicalName, fieldName, options);
+
     setOptions(options);
   }, [lookups]);
 
@@ -41,8 +41,7 @@ export const LookupFormat = ({ fieldName, defaultValue, _onChange } : ILookupPro
     }
   }, [options]);
 
-  const initialValues = (selectedItems?: ITag[]): ITag[] => {
-    console.log(selectedItems);
+  const initialValues = (): ITag[] => {
     if (options.length > 100) {
       return options.slice(0, 100);
     }

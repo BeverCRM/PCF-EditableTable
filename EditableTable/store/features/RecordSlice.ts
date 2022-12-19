@@ -87,13 +87,11 @@ const RecordSlice = createSlice({
         }
       }
       state.changedRecords = changedRecords;
-      console.log(state);
     },
   },
   extraReducers(builder) {
-    builder.addCase(saveRecords.fulfilled, (state, action) => {
+    builder.addCase(saveRecords.fulfilled, state => {
       state.changedRecords = [];
-      console.log(action.payload);
     });
     builder.addCase(saveRecords.rejected, (state, action) => {
       console.log(action.payload);

@@ -51,7 +51,6 @@ export const DateTimeFormat = (
   React.useEffect(() => {
     const currentDate = dates.find(date => date.fieldName === fieldName);
     setDateBehavior(currentDate ? currentDate.dateBehavior : '');
-    console.log(currentDate);
   }, [dates]);
 
   React.useEffect(() => {

@@ -14,8 +14,7 @@ const initialState: IWholeFormatState = {
 
 export const getTimeZones = createAsyncThunk(
   'wholeFormat/getTimeZones',
-  async (a, thunkApi) => {
-    console.log(a, thunkApi);
+  async () => {
     const timezones = await DataverseService.getTimeZones();
     return timezones;
   },
@@ -36,14 +35,12 @@ const WholeFormatSlice = createSlice({
   },
   extraReducers(builder) {
     builder.addCase(getTimeZones.fulfilled, (state, action) => {
-      console.log(action.payload);
       state.timezones = [...action.payload];
     });
     builder.addCase(getTimeZones.rejected, (state, action) => {
       console.log(action.payload);
     });
     builder.addCase(getLanguages.fulfilled, (state, action) => {
-      console.log(action.payload);
       state.languages = [...action.payload];
     });
     builder.addCase(getLanguages.rejected, (state, action) => {

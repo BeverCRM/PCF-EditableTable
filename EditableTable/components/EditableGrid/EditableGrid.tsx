@@ -287,11 +287,10 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
         onRenderRow={_onRenderRow}
         onRenderDetailsHeader={_onRenderDetailsHeader}
         layoutMode={DetailsListLayoutMode.fixedColumns}
-        onActiveItemChanged={(item?: any, index?: any) => console.log(item, index)}
+        // onActiveItemChanged={(item?: any, index?: any) => console.log(item, index)}
         componentRef={listRef}
         styles={{ contentWrapper: { padding: items.length === 0 ? '50px' : '0' } }}
         onRowDidMount={(item?: any, index?: any) => {
-          console.log(item);
           if (index === (items.length - 1)) dispatch(setLoading(false));
         }}
       >

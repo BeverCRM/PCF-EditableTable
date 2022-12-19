@@ -30,7 +30,6 @@ export const NumberFormat = ({ fieldName,
 
   React.useEffect(() => {
     const number = numbers.find(num => num.fieldName === fieldName);
-    console.log(number);
     setCurrentNumber(number);
   }, [numbers]);
 
@@ -49,7 +48,6 @@ export const NumberFormat = ({ fieldName,
   };
 
   const _onChange = (event: React.SyntheticEvent<HTMLElement>, newValue?: string) => {
-    console.log(newValue);
     if (newValue !== undefined && newValue !== null) {
       setVal(currentCurrency?.symbol !== undefined
         ? currentCurrency?.symbol + newValue

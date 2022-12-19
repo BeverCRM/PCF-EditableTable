@@ -24,13 +24,11 @@ export const OptionSetFormat =
   React.useEffect(() => {
     const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
     setOptions(currentDropdown ? currentDropdown.options : []);
-    console.log('DROPDOWN: ', currentDropdown?.fieldName, fieldName, options);
   }, [dropdowns]);
 
   React.useMemo(() => {
     if (!isMultiple) {
       const selectedOption = options.find(opt => opt.text === defaultValue);
-      console.log(selectedOption ? selectedOption.key : '');
       setCurrentOption(selectedOption ? selectedOption.key : '');
     }
     else {
@@ -39,7 +37,6 @@ export const OptionSetFormat =
         if (val === opt.text) return true;
       }));
       const selectedOptions = selectedValues.map(value => value.key as string);
-      console.log(selectedOptions);
       setCurrentOptions(selectedOptions);
     }
   }, [options]);

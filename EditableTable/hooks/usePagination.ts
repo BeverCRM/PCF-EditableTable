@@ -1,32 +1,38 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
 export const usePagination = (dataset: DataSet) => {
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { totalResultCount: totalRecords, hasPreviousPage, hasNextPage } = dataset.paging;
+  const {
+    totalResultCount: totalRecords,
+    pageSize,
+  } = dataset.paging;
 
-  const pageSize = dataset.sortedRecordIds.length;
+  const totalPages = Math.ceil(totalRecords / pageSize);
+  const hasNextPage = currentPage < totalPages;
+  const hasPreviousPage = currentPage > 1;
 
   const firstItemNumber = (currentPage - 1) * pageSize + 1;
   const lastItemNumber = (currentPage - 1) * pageSize + pageSize;
 
-  function moveToPage(pageNumber: number) {
-    setCurrentPage(pageNumber);
-    dataset.paging.loadExactPage(pageNumber);
-  }
+  useEffect(() => {
+    if (!dataset.loading && dataset.paging.firstPageNumber !== currentPage) {
+      dataset.paging.loadExactPage(currentPage);
+    }
+  }, [currentPage, dataset.loading]);
 
   function moveToFirst() {
-    moveToPage(1);
+    setCurrentPage(1);
   }
 
   function movePrevious() {
-    moveToPage(currentPage - 1);
+    setCurrentPage(currentPage - 1);
   }
 
   function moveNext() {
-    moveToPage(currentPage + 1);
+    setCurrentPage(currentPage + 1);
   }
 
   return {
