@@ -1,6 +1,6 @@
 import { IComboBoxOption } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import DataverseService from '../../services/DataverseService';
+import { getTimeZoneDefinitions, getProvisionedLanguages } from '../../services/DataverseService';
 
 interface IWholeFormatState {
   timezones: IComboBoxOption[];
@@ -15,7 +15,7 @@ const initialState: IWholeFormatState = {
 export const getTimeZones = createAsyncThunk(
   'wholeFormat/getTimeZones',
   async () => {
-    const timezones = await DataverseService.getTimeZones();
+    const timezones = await getTimeZoneDefinitions();
     return timezones;
   },
 );
@@ -23,7 +23,7 @@ export const getTimeZones = createAsyncThunk(
 export const getLanguages = createAsyncThunk(
   'wholeFormat/getLanguages',
   async () => {
-    const languages = await DataverseService.getLanguages();
+    const languages = await getProvisionedLanguages();
     return languages;
   },
 );

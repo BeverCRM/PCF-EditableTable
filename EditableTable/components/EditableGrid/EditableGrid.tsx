@@ -12,7 +12,7 @@ import { useSelection } from '../../hooks/useSelection';
 import { dataSetStyles } from '../../styles/DataSetStyles';
 import { _onRenderDetailsHeader, _onRenderRow } from '../../utils/Utils';
 import { CommandBar } from './CommandBar';
-import DataverseService from '../../services/DataverseService';
+import { getColumns } from '../../services/DataverseService';
 import { GridFooter } from './GridFooter';
 import { useAppDispatch } from '../../store/hooks';
 import {
@@ -61,7 +61,7 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
   };
 
   const newButtonHandler = () => {
-    const emptyColumns = DataverseService.getColumns();
+    const emptyColumns = getColumns();
     const emptyAttributes = emptyColumns.map((column: any) => ({ [column.name]: '' }));
 
     setItems((previousItems: any) =>
@@ -196,7 +196,7 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
           case 'OptionSet':
             return <OptionSetFormat fieldName={column?.fieldName ? column?.fieldName : ''}
               defaultValue={fieldContent} isMultiple={false}
-              onOptionChange={changedValue.bind('', item.key, column?.fieldName || '', '')}
+              _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')}
             />;
 
           case 'Lookup.Simple':
@@ -208,23 +208,23 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
           case 'TwoOptions':
             return <OptionSetFormat fieldName={column?.fieldName ? column?.fieldName : ''}
               defaultValue={fieldContent} isMultiple={false} isTwoOptions={true}
-              onOptionChange={changedValue.bind('', item.key, column?.fieldName || '', '')}
+              _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')}
             />;
 
           case 'Decimal':
             return <NumberFormat fieldName={column?.fieldName ? column?.fieldName : ''}
               defaultValue={fieldContent} type={'decimal'}
-              onNumberChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
+              _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
 
           case 'Currency':
             return <NumberFormat fieldName={column?.fieldName ? column?.fieldName : ''}
               defaultValue={fieldContent} type={'currency'} rowId={item.key}
-              onNumberChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
+              _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
 
           case 'FP':
             return <NumberFormat fieldName={column?.fieldName ? column?.fieldName : ''}
               defaultValue={fieldContent} type={'float'}
-              onNumberChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
+              _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
 
           case 'Multiple':
             return <TextField defaultValue={fieldContent}
@@ -236,13 +236,13 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
           case 'MultiSelectPicklist':
             return <OptionSetFormat fieldName={column?.fieldName ? column?.fieldName : ''}
               defaultValue={fieldContent} isMultiple={true}
-              onOptionChange={changedValue.bind('', item.key, column?.fieldName || '', '')}
+              _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')}
             />;
 
           case 'Whole.None':
             return <NumberFormat fieldName={column?.fieldName ? column?.fieldName : ''}
               defaultValue={fieldContent} type={''}
-              onNumberChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
+              _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
 
           case 'Whole.Duration':
             return <WholeFormat defaultValue={fieldKey} type={'duration'}

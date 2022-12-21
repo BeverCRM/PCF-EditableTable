@@ -1,6 +1,6 @@
 import { IColumn, IDropdownOption } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import DataverseService from '../../services/DataverseService';
+import { getDropdownOptions } from '../../services/DataverseService';
 
 export type DropdownField = {
   fieldName: string,
@@ -33,6 +33,12 @@ export const getDropdownsOptions = createAsyncThunk<DropdownField[], IColumn[]>(
           isTwoOptions = false;
           break;
 
+        default:
+          attributeType = 'PicklistAttributeMetadata';
+          isTwoOptions = false;
+      }
+
+      switch (dropdownField.fieldName) {
         case 'statuscode':
           attributeType = 'StatusAttributeMetadata';
           isTwoOptions = false;
@@ -42,13 +48,9 @@ export const getDropdownsOptions = createAsyncThunk<DropdownField[], IColumn[]>(
           attributeType = 'StateAttributeMetadata';
           isTwoOptions = false;
           break;
-
-        default:
-          attributeType = 'PicklistAttributeMetadata';
-          isTwoOptions = false;
       }
 
-      const currentDropdown = await DataverseService.getDropdownOptions(
+      const currentDropdown = await getDropdownOptions(
         dropdownField.fieldName!,
         attributeType,
         isTwoOptions);

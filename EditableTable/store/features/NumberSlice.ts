@@ -1,6 +1,6 @@
 import { IColumn } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import DataverseService from '../../services/DataverseService';
+import { getNumberFieldMetadata, getCurrencySymbol } from '../../services/DataverseService';
 
 export type NumberFieldMetadata = {
   fieldName: string,
@@ -51,7 +51,7 @@ export const getNumberFieldsMetadata = createAsyncThunk<NumberFieldMetadata[], I
           selection = 'MaxValue,MinValue';
       }
 
-      const currentNumber = await DataverseService.getNumberFieldMetadata(
+      const currentNumber = await getNumberFieldMetadata(
         numberField.fieldName!,
         attributeType,
         selection);
@@ -60,11 +60,11 @@ export const getNumberFieldsMetadata = createAsyncThunk<NumberFieldMetadata[], I
 );
 
 export const getCurrencySymbols = createAsyncThunk<CurrencySymbol[], string[]>(
-  'number/setCurrencySymbols',
+  'number/getCurrencySymbols',
   async recordIds =>
     await Promise.all(recordIds.map(async recordId => {
-      const currentSymbol = await DataverseService.getCurrencySymbol(recordId);
-      return {
+      const currentSymbol = await getCurrencySymbol(recordId);
+      return <CurrencySymbol>{
         recordId,
         symbol: currentSymbol,
       };

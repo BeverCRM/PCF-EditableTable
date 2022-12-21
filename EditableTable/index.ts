@@ -1,6 +1,6 @@
 import { IInputs, IOutputs } from './generated/ManifestTypes';
 import * as React from 'react';
-import DataverseService from './services/DataverseService';
+import { setContext } from './services/DataverseService';
 import { IDataSetProps } from './components/EditableGrid/EditableGrid';
 import { Wrapper } from './components/AppWrapper';
 
@@ -20,7 +20,7 @@ export class EditableTable implements ComponentFramework.ReactControl<IInputs, I
   }
 
   public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
-    DataverseService.setContext(context);
+    setContext(context);
     const props: IDataSetProps = {
       dataset: context.parameters.dataset,
       targetEntityType: context.parameters.dataset.getTargetEntityType(),

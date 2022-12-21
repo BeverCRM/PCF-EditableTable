@@ -47,6 +47,8 @@ export const DateTimeFormat = (
   const datePickerRef = React.useRef<IDatePicker>(null);
 
   const dates = useAppSelector(state => state.date.dates, shallowEqual);
+  const userTimeZoneOffset = useAppSelector(state => state.date.userTimeZoneOffset, shallowEqual);
+  console.log(userTimeZoneOffset);
 
   React.useEffect(() => {
     const currentDate = dates.find(date => date.fieldName === fieldName);
@@ -64,6 +66,9 @@ export const DateTimeFormat = (
         defaultValue.getUTCSeconds());
 
       setValue(newDate);
+    }
+    if (!isNaN(defaultValue.getTime()) && dateBehavior === 'UserLocal') {
+      setValue(defaultValue);
     }
   }, [dateBehavior]);
 

@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
+import { setLoading } from '../store/features/LoadingSlice';
+import { useAppDispatch } from '../store/hooks';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
 export const usePagination = (dataset: DataSet) => {
   const [currentPage, setCurrentPage] = useState(1);
+
+  const dispatch = useAppDispatch();
 
   const {
     totalResultCount: totalRecords,
@@ -23,16 +27,21 @@ export const usePagination = (dataset: DataSet) => {
     }
   }, [currentPage, dataset.loading]);
 
+  function moveToPage(pageNumber: number) {
+    dispatch(setLoading(true));
+    setCurrentPage(pageNumber);
+  }
+
   function moveToFirst() {
-    setCurrentPage(1);
+    moveToPage(1);
   }
 
   function movePrevious() {
-    setCurrentPage(currentPage - 1);
+    moveToPage(currentPage - 1);
   }
 
   function moveNext() {
-    setCurrentPage(currentPage + 1);
+    moveToPage(currentPage + 1);
   }
 
   return {

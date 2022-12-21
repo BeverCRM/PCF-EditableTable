@@ -1,6 +1,6 @@
 import { IColumn } from '@fluentui/react';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import DataverseService from '../../services/DataverseService';
+import { deleteRecord, openRecordDeleteDialog, saveRecord } from '../../services/DataverseService';
 import { RootState } from '../store';
 
 export type Record = {
@@ -34,17 +34,17 @@ export const saveRecords = createAsyncThunk<void, undefined, AsyncThunkConfig>(
   'record/saveRecords',
   async (a, thunkApi) => {
     const recordsToSave = thunkApi.getState().record.changedRecords;
-    await Promise.all(recordsToSave.map(record => DataverseService.saveRecord(record)));
+    await Promise.all(recordsToSave.map(record => saveRecord(record)));
   },
 );
 
 export const deleteSelectedRecords = createAsyncThunk<Array<string>, any, AsyncThunkConfig>(
   'record/deleteSelectedRecords',
   async selectedRecordIds => {
-    const response = await DataverseService.openRecordDeleteDialog();
+    const response = await openRecordDeleteDialog();
     if (response.confirmed) {
       await Promise.all(selectedRecordIds.map(async (id: string) => {
-        await DataverseService.deleteRecord(id);
+        await deleteRecord(id);
       }));
     }
     else {
@@ -63,6 +63,7 @@ const RecordSlice = createSlice({
       action: PayloadAction<{id: string, fieldName: string, fieldType: string, newValue: any}>) => {
       const { changedRecords } = state;
       const currentRecord = changedRecords?.find(record => record.id === action.payload.id);
+      console.log(currentRecord?.data);
       if (currentRecord === undefined) {
         changedRecords.push({
           id: action.payload.id,
@@ -75,6 +76,7 @@ const RecordSlice = createSlice({
       else {
         const currentField = currentRecord.data
           .find(data => data.fieldName === action.payload.fieldName);
+        console.log(currentField);
         if (currentField === undefined) {
           currentRecord.data.push({
             fieldName: action.payload.fieldName,
@@ -84,9 +86,11 @@ const RecordSlice = createSlice({
         }
         else {
           currentField.newValue = action.payload.newValue;
+          currentField.fieldType = action.payload.fieldType;
         }
       }
       state.changedRecords = changedRecords;
+      console.log(state.changedRecords);
     },
   },
   extraReducers(builder) {

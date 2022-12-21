@@ -1,7 +1,10 @@
 // import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IColumn, ITag } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import DataverseService from '../../services/DataverseService';
+import {
+  getLookupOptions,
+  getRelationships,
+  getEntityPluralName } from '../../services/DataverseService';
 import { RootState } from '../store';
 
 export type LookupField = {
@@ -37,7 +40,7 @@ type AsyncThunkConfig = {
 };
 
 export const setLogicalNames = createAsyncThunk<Relationship[], string, AsyncThunkConfig>(
-  'lookup/setLogicalNames', async () => await DataverseService.getRelationships(),
+  'lookup/setLogicalNames', async () => await getRelationships(),
 );
 
 export const setLookups = createAsyncThunk<Lookup[], LookupField[], AsyncThunkConfig>(
@@ -59,8 +62,8 @@ export const setLookups = createAsyncThunk<Lookup[], LookupField[], AsyncThunkCo
         });
 
       const entityName = lookupRef ? lookupRef.entityNameRef : '';
-      const entityPluralName = await DataverseService.getEntityPluralName(entityName);
-      const options = await DataverseService.getLookupOptions(entityName);
+      const entityPluralName = await getEntityPluralName(entityName);
+      const options = await getLookupOptions(entityName);
 
       return <Lookup>{
         logicalName: fieldName,

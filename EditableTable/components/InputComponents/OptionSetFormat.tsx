@@ -1,7 +1,6 @@
 import { Dropdown, IDropdownOption, Stack } from '@fluentui/react';
 import { ComboBox, IComboBox, IComboBoxOption } from '@fluentui/react';
 import * as React from 'react';
-import { shallowEqual } from 'react-redux';
 import { useAppSelector } from '../../store/hooks';
 
 export interface IDropDownProps {
@@ -9,17 +8,17 @@ export interface IDropDownProps {
   defaultValue: string;
   isMultiple: boolean;
   isTwoOptions?: boolean;
-  onOptionChange: any
+  _onChange: any
 }
 
 export const OptionSetFormat =
 ({ fieldName, defaultValue, isMultiple,
-  isTwoOptions, onOptionChange } : IDropDownProps) => {
+  isTwoOptions, _onChange } : IDropDownProps) => {
   const [options, setOptions] = React.useState<IDropdownOption[]>([]);
   const [currentOption, setCurrentOption] = React.useState<string | number | undefined>('');
   const [currentOptions, setCurrentOptions] = React.useState<string[]>([]);
 
-  const dropdowns = useAppSelector(state => state.dropdown.dropdownFields, shallowEqual);
+  const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);
 
   React.useEffect(() => {
     const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
@@ -44,10 +43,10 @@ export const OptionSetFormat =
   const onSingleOptionChange =
   (event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption | undefined) => {
     if (isTwoOptions) {
-      onOptionChange(option?.key === 1);
+      _onChange(option?.key === 1);
     }
     else {
-      onOptionChange(option?.key);
+      _onChange(option?.key);
     }
   };
 
@@ -55,11 +54,11 @@ export const OptionSetFormat =
   (event: React.FormEvent<IComboBox>, option?: IComboBoxOption | undefined) => {
     if (option?.selected) {
       setCurrentOptions([...currentOptions, option.key as string]);
-      onOptionChange([...currentOptions, option.key as string].join(', '));
+      _onChange([...currentOptions, option.key as string].join(', '));
     }
     else {
       setCurrentOptions(currentOptions.filter(key => key !== option?.key));
-      onOptionChange(currentOptions.filter(key => key !== option?.key).join(', '));
+      _onChange(currentOptions.filter(key => key !== option?.key).join(', '));
     }
   };
 

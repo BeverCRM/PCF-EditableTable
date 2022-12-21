@@ -8,11 +8,11 @@ export interface IInputNumberProps {
   defaultValue: string;
   type: string;
   rowId?: string;
-  onNumberChange: any
+  _onChange: any
 }
 
 export const NumberFormat = ({ fieldName,
-  defaultValue, rowId, onNumberChange } : IInputNumberProps) => {
+  defaultValue, rowId, _onChange } : IInputNumberProps) => {
   const styles: Partial<ISpinButtonStyles> = {
     arrowButtonsContainer: {
       display: 'none',
@@ -40,19 +40,20 @@ export const NumberFormat = ({ fieldName,
     }
   });
 
-  const _onValidate = (value: string): string | void => {
+  const onValidate = (value: string): string | void => {
+    let newValue = value;
     if (value.slice(0, 1) === currentCurrency?.symbol) {
-      value = value.slice(1);
+      newValue = value.slice(1);
     }
-    return String(parseFloat(value).toFixed(currentNumber?.precision));
+    return String(parseFloat(newValue).toFixed(currentNumber?.precision));
   };
 
-  const _onChange = (event: React.SyntheticEvent<HTMLElement>, newValue?: string) => {
+  const onNumberChange = (event: React.SyntheticEvent<HTMLElement>, newValue?: string) => {
     if (newValue !== undefined && newValue !== null) {
       setVal(currentCurrency?.symbol !== undefined
         ? currentCurrency?.symbol + newValue
         : newValue);
-      onNumberChange(parseFloat(parseFloat(newValue).toFixed(currentNumber?.precision)));
+      _onChange(parseFloat(parseFloat(newValue).toFixed(currentNumber?.precision)));
     }
   };
 
@@ -66,8 +67,8 @@ export const NumberFormat = ({ fieldName,
         max={currentNumber?.maxValue}
         precision={currentNumber?.precision}
         styles={styles}
-        onChange={_onChange}
-        onValidate={_onValidate}
+        onChange={onNumberChange}
+        onValidate={onValidate}
         value={val}
       />
     </Stack>
