@@ -49,11 +49,6 @@ export const DateTimeFormat = (
 
   const dates = useAppSelector(state => state.date.dates, shallowEqual);
   const userTimeZoneOffset = getUserTimeZoneOffset();
-  console.log(userTimeZoneOffset);
-
-  const setUserLocalDateTime = (dateTime: Date) =>
-    new Date(dateTime.getTime() +
-    ((new Date().getTimezoneOffset() + userTimeZoneOffset) * 60 * 1000));
 
   React.useEffect(() => {
     const currentDate = dates.find(date => date.fieldName === fieldName);
@@ -73,7 +68,8 @@ export const DateTimeFormat = (
       setValue(newDate);
     }
     if (!isNaN(defaultValue.getTime()) && dateBehavior === 'UserLocal') {
-      setValue(setUserLocalDateTime(defaultValue));
+      setValue(new Date(defaultValue.getTime() +
+        ((new Date().getTimezoneOffset() + userTimeZoneOffset) * 60 * 1000)));
     }
   }, [dateBehavior, userTimeZoneOffset]);
 
@@ -146,9 +142,6 @@ export const DateTimeFormat = (
     return key;
   };
 
-  // setting the time is wrong
-  // if using setUserLocalDateTime - sets two hrs earlier
-  // if using local date - sets 4 hrs earlier
   const onSelectTime = React.useCallback(
     (event: React.FormEvent<IComboBox>, option?: IComboBoxOption,
       index?: number, value?: string): void => {
