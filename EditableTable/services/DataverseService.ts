@@ -56,17 +56,16 @@ const retrieveAllRecords = async (entityName: string, options: string) => {
   return entities;
 };
 
-export let _userTimeZoneUtcOffsetMinutes: number;
-
 export const setContext = (context: ComponentFramework.Context<IInputs>) => {
   _context = context;
   _targetEntityType = context.parameters.dataset.getTargetEntityType();
 
   // @ts-ignore
   _clientUrl = `${_context.page.getClientUrl()}/api/data/v9.2/`;
-  // @ts-ignore
-  _userTimeZoneUtcOffsetMinutes = _context.client.userTimeZoneUtcOffsetMinutes;
 };
+
+// @ts-ignore
+export const getUserTimeZoneOffset = (): number => _context.client.userTimeZoneUtcOffsetMinutes;
 
 export const deleteRecord = async (recordId: string): Promise<void> => {
   try {

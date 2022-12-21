@@ -6,6 +6,7 @@ import { timesList } from './timeList';
 import { stackComboBox } from '../../styles/ComboBoxStyles';
 import { useAppSelector } from '../../store/hooks';
 import { shallowEqual } from 'react-redux';
+import { getUserTimeZoneOffset } from '../../services/DataverseService';
 
 export interface IDatePickerProps {
   fieldName: string,
@@ -47,8 +48,12 @@ export const DateTimeFormat = (
   const datePickerRef = React.useRef<IDatePicker>(null);
 
   const dates = useAppSelector(state => state.date.dates, shallowEqual);
-  const userTimeZoneOffset = useAppSelector(state => state.date.userTimeZoneOffset, shallowEqual);
+  const userTimeZoneOffset = getUserTimeZoneOffset();
   console.log(userTimeZoneOffset);
+
+  const setUserLocalDateTime = (dateTime: Date) =>
+    new Date(dateTime.getTime() +
+    ((new Date().getTimezoneOffset() + userTimeZoneOffset) * 60 * 1000));
 
   React.useEffect(() => {
     const currentDate = dates.find(date => date.fieldName === fieldName);
@@ -68,9 +73,9 @@ export const DateTimeFormat = (
       setValue(newDate);
     }
     if (!isNaN(defaultValue.getTime()) && dateBehavior === 'UserLocal') {
-      setValue(defaultValue);
+      setValue(setUserLocalDateTime(defaultValue));
     }
-  }, [dateBehavior]);
+  }, [dateBehavior, userTimeZoneOffset]);
 
   React.useEffect(() => { // set keys for date and time
     if (selectedValue !== undefined && !isNaN(selectedValue.getTime())) {
@@ -141,7 +146,10 @@ export const DateTimeFormat = (
     return key;
   };
 
-  const onChange = React.useCallback(
+  // setting the time is wrong
+  // if using setUserLocalDateTime - sets two hrs earlier
+  // if using local date - sets 4 hrs earlier
+  const onSelectTime = React.useCallback(
     (event: React.FormEvent<IComboBox>, option?: IComboBoxOption,
       index?: number, value?: string): void => {
       let key = option?.key;
@@ -156,7 +164,8 @@ export const DateTimeFormat = (
           _onChange(`${newValue.toISOString().split('T')[0]}T${key}:00Z`);
         }
         else {
-          _onChange(`${newValue?.toISOString().split('.')[0]}Z`);
+          _onChange(`${new Date(newValue.getTime() +
+            (userTimeZoneOffset * 60 * 1000)).toISOString().split('.')[0]}Z`);
         }
       }
     },
@@ -213,7 +222,7 @@ export const DateTimeFormat = (
         <ComboBox
           options={options}
           allowFreeform={true}
-          onChange={onChange}
+          onChange={onSelectTime}
           styles={comboBoxStyles}
           selectedKey={selectedKey}
         />

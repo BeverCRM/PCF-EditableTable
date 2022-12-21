@@ -1,6 +1,6 @@
 import { IColumn } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getDateMetadata, _userTimeZoneUtcOffsetMinutes } from '../../services/DataverseService';
+import { getDateMetadata } from '../../services/DataverseService';
 
 type Date = {
   fieldName: string,
@@ -8,12 +8,10 @@ type Date = {
 }
 
 interface IDateState {
-  userTimeZoneOffset: number;
   dates: Date[]
 }
 
 const initialState: IDateState = {
-  userTimeZoneOffset: _userTimeZoneUtcOffsetMinutes,
   dates: [],
 };
 
