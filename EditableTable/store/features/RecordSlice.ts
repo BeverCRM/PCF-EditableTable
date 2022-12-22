@@ -33,24 +33,24 @@ type AsyncThunkConfig = {
 export const saveRecords = createAsyncThunk<void, undefined, AsyncThunkConfig>(
   'record/saveRecords',
   async (a, thunkApi) => {
-    const recordsToSave = thunkApi.getState().record.changedRecords;
-    await Promise.all(recordsToSave.map(record => saveRecord(record)));
+    const { changedRecords } = thunkApi.getState().record;
+    await Promise.all(changedRecords.map(record => saveRecord(record)));
   },
 );
 
-export const deleteSelectedRecords = createAsyncThunk<Array<string>, any, AsyncThunkConfig>(
-  'record/deleteSelectedRecords',
-  async selectedRecordIds => {
+export const deleteRecords = createAsyncThunk<string[], string[], AsyncThunkConfig>(
+  'record/deleteRecords',
+  async recordIds => {
     const response = await openRecordDeleteDialog();
     if (response.confirmed) {
-      await Promise.all(selectedRecordIds.map(async (id: string) => {
+      await Promise.all(recordIds.map(async id => {
         await deleteRecord(id);
       }));
+
+      return recordIds;
     }
-    else {
-      selectedRecordIds = [];
-    }
-    return selectedRecordIds;
+
+    return [];
   },
 );
 
@@ -63,7 +63,7 @@ const RecordSlice = createSlice({
       action: PayloadAction<{id: string, fieldName: string, fieldType: string, newValue: any}>) => {
       const { changedRecords } = state;
       const currentRecord = changedRecords?.find(record => record.id === action.payload.id);
-      console.log(currentRecord?.data);
+
       if (currentRecord === undefined) {
         changedRecords.push({
           id: action.payload.id,
@@ -76,7 +76,7 @@ const RecordSlice = createSlice({
       else {
         const currentField = currentRecord.data
           .find(data => data.fieldName === action.payload.fieldName);
-        console.log(currentField);
+
         if (currentField === undefined) {
           currentRecord.data.push({
             fieldName: action.payload.fieldName,
@@ -90,7 +90,6 @@ const RecordSlice = createSlice({
         }
       }
       state.changedRecords = changedRecords;
-      console.log(state.changedRecords);
     },
   },
   extraReducers(builder) {
@@ -100,11 +99,11 @@ const RecordSlice = createSlice({
     builder.addCase(saveRecords.rejected, (state, action) => {
       console.log(action.payload);
     });
-    builder.addCase(deleteSelectedRecords.fulfilled, (state, action) => {
+    builder.addCase(deleteRecords.fulfilled, (state, action) => {
       state.changedRecords.filter(record =>
-        action.payload.find((id: string) => record.id !== id));
+        action.payload.find(id => record.id !== id));
     });
-    builder.addCase(deleteSelectedRecords.rejected, (state, action) => {
+    builder.addCase(deleteRecords.rejected, (state, action) => {
       console.log(action);
     });
   },

@@ -4,7 +4,8 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
   getLookupOptions,
   getRelationships,
-  getEntityPluralName } from '../../services/DataverseService';
+  getEntityPluralName,
+} from '../../services/DataverseService';
 import { RootState } from '../store';
 
 export type LookupField = {
@@ -19,19 +20,19 @@ export type Relationship = {
 }
 
 export type Lookup = {
-  logicalName: string | undefined,
-  reference: Relationship | undefined,
+  logicalName?: string,
+  reference?: Relationship,
   entityPluralName?: string,
   options: ITag[]
 }
 
 interface ILookupState {
-  logicalNames: Array<Relationship>,
-  lookups: Array<Lookup>
+  relationships: Relationship[],
+  lookups: Lookup[]
 }
 
 const initialState: ILookupState = {
-  logicalNames: [],
+  relationships: [],
   lookups: [],
 };
 
@@ -39,29 +40,27 @@ type AsyncThunkConfig = {
   state: RootState
 };
 
-export const setLogicalNames = createAsyncThunk<Relationship[], string, AsyncThunkConfig>(
-  'lookup/setLogicalNames', async () => await getRelationships(),
+export const setRelationships = createAsyncThunk<Relationship[], string>(
+  'lookup/setRelationships', async () => await getRelationships(),
 );
 
 export const setLookups = createAsyncThunk<Lookup[], LookupField[], AsyncThunkConfig>(
   'lookup/setLookups',
   async (lookupFields, thunkApi) =>
     await Promise.all(lookupFields.map(async lookupField => {
-      const { logicalNames } = thunkApi.getState().lookup;
+      const { relationships } = thunkApi.getState().lookup;
       const { lookupRefEntity } = lookupField;
       const { fieldName } = lookupField.lookupColumn;
 
       const lookupRef: Relationship | undefined =
-        logicalNames.find((ref: Relationship) => {
-          if (lookupRefEntity) {
-            if (ref.entityNameRef === lookupRefEntity) return true;
-          }
-          else if (ref.fieldNameRef === fieldName) {
-            return true;
-          }
+        relationships.find(relationship => {
+          if (lookupRefEntity && relationship.entityNameRef === lookupRefEntity) return true;
+          if (relationship.fieldNameRef === fieldName) return true;
+
+          return false;
         });
 
-      const entityName = lookupRef ? lookupRef.entityNameRef : '';
+      const entityName = lookupRef?.entityNameRef ?? '';
       const entityPluralName = await getEntityPluralName(entityName);
       const options = await getLookupOptions(entityName);
 
@@ -79,11 +78,11 @@ export const lookupSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: builder => {
-    builder.addCase(setLogicalNames.fulfilled, (state, action) => {
-      state.logicalNames = [...action.payload];
+    builder.addCase(setRelationships.fulfilled, (state, action) => {
+      state.relationships = [...action.payload];
     });
-    builder.addCase(setLogicalNames.rejected, (state, action) => {
-      state.logicalNames = [];
+    builder.addCase(setRelationships.rejected, (state, action) => {
+      state.relationships = [];
       console.log(action);
     });
     builder.addCase(setLookups.fulfilled, (state, action) => {
@@ -96,5 +95,3 @@ export const lookupSlice = createSlice({
 });
 
 export default lookupSlice.reducer;
-
-// export const { setLookupReference } = lookupSlice.actions;

@@ -5,13 +5,13 @@ type DataSet = ComponentFramework.PropertyTypes.DataSet;
 type Entity = ComponentFramework.WebApi.Entity;
 
 export const useSelection = (dataset: DataSet) => {
-  const [selectedRecordIds, setSelectedRecordIds] = React.useState<any[]>([]);
+  const [selectedRecordIds, setSelectedRecordIds] = React.useState<string[]>([]);
 
   const selection = new Selection({
     onSelectionChanged: () => {
       const recordIds = selection.getSelection()
         .filter((row: Entity) => row.key.length > 15)
-        .map((row : Entity) => row.key);
+        .map<string>((row : Entity) => row.key);
 
       dataset.setSelectedRecordIds(recordIds);
       setSelectedRecordIds(recordIds);
