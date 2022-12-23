@@ -5,47 +5,51 @@ import { useAppSelector } from '../../store/hooks';
 
 export interface IDropDownProps {
   fieldName: string | undefined;
-  defaultValue: string;
+  defaultValue: string[];
   isMultiple: boolean;
   isTwoOptions?: boolean;
   _onChange: any
 }
 
 export const OptionSetFormat =
-({ fieldName, defaultValue, isMultiple,
-  isTwoOptions, _onChange } : IDropDownProps) => {
-  const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);
-  const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
-  const options = currentDropdown?.options ?? [];
+  ({ fieldName, defaultValue, isMultiple,
+    isTwoOptions, _onChange }: IDropDownProps) => {
+    const [currentOptions, setCurrentOptions] = React.useState<string[]>(defaultValue ?? []);
 
-  const values = defaultValue?.split('; ');
-  const selectedValues = options.filter(opt => values?.some(val => {
-    if (val === opt.text) return true;
-  }));
-  const selectedOptions = selectedValues.map(value => value.key as string);
+    const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);
+    const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
+    const options = currentDropdown?.options ?? [];
 
-  const [currentOptions, setCurrentOptions] = React.useState<string[]>(selectedOptions);
+    const onChange =
+      (event: React.FormEvent<IComboBox>, option?: IComboBoxOption | undefined) => {
+        if (isMultiple) {
+          if (option?.selected) {
+            // doesnt work ?
+            _onChange([...currentOptions, option.key as string].join(', '));
+            setCurrentOptions([...currentOptions, option.key as string]);
+          }
+          else {
+            _onChange(currentOptions.filter(key => key !== option?.key).join(', '));
+            setCurrentOptions(currentOptions.filter(key => key !== option?.key));
+          }
+        }
+        else if (isTwoOptions) {
+          setCurrentOptions([option!.key.toString()]);
+          _onChange(option?.key === '1');
+        }
+        else {
+          setCurrentOptions([option!.key.toString()]);
+          _onChange(option?.key);
+        }
+      };
 
-  const onMultipleOptionChange =
-  (event: React.FormEvent<IComboBox>, option?: IComboBoxOption | undefined) => {
-    console.log(isTwoOptions);
-    if (option?.selected) {
-      setCurrentOptions([...currentOptions, option.key as string]);
-      _onChange([...currentOptions, option.key as string].join(', '));
-    }
-    else {
-      setCurrentOptions(currentOptions.filter(key => key !== option?.key));
-      _onChange(currentOptions.filter(key => key !== option?.key).join(', '));
-    }
+    return <Stack>
+      <ComboBox
+        options={options}
+        multiSelect={isMultiple}
+        selectedKey={currentOptions}
+        onChange={onChange}
+        styles={{ container: { maxWidth: '200px' } }}
+      />
+    </Stack>;
   };
-
-  return <Stack>
-    <ComboBox
-      options={options}
-      multiSelect={isMultiple}
-      selectedKey={currentOptions}
-      onChange={onMultipleOptionChange}
-      styles={{ container: { maxWidth: '200px' } }}
-    />
-  </Stack>;
-};

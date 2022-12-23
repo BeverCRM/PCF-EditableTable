@@ -2,12 +2,10 @@ import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
 import { Stack } from '@fluentui/react';
 import * as React from 'react';
 import { useAppSelector } from '../../store/hooks';
-import { Lookup as CurrentLookup } from '../../store/features/LookupSlice';
-import { shallowEqual } from 'react-redux';
 
 export interface ILookupProps {
   fieldName: string;
-  defaultValue: string;
+  defaultValue: ITag[] | undefined;
   _onChange: any,
   lookupReference: string,
 }
@@ -19,27 +17,12 @@ export type LogicalName = {
 }
 
 export const LookupFormat = ({ fieldName, defaultValue, _onChange } : ILookupProps) => {
-  const [options, setOptions] = React.useState<ITag[]>([]);
-  const [currentOption, setCurrentOption] = React.useState<ITag[] | undefined>();
-  const [currentLookup, setCurrentLookup] = React.useState<CurrentLookup>();
+  const [currentOption, setCurrentOption] = React.useState<ITag[] | undefined>(defaultValue);
   const picker = React.useRef(null);
 
-  const lookups = useAppSelector(state => state.lookup.lookups, shallowEqual);
-
-  React.useEffect(() => {
-    const currentLookup = lookups.find(lookup => lookup.logicalName === fieldName);
-    setCurrentLookup(currentLookup);
-    const options = currentLookup ? currentLookup.options : [];
-
-    setOptions(options);
-  }, [lookups]);
-
-  React.useEffect(() => {
-    if (defaultValue !== null) {
-      const selectedOption = options.filter(opt => opt.key === defaultValue);
-      setCurrentOption(selectedOption);
-    }
-  }, [options]);
+  const lookups = useAppSelector(state => state.lookup.lookups);
+  const currentLookup = lookups.find(lookup => lookup.logicalName === fieldName);
+  const options = currentLookup ? currentLookup.options : [];
 
   const initialValues = (): ITag[] => {
     if (options.length > 100) {
@@ -98,7 +81,6 @@ export const LookupFormat = ({ fieldName, defaultValue, _onChange } : ILookupPro
       itemLimit={1}
       pickerSuggestionsProps={{ noResultsFoundText: 'No Results Found' }}
       styles={{ text: { minWidth: '30px' }, root: { maxWidth: '300px' } }}
-      // onGetMoreResults={showMoreResults}
       onBlur={() => {
         if (picker.current) {
           // @ts-ignore

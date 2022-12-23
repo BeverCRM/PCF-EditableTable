@@ -15,6 +15,13 @@ export interface IDatePickerProps {
   _onChange: any
 }
 
+const formatTime = (date? : Date): string => !date ? ''
+  : date.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true,
+  });
+
 const styles = mergeStyleSets({
   root: { selectors: { '> *': { marginBottom: 15 } } },
   control: { maxWidth: 300, marginBottom: 15 },
@@ -23,37 +30,27 @@ const styles = mergeStyleSets({
 const onFormatDate = (date?: Date): string => !date ? ''
   : `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
 
-const formatTime = (date? : Date): string => !date ? ''
-  : date.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true,
-  });
-// .replace(/([\d]+:[\d]{2})(:[\d]{2})(.*)/, '$1$3');
-
 export const DateTimeFormat = (
   { fieldName, dateOnly, defaultValue, _onChange }: IDatePickerProps) => {
-  const left = dateOnly ? 0 : '-1px';
+
   const comboBoxStyles: Partial<IComboBoxStyles> = {
     optionsContainer: { maxHeight: 260 },
     container: { flexShrink: '2 !important',
-      marginLeft: left, maxWidth: 100 },
+      marginLeft: dateOnly ? 0 : '-1px',
+      maxWidth: 100 },
   };
 
-  const [selectedValue, setValue] = React.useState<Date | undefined>(!isNaN(defaultValue.getTime())
-    ? defaultValue : undefined);
-  const [selectedKey, setSelectedKey] = React.useState<string | number | undefined>();
+  const [currentDate, setCurrentDate] = React.useState<Date | undefined>(
+    !isNaN(defaultValue.getTime()) ? defaultValue : undefined);
+  const [timeKey, setTimeKey] = React.useState<string | number | undefined>();
   const [options, setOptions] = React.useState(timesList);
-  const [dateBehavior, setDateBehavior] = React.useState<string>('');
+  // const [dateBehavior, setDateBehavior] = React.useState<string>('');
   const datePickerRef = React.useRef<IDatePicker>(null);
 
   const dates = useAppSelector(state => state.date.dates, shallowEqual);
+  const currentDateMetadata = dates.find(date => date.fieldName === fieldName);
+  const dateBehavior = currentDateMetadata?.dateBehavior ?? '';
   const userTimeZoneOffset = getUserTimeZoneOffset();
-
-  React.useEffect(() => {
-    const currentDate = dates.find(date => date.fieldName === fieldName);
-    setDateBehavior(currentDate ? currentDate.dateBehavior : '');
-  }, [dates]);
 
   React.useEffect(() => {
     if (!isNaN(defaultValue.getTime()) && dateBehavior === 'TimeZoneIndependent') {
@@ -65,35 +62,35 @@ export const DateTimeFormat = (
         defaultValue.getUTCMinutes(),
         defaultValue.getUTCSeconds());
 
-      setValue(newDate);
+      setCurrentDate(newDate);
     }
     if (!isNaN(defaultValue.getTime()) && dateBehavior === 'UserLocal') {
-      setValue(new Date(defaultValue.getTime() +
+      setCurrentDate(new Date(defaultValue.getTime() +
         ((new Date().getTimezoneOffset() + userTimeZoneOffset) * 60 * 1000)));
     }
   }, [dateBehavior, userTimeZoneOffset]);
 
   React.useEffect(() => { // set keys for date and time
-    if (selectedValue !== undefined && !isNaN(selectedValue.getTime())) {
-      const hour = selectedValue.getHours() > 9
-        ? selectedValue.getHours()
-        : `0${selectedValue.getHours()}`;
-      const minutes = selectedValue.getMinutes() > 9
-        ? selectedValue.getMinutes()
-        : `0${selectedValue.getMinutes()}`;
+    if (currentDate !== undefined && !isNaN(currentDate.getTime())) {
+      const hour = currentDate.getHours() > 9
+        ? currentDate.getHours()
+        : `0${currentDate.getHours()}`;
+      const minutes = currentDate.getMinutes() > 9
+        ? currentDate.getMinutes()
+        : `0${currentDate.getMinutes()}`;
       const time = timesList.find(time => time.key === `${hour}:${minutes}`);
       const newKey = time === undefined ? `${hour}:${minutes}` : time.key;
-      setOptions(prevOptions => [...prevOptions, { key: newKey, text: formatTime(selectedValue) }]);
-      setSelectedKey(newKey);
+      setTimeKey(newKey);
+      setOptions(prevOptions => [...prevOptions, { key: newKey, text: formatTime(currentDate) }]);
     }
     else {
-      setSelectedKey(undefined);
+      setTimeKey(undefined);
     }
-  }, [selectedValue]);
+  }, [currentDate]);
 
   const onParseDateFromString = React.useCallback( // when date is typed
     (newValue: string): Date => {
-      const previousValue = selectedValue || new Date();
+      const previousValue = currentDate || new Date();
       const newValueParts = (newValue || '').trim().split('/');
       const day =
         newValueParts.length > 0
@@ -109,7 +106,7 @@ export const DateTimeFormat = (
       }
       return new Date(year, month, day);
     },
-    [selectedValue],
+    [currentDate],
   );
 
   const setTime = (value: Date | undefined, time: string | undefined) => {
@@ -142,7 +139,7 @@ export const DateTimeFormat = (
     return key;
   };
 
-  const onSelectTime = React.useCallback(
+  const onTimeChange = React.useCallback(
     (event: React.FormEvent<IComboBox>, option?: IComboBoxOption,
       index?: number, value?: string): void => {
       let key = option?.key;
@@ -150,8 +147,8 @@ export const DateTimeFormat = (
         key = formatValue(value);
         setOptions(prevOptions => [...prevOptions, { key: key!, text: value }]);
       }
-      setSelectedKey(key);
-      const newValue = setTime(selectedValue, key?.toString());
+      setTimeKey(key);
+      const newValue = setTime(currentDate, key?.toString());
       if (newValue !== undefined) {
         if (dateBehavior === 'TimeZoneIndependent') {
           _onChange(`${newValue.toISOString().split('T')[0]}T${key}:00Z`);
@@ -162,7 +159,7 @@ export const DateTimeFormat = (
         }
       }
     },
-    [selectedValue],
+    [currentDate],
   );
 
   const formatDate = (date: Date) => {
@@ -172,18 +169,18 @@ export const DateTimeFormat = (
     return fullDate;
   };
 
-  const onSelectDate = (date: Date | null | undefined) => {
+  const onDateChange = (date: Date | null | undefined) => {
     if (date !== null && date !== undefined) {
       if (dateOnly) {
-        setValue(date);
+        setCurrentDate(date);
         _onChange(`${formatDate(date)}T00:00:00Z`);
       }
       else {
-        const dateTime = setTime(date, selectedKey?.toString());
+        const dateTime = setTime(date, timeKey?.toString());
         if (dateTime !== undefined) {
-          setValue(dateTime);
+          setCurrentDate(dateTime);
           if (dateBehavior === 'TimeZoneIndependent') {
-            _onChange(`${formatDate(dateTime)}T${selectedKey ? selectedKey : '00:00'}:00Z`);
+            _onChange(`${formatDate(dateTime)}T${timeKey ? timeKey : '00:00'}:00Z`);
           }
           else {
             _onChange(`${dateTime.toISOString().split('.')[0]}Z`);
@@ -198,8 +195,8 @@ export const DateTimeFormat = (
       <DatePicker
         componentRef={datePickerRef}
         allowTextInput
-        value={selectedValue}
-        onSelectDate={onSelectDate}
+        value={currentDate}
+        onSelectDate={onDateChange}
         formatDate={onFormatDate}
         parseDateFromString={onParseDateFromString}
         className={styles.control}
@@ -215,9 +212,9 @@ export const DateTimeFormat = (
         <ComboBox
           options={options}
           allowFreeform={true}
-          onChange={onSelectTime}
+          onChange={onTimeChange}
           styles={comboBoxStyles}
-          selectedKey={selectedKey}
+          selectedKey={timeKey}
         />
       }
     </Stack>

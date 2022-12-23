@@ -153,15 +153,15 @@ export const getDropdownOptions =
     const results = await getFetchResponse(request);
     if (!isTwoOptions) {
       options = results.value[0].OptionSet.Options.map((result: any) => ({
-        key: result.Value,
+        key: result.Value.toString(),
         text: result.Label.UserLocalizedLabel.Label,
       }));
     }
     else {
-      const trueKey = results.value[0].OptionSet.TrueOption.Value;
+      const trueKey = results.value[0].OptionSet.TrueOption.Value.toString();
       const trueText = results.value[0].OptionSet.TrueOption.Label.UserLocalizedLabel.Label;
       options.push({ key: trueKey, text: trueText });
-      const falseKey = results.value[0].OptionSet.FalseOption.Value;
+      const falseKey = results.value[0].OptionSet.FalseOption.Value.toString();
       const falseText = results.value[0].OptionSet.FalseOption.Label.UserLocalizedLabel.Label;
       options.push({ key: falseKey, text: falseText });
     }

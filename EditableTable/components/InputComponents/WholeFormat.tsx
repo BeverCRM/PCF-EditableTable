@@ -10,29 +10,24 @@ export interface IWholeFormatProps {
 }
 
 export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProps) => {
-  const [selectedKey, setSelectedKey] = React.useState<string | number | undefined>('');
-  const timezones = useAppSelector(state => state.wholeFormat.timezones);
-  const lagnauges = useAppSelector(state => state.wholeFormat.languages);
+  const [selectedKey, setSelectedKey] = React.useState<string | number | undefined>(defaultValue);
+
+  const wholeFormat = useAppSelector(state => state.wholeFormat);
 
   let options: IComboBoxOption[] = [];
   switch (type) {
     case 'timezone':
-      options = timezones;
+      options = wholeFormat.timezones;
       break;
 
     case 'language':
-      options = lagnauges;
+      options = wholeFormat.languages;
       break;
 
     case 'duration':
       options = durationList;
       break;
   }
-
-  React.useEffect(() => {
-    const selectedOption = options.find(opt => opt.key === defaultValue);
-    setSelectedKey(selectedOption?.key);
-  }, [options]);
 
   const onChange = (event: React.FormEvent<IComboBox>, option?: IComboBoxOption): void => {
     const key = option?.key;

@@ -2,20 +2,20 @@ import { IColumn } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getDateMetadata } from '../../services/DataverseService';
 
-type Date = {
+type DateMetadata = {
   fieldName: string,
   dateBehavior: string
 }
 
 interface IDateState {
-  dates: Date[]
+  dates: DateMetadata[]
 }
 
 const initialState: IDateState = {
   dates: [],
 };
 
-export const getDateBehavior = createAsyncThunk<Date[], IColumn[]>(
+export const getDateBehavior = createAsyncThunk<DateMetadata[], IColumn[]>(
   'date/getDateBehavior',
   async dateFields =>
     await Promise.all(dateFields.map(async date => {

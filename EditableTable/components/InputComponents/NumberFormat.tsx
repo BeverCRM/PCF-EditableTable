@@ -1,6 +1,5 @@
 import { ISpinButtonStyles, SpinButton, Stack } from '@fluentui/react';
 import * as React from 'react';
-import { CurrencySymbol, NumberFieldMetadata } from '../../store/features/NumberSlice';
 import { useAppSelector } from '../../store/hooks';
 
 export interface IInputNumberProps {
@@ -13,6 +12,7 @@ export interface IInputNumberProps {
 
 export const NumberFormat = ({ fieldName,
   defaultValue, rowId, _onChange } : IInputNumberProps) => {
+
   const styles: Partial<ISpinButtonStyles> = {
     arrowButtonsContainer: {
       display: 'none',
@@ -21,36 +21,23 @@ export const NumberFormat = ({ fieldName,
       maxWidth: '150px',
     },
   };
-  const [val, setVal] = React.useState(defaultValue);
-  const [currentNumber, setCurrentNumber] = React.useState<NumberFieldMetadata>();
-  const [currentCurrency, setCurrentCurrency] = React.useState<CurrencySymbol>();
+  const [value, setValue] = React.useState<string>(defaultValue);
+  // const [currentCurrency, setCurrentCurrency] = React.useState<CurrencySymbol>();
 
   const numbers = useAppSelector(state => state.number.numberFieldsMetadata);
   const currencySymbols = useAppSelector(state => state.number.currencySymbols);
 
-  React.useEffect(() => {
-    const number = numbers.find(num => num.fieldName === fieldName);
-    setCurrentNumber(number);
-  }, [numbers]);
-
-  React.useEffect(() => {
-    if (rowId !== undefined) {
-      const currentCurrency = currencySymbols.find(currency => currency.recordId === rowId);
-      setCurrentCurrency(currentCurrency);
-    }
-  });
+  const currentNumber = numbers.find(num => num.fieldName === fieldName);
+  const currentCurrency = currencySymbols.find(currency => currency.recordId === rowId) ?? null;
 
   const onValidate = (value: string): string | void => {
-    let newValue = value;
-    if (value.slice(0, 1) === currentCurrency?.symbol) {
-      newValue = value.slice(1);
-    }
+    const newValue = value.slice(0, 1) === currentCurrency?.symbol ? value.slice(1) : value;
     return String(parseFloat(newValue).toFixed(currentNumber?.precision));
   };
 
   const onNumberChange = (event: React.SyntheticEvent<HTMLElement>, newValue?: string) => {
     if (newValue !== undefined && newValue !== null) {
-      setVal(currentCurrency?.symbol !== undefined
+      setValue(currentCurrency?.symbol !== undefined
         ? currentCurrency?.symbol + newValue
         : newValue);
       _onChange(parseFloat(parseFloat(newValue).toFixed(currentNumber?.precision)));
@@ -69,7 +56,7 @@ export const NumberFormat = ({ fieldName,
         styles={styles}
         onChange={onNumberChange}
         onValidate={onValidate}
-        value={val}
+        value={value}
       />
     </Stack>
   );

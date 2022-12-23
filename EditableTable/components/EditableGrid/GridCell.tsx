@@ -24,10 +24,14 @@ export const GridCell = ({ item, column }: IGridSetProps) => {
 
   const fieldContent = item[column?.fieldName as keyof any] as any;
   const fieldKey = item.raw?._record?.fields[column?.fieldName as keyof any]?.value;
+  const optionsetValue: string = item.raw?._record?.fields[column?.fieldName!]?.valueString;
+  const multiselectValue = column?.data === 'MultiSelectPicklist' ? fieldKey?.split(',') : [];
   const currentRecord = item[column?.fieldName!] === '' || item[column?.fieldName!] === null
     ? '' : item?.raw?.getValue(column?.fieldName!);
 
   const lookupReference = currentRecord?.etn;
+  const lookupDefaultValue = column?.data === 'Lookup.Simple' && fieldContent && currentRecord
+    ? [{ name: fieldContent, key: currentRecord?.id?.guid }] : undefined;
 
   if (column !== undefined && fieldContent !== undefined) {
     switch (column.data) {
@@ -52,19 +56,19 @@ export const GridCell = ({ item, column }: IGridSetProps) => {
 
       case 'OptionSet':
         return <OptionSetFormat fieldName={column?.fieldName ? column?.fieldName : ''}
-          defaultValue={fieldContent} isMultiple={false}
+          defaultValue={[optionsetValue]} isMultiple={false}
           _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')}
         />;
 
       case 'Lookup.Simple':
         return <LookupFormat fieldName={column?.fieldName ? column?.fieldName : ''}
-          defaultValue={currentRecord?.id?.guid}
+          defaultValue={lookupDefaultValue}
           _onChange={changedValue.bind('', item.key)}
           lookupReference={lookupReference} />;
 
       case 'TwoOptions':
         return <OptionSetFormat fieldName={column?.fieldName ? column?.fieldName : ''}
-          defaultValue={fieldContent} isMultiple={false} isTwoOptions={true}
+          defaultValue={[optionsetValue]} isMultiple={false} isTwoOptions={true}
           _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')}
         />;
 
@@ -92,7 +96,7 @@ export const GridCell = ({ item, column }: IGridSetProps) => {
 
       case 'MultiSelectPicklist':
         return <OptionSetFormat fieldName={column?.fieldName ? column?.fieldName : ''}
-          defaultValue={fieldContent} isMultiple={true}
+          defaultValue={multiselectValue} isMultiple={true}
           _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')}
         />;
 

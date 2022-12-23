@@ -22,8 +22,15 @@ export const usePagination = (dataset: DataSet) => {
   const lastItemNumber = (currentPage - 1) * pageSize + pageSize;
 
   useEffect(() => {
+    setCurrentPage(dataset.paging.firstPageNumber);
+  }, [dataset.paging.firstPageNumber]);
+
+  useEffect(() => {
     if (!dataset.loading && dataset.paging.firstPageNumber !== currentPage) {
       dataset.paging.loadExactPage(currentPage);
+    }
+    else {
+      dispatch(setLoading(false));
     }
   }, [currentPage, dataset.loading]);
 

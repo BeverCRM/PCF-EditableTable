@@ -20,9 +20,9 @@ export type Relationship = {
 }
 
 export type Lookup = {
-  logicalName?: string,
-  reference?: Relationship,
-  entityPluralName?: string,
+  logicalName: string | undefined,
+  reference: Relationship | undefined,
+  entityPluralName: string | undefined,
   options: ITag[]
 }
 
