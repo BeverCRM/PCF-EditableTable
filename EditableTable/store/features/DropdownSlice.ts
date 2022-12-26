@@ -1,6 +1,7 @@
 import { IColumn, IDropdownOption } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getDropdownOptions } from '../../services/DataverseService';
+import { DynamicsError, showErrorDialog } from './ErrorSlice';
 
 export type DropdownField = {
   fieldName: string,
@@ -17,45 +18,52 @@ const initialState: IDropdownState = {
 
 export const getDropdownsOptions = createAsyncThunk<DropdownField[], IColumn[]>(
   'dropdown/getDropdownsOptions',
-  async dropdownFields =>
-    await Promise.all(dropdownFields.map(async dropdownField => {
-      let attributeType: string;
-      let isTwoOptions: boolean;
+  async (dropdownFields, thunkApi) => {
+    try {
+      return await Promise.all(dropdownFields.map(async dropdownField => {
+        let attributeType: string;
+        let isTwoOptions: boolean;
 
-      switch (dropdownField.data) {
-        case 'TwoOptions':
-          attributeType = 'BooleanAttributeMetadata';
-          isTwoOptions = true;
-          break;
+        switch (dropdownField.data) {
+          case 'TwoOptions':
+            attributeType = 'BooleanAttributeMetadata';
+            isTwoOptions = true;
+            break;
 
-        case 'MultiSelectPicklist':
-          attributeType = 'MultiSelectPicklistAttributeMetadata';
-          isTwoOptions = false;
-          break;
+          case 'MultiSelectPicklist':
+            attributeType = 'MultiSelectPicklistAttributeMetadata';
+            isTwoOptions = false;
+            break;
 
-        default:
-          attributeType = 'PicklistAttributeMetadata';
-          isTwoOptions = false;
-      }
+          default:
+            attributeType = 'PicklistAttributeMetadata';
+            isTwoOptions = false;
+        }
 
-      switch (dropdownField.fieldName) {
-        case 'statuscode':
-          attributeType = 'StatusAttributeMetadata';
-          isTwoOptions = false;
-          break;
+        switch (dropdownField.fieldName) {
+          case 'statuscode':
+            attributeType = 'StatusAttributeMetadata';
+            isTwoOptions = false;
+            break;
 
-        case 'statecode':
-          attributeType = 'StateAttributeMetadata';
-          isTwoOptions = false;
-          break;
-      }
+          case 'statecode':
+            attributeType = 'StateAttributeMetadata';
+            isTwoOptions = false;
+            break;
+        }
 
-      const currentDropdown = await getDropdownOptions(
-        dropdownField.fieldName!,
-        attributeType,
-        isTwoOptions);
-      return <DropdownField>currentDropdown;
-    })),
+        const currentDropdown = await getDropdownOptions(
+          dropdownField.fieldName!,
+          attributeType,
+          isTwoOptions);
+        return <DropdownField>currentDropdown;
+      }));
+    }
+    catch (error) {
+      thunkApi.dispatch(showErrorDialog(error as DynamicsError));
+      return [];
+    }
+  },
 );
 
 const DropdownSlice = createSlice({

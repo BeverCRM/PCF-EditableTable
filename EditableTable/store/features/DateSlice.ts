@@ -1,6 +1,7 @@
 import { IColumn } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getDateMetadata } from '../../services/DataverseService';
+import { DynamicsError, showErrorDialog } from './ErrorSlice';
 
 type DateMetadata = {
   fieldName: string,
@@ -15,16 +16,27 @@ const initialState: IDateState = {
   dates: [],
 };
 
+// type AsyncThunkConfig = {
+//   state: RootState,
+// };
+
 export const getDateBehavior = createAsyncThunk<DateMetadata[], IColumn[]>(
   'date/getDateBehavior',
-  async dateFields =>
-    await Promise.all(dateFields.map(async date => {
-      const behavior = await getDateMetadata(date.key);
-      return {
-        fieldName: date.key,
-        dateBehavior: behavior,
-      };
-    })),
+  async (dateFields, thunkApi) => {
+    try {
+      return await Promise.all(dateFields.map(async date => {
+        const behavior = await getDateMetadata(date.key);
+        return {
+          fieldName: date.key,
+          dateBehavior: behavior,
+        };
+      }));
+    }
+    catch (error) {
+      thunkApi.dispatch(showErrorDialog(error as DynamicsError));
+      return [];
+    }
+  },
 );
 
 export const dateSlice = createSlice({
