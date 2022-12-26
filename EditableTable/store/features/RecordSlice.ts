@@ -1,8 +1,12 @@
 import { IColumn } from '@fluentui/react';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { deleteRecord, openRecordDeleteDialog, saveRecord } from '../../services/DataverseService';
+import {
+  deleteRecord,
+  openRecordDeleteDialog,
+  saveRecord,
+  openErrorDialog,
+} from '../../services/DataverseService';
 import { RootState } from '../store';
-import { DynamicsError, showErrorDialog } from './ErrorSlice';
 
 export type Record = {
   id: string;
@@ -39,30 +43,25 @@ export const saveRecords = createAsyncThunk<void, undefined, AsyncThunkConfig>(
       await Promise.all(changedRecords.map(record => saveRecord(record)));
     }
     catch (error) {
-      thunkApi.dispatch(showErrorDialog(error as DynamicsError));
+      openErrorDialog(error);
+      throw error;
     }
   },
 );
 
 export const deleteRecords = createAsyncThunk<string[], string[], AsyncThunkConfig>(
   'record/deleteRecords',
-  async (recordIds, thunkApi) => {
-    try {
-      const response = await openRecordDeleteDialog();
-      if (response.confirmed) {
-        await Promise.all(recordIds.map(async id => {
-          await deleteRecord(id);
-        }));
+  async recordIds => {
+    const response = await openRecordDeleteDialog();
+    if (response.confirmed) {
+      await Promise.all(recordIds.map(async id => {
+        await deleteRecord(id);
+      }));
 
-        return recordIds;
-      }
+      return recordIds;
+    }
 
-      return [];
-    }
-    catch (error) {
-      thunkApi.dispatch(showErrorDialog(error as DynamicsError));
-      return [];
-    }
+    return [];
   },
 );
 
@@ -109,14 +108,14 @@ const RecordSlice = createSlice({
       state.changedRecords = [];
     });
     builder.addCase(saveRecords.rejected, (state, action) => {
-      action.error;
+      openErrorDialog(action.error);
     });
     builder.addCase(deleteRecords.fulfilled, (state, action) => {
       state.changedRecords.filter(record =>
         action.payload.find(id => record.id !== id));
     });
     builder.addCase(deleteRecords.rejected, (state, action) => {
-      console.log(action);
+      openErrorDialog(action.error);
     });
   },
 });

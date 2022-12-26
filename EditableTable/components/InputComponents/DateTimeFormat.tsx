@@ -1,51 +1,41 @@
 import * as React from 'react';
-import { DatePicker, IDatePicker, mergeStyleSets,
-  defaultDatePickerStrings } from '@fluentui/react';
+import { DatePicker, mergeStyleSets, defaultDatePickerStrings } from '@fluentui/react';
 import { ComboBox, IComboBox, IComboBoxOption, IComboBoxStyles, Stack } from '@fluentui/react';
 import { timesList } from './timeList';
 import { stackComboBox } from '../../styles/ComboBoxStyles';
 import { useAppSelector } from '../../store/hooks';
 import { shallowEqual } from 'react-redux';
 import { getUserTimeZoneOffset } from '../../services/DataverseService';
+import { formatTime, formatDate } from '../../utils/dateTimeUtils';
 
 export interface IDatePickerProps {
-  fieldName: string,
-  dateOnly : boolean,
-  defaultValue : Date,
-  _onChange: any
+  fieldName: string;
+  dateOnly: boolean;
+  defaultValue: Date;
+  _onChange: Function;
 }
-
-const formatTime = (date? : Date): string => !date ? ''
-  : date.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true,
-  });
 
 const styles = mergeStyleSets({
   root: { selectors: { '> *': { marginBottom: 15 } } },
   control: { maxWidth: 300, marginBottom: 15 },
 });
 
-const onFormatDate = (date?: Date): string => !date ? ''
-  : `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-
 export const DateTimeFormat = (
   { fieldName, dateOnly, defaultValue, _onChange }: IDatePickerProps) => {
 
   const comboBoxStyles: Partial<IComboBoxStyles> = {
     optionsContainer: { maxHeight: 260 },
-    container: { flexShrink: '2 !important',
+    container: {
+      flexShrink: '2 !important',
       marginLeft: dateOnly ? 0 : '-1px',
-      maxWidth: 100 },
+      maxWidth: 100,
+    },
   };
 
   const [currentDate, setCurrentDate] = React.useState<Date | undefined>(
     !isNaN(defaultValue.getTime()) ? defaultValue : undefined);
   const [timeKey, setTimeKey] = React.useState<string | number | undefined>();
   const [options, setOptions] = React.useState(timesList);
-  // const [dateBehavior, setDateBehavior] = React.useState<string>('');
-  const datePickerRef = React.useRef<IDatePicker>(null);
 
   const dates = useAppSelector(state => state.date.dates, shallowEqual);
   const currentDateMetadata = dates.find(date => date.fieldName === fieldName);
@@ -88,26 +78,23 @@ export const DateTimeFormat = (
     }
   }, [currentDate]);
 
-  const onParseDateFromString = React.useCallback( // when date is typed
-    (newValue: string): Date => {
-      const previousValue = currentDate || new Date();
-      const newValueParts = (newValue || '').trim().split('/');
-      const day =
-        newValueParts.length > 0
-          ? Math.max(1, Math.min(31, parseInt(newValueParts[0], 10))) : previousValue.getDate();
-      const month =
-        newValueParts.length > 1
-          ? Math.max(1, Math.min(12, parseInt(newValueParts[1], 10))) - 1
-          : previousValue.getMonth();
-      let year = newValueParts.length > 2
-        ? parseInt(newValueParts[2], 10) : previousValue.getFullYear();
-      if (year < 100) {
-        year += previousValue.getFullYear() - (previousValue.getFullYear() % 100);
-      }
-      return new Date(year, month, day);
-    },
-    [currentDate],
-  );
+  const onParseDateFromString = (newValue: string): Date => {
+    const previousValue = currentDate || new Date();
+    const newValueParts = (newValue || '').trim().split('/');
+    const day =
+      newValueParts.length > 0
+        ? Math.max(1, Math.min(31, parseInt(newValueParts[0], 10))) : previousValue.getDate();
+    const month =
+      newValueParts.length > 1
+        ? Math.max(1, Math.min(12, parseInt(newValueParts[1], 10))) - 1
+        : previousValue.getMonth();
+    let year = newValueParts.length > 2
+      ? parseInt(newValueParts[2], 10) : previousValue.getFullYear();
+    if (year < 100) {
+      year += previousValue.getFullYear() - (previousValue.getFullYear() % 100);
+    }
+    return new Date(year, month, day);
+  };
 
   const setTime = (value: Date | undefined, time: string | undefined) => {
     if (time !== undefined && value !== undefined) {
@@ -139,34 +126,24 @@ export const DateTimeFormat = (
     return key;
   };
 
-  const onTimeChange = React.useCallback(
-    (event: React.FormEvent<IComboBox>, option?: IComboBoxOption,
-      index?: number, value?: string): void => {
-      let key = option?.key;
-      if (!option && value) {
-        key = formatValue(value);
-        setOptions(prevOptions => [...prevOptions, { key: key!, text: value }]);
+  const onTimeChange = (event: React.FormEvent<IComboBox>, option?: IComboBoxOption,
+    index?: number, value?: string): void => {
+    let key = option?.key;
+    if (!option && value) {
+      key = formatValue(value);
+      setOptions(prevOptions => [...prevOptions, { key: key!, text: value }]);
+    }
+    setTimeKey(key);
+    const newValue = setTime(currentDate, key?.toString());
+    if (newValue !== undefined) {
+      if (dateBehavior === 'TimeZoneIndependent') {
+        _onChange(`${newValue.toISOString().split('T')[0]}T${key}:00Z`);
       }
-      setTimeKey(key);
-      const newValue = setTime(currentDate, key?.toString());
-      if (newValue !== undefined) {
-        if (dateBehavior === 'TimeZoneIndependent') {
-          _onChange(`${newValue.toISOString().split('T')[0]}T${key}:00Z`);
-        }
-        else {
-          _onChange(`${new Date(newValue.getTime() +
-            (userTimeZoneOffset * 60 * 1000)).toISOString().split('.')[0]}Z`);
-        }
+      else {
+        _onChange(`${new Date(newValue.getTime() +
+          (userTimeZoneOffset * 60 * 1000)).toISOString().split('.')[0]}Z`);
       }
-    },
-    [currentDate],
-  );
-
-  const formatDate = (date: Date) => {
-    const day = date.getDate() > 9 ? date.getDate() : `0${date.getDate()}`;
-    const month = date.getMonth() + 1 > 9 ? `${date.getMonth() + 1}` : `0${date.getMonth() + 1}`;
-    const fullDate = `${date.getFullYear()}-${month}-${day}`;
-    return fullDate;
+    }
   };
 
   const onDateChange = (date: Date | null | undefined) => {
@@ -180,7 +157,7 @@ export const DateTimeFormat = (
         if (dateTime !== undefined) {
           setCurrentDate(dateTime);
           if (dateBehavior === 'TimeZoneIndependent') {
-            _onChange(`${formatDate(dateTime)}T${timeKey ? timeKey : '00:00'}:00Z`);
+            _onChange(`${formatDate(dateTime)}T${timeKey ?? '00:00'}:00Z`);
           }
           else {
             _onChange(`${dateTime.toISOString().split('.')[0]}Z`);
@@ -193,20 +170,21 @@ export const DateTimeFormat = (
   return (
     <Stack styles={stackComboBox}>
       <DatePicker
-        componentRef={datePickerRef}
         allowTextInput
         value={currentDate}
         onSelectDate={onDateChange}
-        formatDate={onFormatDate}
+        formatDate={formatDate}
         parseDateFromString={onParseDateFromString}
         className={styles.control}
         strings={defaultDatePickerStrings}
-        styles={!dateOnly ? { textField: {
-          borderLeft: 'none',
-          borderTopLeftRadius: 0,
-          borderBottomLeftRadius: 0,
-          zIndex: 100,
-        } } : {}}
+        styles={!dateOnly ? {
+          textField: {
+            borderLeft: 'none',
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+            zIndex: 100,
+          },
+        } : {}}
       />
       {!dateOnly &&
         <ComboBox

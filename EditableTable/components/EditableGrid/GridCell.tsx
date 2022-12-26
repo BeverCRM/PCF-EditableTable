@@ -23,9 +23,9 @@ export const GridCell = ({ item, column }: IGridSetProps) => {
   };
 
   const fieldContent = item[column?.fieldName as keyof any] as any;
-  const fieldKey = item.raw?._record?.fields[column?.fieldName as keyof any]?.value;
+  const fieldValue = item.raw?._record?.fields[column?.fieldName as keyof any]?.value;
   const optionsetValue: string = item.raw?._record?.fields[column?.fieldName!]?.valueString;
-  const multiselectValue = column?.data === 'MultiSelectPicklist' ? fieldKey?.split(',') : [];
+  const multiselectValue = column?.data === 'MultiSelectPicklist' ? fieldValue?.split(',') : [];
   const currentRecord = item[column?.fieldName!] === '' || item[column?.fieldName!] === null
     ? '' : item?.raw?.getValue(column?.fieldName!);
 
@@ -45,13 +45,13 @@ export const GridCell = ({ item, column }: IGridSetProps) => {
       case 'DateAndTime.DateAndTime':
         return <DateTimeFormat fieldName={column?.fieldName ? column?.fieldName : ''}
           dateOnly={false} key={column.key}
-          defaultValue={new Date(fieldKey)}
+          defaultValue={new Date(fieldValue)}
           _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')}
         />; // TODO
 
       case 'DateAndTime.DateOnly':
         return <DateTimeFormat fieldName={column?.fieldName ? column?.fieldName : ''}
-          dateOnly={true} defaultValue={new Date(fieldKey)}
+          dateOnly={true} defaultValue={new Date(fieldValue)}
           _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
 
       case 'OptionSet':
@@ -106,15 +106,15 @@ export const GridCell = ({ item, column }: IGridSetProps) => {
           _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
 
       case 'Whole.Duration':
-        return <WholeFormat defaultValue={fieldKey} type={'duration'}
+        return <WholeFormat defaultValue={fieldValue} type={'duration'}
           _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
 
       case 'Whole.Language':
-        return <WholeFormat defaultValue={fieldKey} type={'language'}
+        return <WholeFormat defaultValue={fieldValue} type={'language'}
           _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
 
       case 'Whole.TimeZone':
-        return <WholeFormat defaultValue={fieldKey} type={'timezone'}
+        return <WholeFormat defaultValue={fieldValue} type={'timezone'}
           _onChange={changedValue.bind('', item.key, column?.fieldName || '', '')} />;
 
       default:

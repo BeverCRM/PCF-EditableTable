@@ -6,7 +6,7 @@ import { durationList } from './durationList';
 export interface IWholeFormatProps {
   defaultValue: string;
   type: string;
-  _onChange: any
+  _onChange: Function;
 }
 
 export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProps) => {

@@ -8,7 +8,7 @@ export interface IDropDownProps {
   defaultValue: string[];
   isMultiple: boolean;
   isTwoOptions?: boolean;
-  _onChange: any
+  _onChange: Function;
 }
 
 export const OptionSetFormat =

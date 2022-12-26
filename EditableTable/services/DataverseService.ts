@@ -77,7 +77,7 @@ export const deleteRecord = async (recordId: string): Promise<void> => {
 };
 
 export const openRecordDeleteDialog =
-  async () : Promise<ComponentFramework.NavigationApi.ConfirmDialogResponse> => {
+  async (): Promise<ComponentFramework.NavigationApi.ConfirmDialogResponse> => {
     const entityMetadata = await _context.utils.getEntityMetadata(_targetEntityType);
     const confirmStrings = {
       text: `Do you want to delete this ${entityMetadata._displayName}?
@@ -90,12 +90,15 @@ export const openRecordDeleteDialog =
     return response;
   };
 
-export const openErrorDialog =
-  async (errorOptions: ComponentFramework.NavigationApi.ErrorDialogOptions) : Promise<void> => {
-    const error = await _context.navigation.openErrorDialog(errorOptions);
-
-    return error;
+export const openErrorDialog = (error: any): Promise<void> => {
+  const errorDialogOptions: ComponentFramework.NavigationApi.ErrorDialogOptions = {
+    errorCode: error.code,
+    message: error.message,
+    details: error.raw,
   };
+
+  return _context.navigation.openErrorDialog(errorDialogOptions);
+};
 
 export const saveRecord = async (record: Record): Promise<void> => {
   const data = record.data.reduce((obj, recordData) =>
@@ -116,19 +119,19 @@ export const getRelationships = async (): Promise<Relationship[]> => {
   const results = await getFetchResponse(request);
 
   return [
-    ...results.OneToManyRelationships.map((relationship : any) => <Relationship>{
+    ...results.OneToManyRelationships.map((relationship: any) => <Relationship>{
       fieldNameRef: relationship.ReferencingAttribute,
       entityNameRef: relationship.ReferencedEntity,
       entityNavigation: relationship.ReferencingEntityNavigationPropertyName,
     },
     ),
-    ...results.ManyToOneRelationships.map((relationship:any) => <Relationship>{
+    ...results.ManyToOneRelationships.map((relationship: any) => <Relationship>{
       fieldNameRef: relationship.ReferencingAttribute,
       entityNameRef: relationship.ReferencedEntity,
       entityNavigation: relationship.ReferencingEntityNavigationPropertyName,
     },
     ),
-    ...results.ManyToManyRelationships.map((relationship:any) => <Relationship>{
+    ...results.ManyToManyRelationships.map((relationship: any) => <Relationship>{
       fieldNameRef: relationship.ReferencingAttribute,
       entityNameRef: relationship.ReferencedEntity,
     },

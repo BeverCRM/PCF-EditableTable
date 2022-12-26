@@ -7,7 +7,7 @@ export interface IInputNumberProps {
   defaultValue: string;
   type: string;
   rowId?: string;
-  _onChange: any
+  _onChange: Function;
 }
 
 export const NumberFormat = ({ fieldName,
