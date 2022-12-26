@@ -90,6 +90,13 @@ export const openRecordDeleteDialog =
     return response;
   };
 
+export const openErrorDialog =
+  async (errorOptions: ComponentFramework.NavigationApi.ErrorDialogOptions) : Promise<void> => {
+    const error = await _context.navigation.openErrorDialog(errorOptions);
+
+    return error;
+  };
+
 export const saveRecord = async (record: Record): Promise<void> => {
   const data = record.data.reduce((obj, recordData) =>
     Object.assign(obj, recordData.fieldType === 'lookup'
