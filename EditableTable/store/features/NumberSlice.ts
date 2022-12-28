@@ -63,10 +63,10 @@ export const getCurrencySymbols = createAsyncThunk<CurrencySymbol[], string[]>(
   'number/getCurrencySymbols',
   async recordIds =>
     await Promise.all(recordIds.map(async recordId => {
-      const currentSymbol = await getCurrencySymbol(recordId);
+      const currencySymbol = await getCurrencySymbol(recordId);
       return <CurrencySymbol>{
         recordId,
-        symbol: currentSymbol,
+        symbol: currencySymbol,
       };
     })),
 );

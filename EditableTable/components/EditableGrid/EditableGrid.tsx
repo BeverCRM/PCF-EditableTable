@@ -8,27 +8,18 @@ import {
 } from '@fluentui/react';
 
 import { useSelection } from '../../hooks/useSelection';
+import { useLoadStore } from '../../hooks/useLoadStore';
 import { useAppDispatch } from '../../store/hooks';
 
 import { CommandBar } from './CommandBar';
 import { GridFooter } from './GridFooter';
 import { GridCell } from './GridCell';
 
-import {
-  deleteRecords,
-  saveRecords,
-} from '../../store/features/RecordSlice';
-import { setRelationships, setLookups } from '../../store/features/LookupSlice';
-import { getDropdownsOptions } from '../../store/features/DropdownSlice';
-import { LookupField } from '../../store/features/LookupSlice';
-import { getCurrencySymbols, getNumberFieldsMetadata } from '../../store/features/NumberSlice';
-import { getLanguages, getTimeZones } from '../../store/features/WholeFormatSlice';
-import { getDateBehavior } from '../../store/features/DateSlice';
+import { deleteRecords, saveRecords } from '../../store/features/RecordSlice';
 import { setLoading } from '../../store/features/LoadingSlice';
 
 import { mapDataSetColumns, mapDataSetItems } from '../../mappers/dataSetMapper';
 import { _onRenderDetailsHeader, _onRenderRow } from '../../utils/Utils';
-import { getColumns } from '../../services/DataverseService';
 
 import { dataSetStyles } from '../../styles/DataSetStyles';
 
@@ -36,22 +27,18 @@ type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
 export interface IDataSetProps {
   dataset: DataSet;
-  targetEntityType: string;
   width: number;
   height: number;
 }
 
-export const EditableGrid = ({ dataset, targetEntityType, height, width }: IDataSetProps) => {
+export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
   const [items, setItems] = React.useState<any[]>([]);
   const { selection, selectedRecordIds } = useSelection(dataset);
   const listRef = React.useRef<IDetailsList>(null);
 
-  const dispatch = useAppDispatch();
-
   const columns = mapDataSetColumns(dataset);
 
-  const getColumnsOfType = (types: string[]): IColumn[] =>
-    columns.filter(column => types.includes(column.data));
+  const dispatch = useAppDispatch();
 
   const refreshButtonHandler = () => {
     dispatch(setLoading(true));
@@ -59,16 +46,16 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
   };
 
   const newButtonHandler = () => {
-    const emptyColumns = getColumns();
-    const emptyAttributes = emptyColumns.map((column: any) => ({ [column.name]: '' }));
+    const emptyAttributes = columns.map(column => ({ [column.name]: '' }));
 
-    setItems((previousItems: any) =>
-      [Object.assign(
-        { key: Date.now().toString(), raw: [] },
-        ...emptyAttributes),
-      ...previousItems]);
-
-    listRef.current?.forceUpdate();
+    setItems(previousItems => [
+      {
+        key: Date.now().toString(),
+        raw: [],
+        ...emptyAttributes,
+      },
+      ...previousItems,
+    ]);
   };
 
   const deleteButtonHandler = () => {
@@ -76,12 +63,6 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
     dispatch(deleteRecords(selectedRecordIds)).unwrap()
       .then(() => {
         dataset.refresh();
-      })
-      .catch(error => {
-        console.log(error);
-      })
-      .finally(() => {
-        dispatch(setLoading(false));
       });
   };
 
@@ -90,12 +71,6 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
     dispatch(saveRecords()).unwrap()
       .then(() => {
         dataset.refresh();
-      })
-      .catch(error => {
-        console.log(error);
-      })
-      .finally(() => {
-        dispatch(setLoading(false));
       });
   };
 
@@ -103,58 +78,10 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
     const datasetItems = mapDataSetItems(dataset);
     setItems(datasetItems);
 
-    const lookupFields: LookupField[] = [];
-    const lookupColumns = getColumnsOfType(['Lookup.Simple']);
-
-    lookupColumns.forEach(lookupColumn => {
-      const item = datasetItems.find(datasetItem =>
-        datasetItem.raw?._record?.fields[lookupColumn.fieldName!]?.reference?.etn !== undefined);
-
-      const lookupRefEntity = item?.raw?._record?.fields[lookupColumn.fieldName!]?.reference?.etn;
-
-      lookupFields.push({ lookupColumn, lookupRefEntity });
-    });
-
-    if (lookupFields.length > 0) {
-      dispatch(setRelationships(targetEntityType)).unwrap()
-        .then(() => {
-          dispatch(setLookups(lookupFields));
-        })
-        .catch(err => { console.log(err); });
-    }
-
-    const dropdownColumns = getColumnsOfType(['OptionSet', 'TwoOptions', 'MultiSelectPicklist']);
-    if (dropdownColumns.length > 0) {
-      dispatch(getDropdownsOptions(dropdownColumns));
-    }
-
-    const numberColumns = getColumnsOfType(['Decimal', 'Currency', 'FP', 'Whole.None']);
-    if (numberColumns.length > 0) {
-      dispatch(getNumberFieldsMetadata(numberColumns));
-
-      // for currency symbol go to record by id and get transactioncurrencyid field (lookup)
-      if (numberColumns.some(numberColumn => numberColumn.data === 'Currency')) {
-        dispatch(getCurrencySymbols(datasetItems.map(item => item.key)));
-      }
-    }
-
-    const timezoneColumns = getColumnsOfType(['Whole.TimeZone']);
-    if (timezoneColumns.length > 0) {
-      dispatch(getTimeZones());
-    }
-
-    const languageColumns = getColumnsOfType(['Whole.Language']);
-    if (languageColumns.length > 0) {
-      dispatch(getLanguages());
-    }
-
-    const dateColumns = getColumnsOfType(['DateAndTime.DateAndTime', 'DateAndTime.DateOnly']);
-    if (dateColumns.length > 0) {
-      dispatch(getDateBehavior(dateColumns));
-    }
-
-    dispatch(setLoading(false));
+    listRef.current?.forceUpdate();
   }, [dataset]);
+
+  useLoadStore(dataset);
 
   const _renderItemColumn = (item: any, index: number | undefined, column: IColumn | undefined) =>
     <GridCell item={item} column={column} />;
@@ -168,10 +95,7 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
         saveButtonHandler={saveButtonHandler}
       ></CommandBar>
     </Stack>
-    <Stack style={{
-      width,
-      height,
-    }}>
+    <Stack style={{ width, height }}>
       <DetailsList
         items={items}
         columns={columns}
@@ -180,15 +104,11 @@ export const EditableGrid = ({ dataset, targetEntityType, height, width }: IData
         onRenderRow={_onRenderRow}
         onRenderDetailsHeader={_onRenderDetailsHeader}
         layoutMode={DetailsListLayoutMode.fixedColumns}
-        // onActiveItemChanged={(item?: any, index?: any) => console.log(item, index)}
         componentRef={listRef}
         styles={{ contentWrapper: { padding: items.length === 0 ? '50px' : '0' } }}
-        onRowDidMount={(item?: any, index?: any) => {
-          if (index === (items.length - 1)) dispatch(setLoading(false));
-        }}
       >
       </DetailsList>
-      {!items.length &&
+      {items.length === 0 &&
         <Stack horizontalAlign='center' className='noDataContainer'>
           <div className='nodata'><span>No data available</span></div>
         </Stack>

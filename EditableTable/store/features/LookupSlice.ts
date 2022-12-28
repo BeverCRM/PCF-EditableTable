@@ -8,11 +8,6 @@ import {
 } from '../../services/DataverseService';
 import { RootState } from '../store';
 
-export type LookupField = {
-  lookupColumn: IColumn;
-  lookupRefEntity: string;
-}
-
 export type Relationship = {
   fieldNameRef: string,
   entityNameRef: string,
@@ -44,29 +39,27 @@ export const setRelationships = createAsyncThunk<Relationship[], string>(
   'lookup/setRelationships', async () => await getRelationships(),
 );
 
-export const setLookups = createAsyncThunk<Lookup[], LookupField[], AsyncThunkConfig>(
+export const setLookups = createAsyncThunk<Lookup[], IColumn[], AsyncThunkConfig>(
   'lookup/setLookups',
-  async (lookupFields, thunkApi) =>
-    await Promise.all(lookupFields.map(async lookupField => {
+  async (lookupColumns, thunkApi) =>
+    await Promise.all(lookupColumns.map(async lookupColumn => {
       const { relationships } = thunkApi.getState().lookup;
-      const { lookupRefEntity } = lookupField;
-      const { fieldName } = lookupField.lookupColumn;
+      const { fieldName } = lookupColumn;
 
-      const lookupRef: Relationship | undefined =
+      const relationship: Relationship | undefined =
         relationships.find(relationship => {
-          if (lookupRefEntity && relationship.entityNameRef === lookupRefEntity) return true;
           if (relationship.fieldNameRef === fieldName) return true;
 
           return false;
         });
 
-      const entityName = lookupRef?.entityNameRef ?? '';
+      const entityName = relationship?.entityNameRef ?? '';
       const entityPluralName = await getEntityPluralName(entityName);
       const options = await getLookupOptions(entityName);
 
       return <Lookup>{
         logicalName: fieldName,
-        reference: lookupRef,
+        reference: relationship,
         entityPluralName,
         options,
       };

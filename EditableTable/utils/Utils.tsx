@@ -1,6 +1,6 @@
+import * as React from 'react';
 import { IDetailsListProps, IDetailsHeaderStyles, CheckboxVisibility,
   IDetailsRowStyles, DetailsHeader, DetailsRow } from '@fluentui/react';
-import * as React from 'react';
 
 export const _onRenderDetailsHeader: IDetailsListProps['onRenderDetailsHeader'] = props => {
   const customStyles: Partial<IDetailsHeaderStyles> = {};

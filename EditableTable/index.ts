@@ -23,7 +23,6 @@ export class EditableTable implements ComponentFramework.ReactControl<IInputs, I
     setContext(context);
     const props: IDataSetProps = {
       dataset: context.parameters.dataset,
-      targetEntityType: context.parameters.dataset.getTargetEntityType(),
       width: context.mode.allocatedWidth,
       height: context.mode.allocatedHeight,
     };

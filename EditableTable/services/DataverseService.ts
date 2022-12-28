@@ -239,3 +239,5 @@ export const getDateMetadata = async (fieldName: string) => {
 // @ts-ignore
 // eslint-disable-next-line max-len
 export const getColumns = () => _context.mode._customControlProperties.dynamicData.parameters.dataset.columnsForEmptyDataset;
+
+export const getTargetEntityType = () => _targetEntityType;
