@@ -102,7 +102,7 @@ export const openErrorDialog = (error: any): Promise<void> => {
 
 export const saveRecord = async (record: Record): Promise<void> => {
   const data = record.data.reduce((obj, recordData) =>
-    Object.assign(obj, recordData.fieldType === 'lookup'
+    Object.assign(obj, recordData.fieldType === 'Lookup.Simple'
       ? { [`${recordData.fieldName}@odata.bind`]: recordData.newValue }
       : { [recordData.fieldName]: recordData.newValue }), {});
   if (record.id.length < 15) {

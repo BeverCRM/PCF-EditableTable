@@ -46,16 +46,11 @@ export const LookupFormat = ({ fieldName, defaultValue, _onChange }: ILookupProp
   const onChange = (items?: ITag[] | undefined): void => {
     setCurrentOption(items);
     if (items !== undefined && items.length > 0) {
-      _onChange(
-        currentLookup?.reference?.entityNavigation,
-        'lookup',
-        `/${currentLookup?.entityPluralName}(${items[0].key})`);
+      _onChange(`/${currentLookup?.entityPluralName}(${items[0].key})`,
+        currentLookup?.reference?.entityNavigation);
     }
     else {
-      _onChange(
-        currentLookup?.reference?.entityNavigation,
-        '',
-        null);
+      _onChange(null, currentLookup?.reference?.entityNavigation);
     }
   };
 

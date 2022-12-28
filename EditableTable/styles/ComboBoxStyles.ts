@@ -5,6 +5,10 @@ export const comboBoxStyles : Partial<IComboBoxStyles> = {
     display: 'inline-block',
     maxWidth: '100px',
   },
+  optionsContainer: { maxHeight: 260 },
+  container: { flexShrink: '2 !important',
+    marginLeft: '-1px',
+    maxWidth: 100 },
 };
 
 export const stackComboBox : IStackStyles = {

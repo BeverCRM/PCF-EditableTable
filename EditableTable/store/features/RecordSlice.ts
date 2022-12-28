@@ -38,14 +38,8 @@ type AsyncThunkConfig = {
 export const saveRecords = createAsyncThunk<void, undefined, AsyncThunkConfig>(
   'record/saveRecords',
   async (a, thunkApi) => {
-    try {
-      const { changedRecords } = thunkApi.getState().record;
-      await Promise.all(changedRecords.map(record => saveRecord(record)));
-    }
-    catch (error) {
-      openErrorDialog(error);
-      throw error;
-    }
+    const { changedRecords } = thunkApi.getState().record;
+    await Promise.all(changedRecords.map(record => saveRecord(record)));
   },
 );
 
