@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { DatePicker, IDatePicker,
+import {
+  DatePicker, IDatePicker,
   defaultDatePickerStrings,
   mergeStyleSets,
-  Stack } from '@fluentui/react';
+  Stack,
+} from '@fluentui/react';
 import { stackComboBox } from '../../styles/ComboBoxStyles';
 import { useAppSelector } from '../../store/hooks';
 import { shallowEqual } from 'react-redux';
@@ -18,8 +20,8 @@ import { TimeFormat } from './TimeFormat';
 
 export interface IDatePickerProps {
   fieldName: string,
-  dateOnly : boolean,
-  defaultValue : Date,
+  dateOnly: boolean,
+  defaultValue: Date,
   _onChange: any
 }
 
@@ -58,10 +60,21 @@ export const DateTimeFormat = (
 
   const onDateChange = (date: Date | null | undefined) => {
     if (date !== null && date !== undefined) {
-      const dateTime = setTimeForDate(date, timeKey?.toString());
-      if (dateTime !== undefined) {
-        setCurrentDate(dateTime);
-        _onChange(`${getDateFormatWithHyphen(dateTime)}T${timeKey ? timeKey : '00:00'}:00Z`);
+      if (dateOnly) {
+        setCurrentDate(date);
+        _onChange(`${getDateFormatWithHyphen(date)}T00:00:00Z`);
+      }
+      else {
+        const dateTime = setTimeForDate(date, timeKey?.toString());
+        if (dateTime !== undefined) {
+          setCurrentDate(dateTime);
+          if (dateBehavior === 'TimeZoneIndependent') {
+            _onChange(`${getDateFormatWithHyphen(dateTime)}T${timeKey ?? '00:00'}:00Z`);
+          }
+          else {
+            _onChange(`${dateTime.toISOString().split('.')[0]}Z`);
+          }
+        }
       }
     }
   };

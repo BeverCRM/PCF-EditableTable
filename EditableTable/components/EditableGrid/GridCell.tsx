@@ -9,118 +9,117 @@ import { WholeFormat } from '../InputComponents/WholeFormat';
 
 import { setChangedRecords } from '../../store/features/RecordSlice';
 import { useAppDispatch } from '../../store/hooks';
+import { Column, Row } from '../../mappers/dataSetMapper';
 
 interface IGridSetProps {
-  item: any,
-  column?: IColumn
+  item: Row,
+  currentColumn?: IColumn
 }
 
-export const GridCell = ({ item, column }: IGridSetProps) => {
+export const GridCell = ({ item, currentColumn }: IGridSetProps) => {
   const dispatch = useAppDispatch();
 
   const _changedValue = (newValue: any, lookupEntityNavigation?: string): void => {
     dispatch(setChangedRecords({
       id: item.key,
-      fieldName: lookupEntityNavigation || column!.key,
-      fieldType: column?.data,
+      fieldName: lookupEntityNavigation || currentColumn!.key,
+      fieldType: currentColumn?.data,
       newValue }));
   };
 
-  const fieldContent = item[column?.fieldName as keyof any] as any;
-  const fieldValue = item.raw?._record?.fields[column?.fieldName as keyof any]?.value;
-  const optionsetValue: string = item.raw?._record?.fields[column?.fieldName!]?.valueString;
-  const multiselectValue = column?.data === 'MultiSelectPicklist' ? fieldValue?.split(',') : [];
-  const currentRecord = item[column?.fieldName!] === '' || item[column?.fieldName!] === null
-    ? '' : item?.raw?.getValue(column?.fieldName!);
+  console.log(item);
 
-  const lookupReference = currentRecord?.etn;
-  const lookupDefaultValue = column?.data === 'Lookup.Simple' && fieldContent && currentRecord
-    ? [{ name: fieldContent, key: currentRecord?.id?.guid }] : undefined;
+  const cell = item.columns.find((column: Column) => column.schemaName === currentColumn?.key);
 
-  if (column !== undefined && fieldContent !== undefined) {
-    switch (column.data) {
+  if (!currentColumn?.fieldName) {
+    console.log(currentColumn?.fieldName);
+  }
+  if (currentColumn !== undefined && cell !== undefined) {
+    switch (currentColumn.data) {
       case 'SingleLine.Text':
-        return <TextField defaultValue={fieldContent}
+        return <TextField defaultValue={cell.formattedValue}
           styles={{ root: { maxWidth: '300px' } }}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
             newValue?: string) => _changedValue(newValue || '')} />;
 
       case 'DateAndTime.DateAndTime':
-        return <DateTimeFormat fieldName={column?.fieldName ? column?.fieldName : ''}
-          dateOnly={false} key={fieldValue}
-          defaultValue={new Date(fieldValue)}
+        return <DateTimeFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
+          dateOnly={false}
+          defaultValue={new Date(cell.rawValue)}
           _onChange={_changedValue}
         />;
 
       case 'DateAndTime.DateOnly':
-        return <DateTimeFormat fieldName={column?.fieldName ? column?.fieldName : ''}
-          dateOnly={true} defaultValue={new Date(fieldValue)}
+        return <DateTimeFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
+          dateOnly={true} defaultValue={new Date(cell.rawValue)}
           _onChange={_changedValue} />;
 
       case 'OptionSet':
-        return <OptionSetFormat fieldName={column?.fieldName ? column?.fieldName : ''}
-          defaultValue={[optionsetValue]} isMultiple={false}
+        return <OptionSetFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
+          defaultValue={[cell.rawValue]} isMultiple={false}
           _onChange={_changedValue}
         />;
 
       case 'Lookup.Simple':
-        return <LookupFormat fieldName={column?.fieldName ? column?.fieldName : ''}
-          defaultValue={lookupDefaultValue}
+        return <LookupFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
+          defaultValue={cell.lookupValue
+            ? [{ name: cell.formattedValue, key: cell.lookupValue?.id.guid }]
+            : undefined}
           _onChange={_changedValue}
-          lookupReference={lookupReference} />;
+          lookupReference={cell.lookupValue?.etn || ''} />;
 
       case 'TwoOptions':
-        return <OptionSetFormat fieldName={column?.fieldName ? column?.fieldName : ''}
-          defaultValue={[optionsetValue]} isMultiple={false} isTwoOptions={true}
+        return <OptionSetFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
+          defaultValue={[cell.rawValue]} isMultiple={false} isTwoOptions={true}
           _onChange={_changedValue}
         />;
 
       case 'Decimal':
-        return <NumberFormat fieldName={column?.fieldName ? column?.fieldName : ''}
-          defaultValue={fieldContent} type={'decimal'}
+        return <NumberFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
+          defaultValue={cell.formattedValue} type={'decimal'}
           _onChange={_changedValue} />;
 
       case 'Currency':
-        return <NumberFormat fieldName={column?.fieldName ? column?.fieldName : ''}
-          defaultValue={fieldContent} type={'currency'} rowId={item.key}
+        return <NumberFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
+          defaultValue={cell.formattedValue} type={'currency'} rowId={item.key}
           _onChange={_changedValue} />;
 
       case 'FP':
-        return <NumberFormat fieldName={column?.fieldName ? column?.fieldName : ''}
-          defaultValue={fieldContent} type={'float'}
+        return <NumberFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
+          defaultValue={cell.formattedValue} type={'float'}
           _onChange={_changedValue} />;
 
       case 'Multiple':
-        return <TextField defaultValue={fieldContent}
+        return <TextField defaultValue={cell.formattedValue}
           styles={{ root: { maxWidth: '400px' } }}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
             newValue?: string) => _changedValue(newValue || '')} />;
 
       case 'MultiSelectPicklist':
-        return <OptionSetFormat fieldName={column?.fieldName ? column?.fieldName : ''}
-          defaultValue={multiselectValue} isMultiple={true}
+        return <OptionSetFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
+          defaultValue={cell.rawValue?.split(',')} isMultiple={true}
           _onChange={_changedValue}
         />;
 
       case 'Whole.None':
-        return <NumberFormat fieldName={column?.fieldName ? column?.fieldName : ''}
-          defaultValue={fieldContent} type={''}
+        return <NumberFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
+          defaultValue={cell.formattedValue} type={''}
           _onChange={_changedValue} />;
 
       case 'Whole.Duration':
-        return <WholeFormat defaultValue={fieldValue} type={'duration'}
+        return <WholeFormat defaultValue={cell.rawValue} type={'duration'}
           _onChange={_changedValue} />;
 
       case 'Whole.Language':
-        return <WholeFormat defaultValue={fieldValue} type={'language'}
+        return <WholeFormat defaultValue={cell.rawValue} type={'language'}
           _onChange={_changedValue} />;
 
       case 'Whole.TimeZone':
-        return <WholeFormat defaultValue={fieldValue} type={'timezone'}
+        return <WholeFormat defaultValue={cell.rawValue} type={'timezone'}
           _onChange={_changedValue} />;
 
       default:
-        return <TextField defaultValue={fieldContent}
+        return <TextField defaultValue={cell.formattedValue}
           styles={{ root: { maxWidth: '300px' } }}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
             newValue?: string) => _changedValue(newValue || '')} />;

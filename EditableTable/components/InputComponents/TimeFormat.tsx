@@ -4,6 +4,7 @@ import { timesList } from './timeList';
 import { comboBoxStyles } from '../../styles/ComboBoxStyles';
 import {
   formatTimeto12Hours,
+  getDateFormatWithHyphen,
   getTimeKeyFromDate,
   getTimeKeyFromTime,
   setTimeForDate,
@@ -54,8 +55,9 @@ export const TimeFormat = (
         _onChange(`${newValue.toISOString().split('T')[0]}T${key}:00Z`);
       }
       else {
-        _onChange(`${new Date(newValue.getTime() +
-          (userTimeZoneOffset * 60 * 1000)).toISOString().split('.')[0]}Z`);
+        const newDate = newValue;
+        newDate.setTime(newValue.getTime() - (userTimeZoneOffset * 60 * 1e3));
+        _onChange(`${getDateFormatWithHyphen(newDate)}T${getTimeKeyFromDate(newDate)}:00Z`);
       }
     }
   };

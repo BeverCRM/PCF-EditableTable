@@ -84,7 +84,7 @@ export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
   useLoadStore(dataset);
 
   const _renderItemColumn = (item: any, index: number | undefined, column: IColumn | undefined) =>
-    <GridCell item={item} column={column} />;
+    <GridCell item={item} currentColumn={column} />;
 
   return <div className='container'>
     <Stack horizontal horizontalAlign="end" className={dataSetStyles.buttons} >
