@@ -19,6 +19,7 @@ interface IGridSetProps {
 export const GridCell = ({ item, currentColumn }: IGridSetProps) => {
   const dispatch = useAppDispatch();
 
+  // changedValue should change the item itself
   const _changedValue = (newValue: any, lookupEntityNavigation?: string): void => {
     dispatch(setChangedRecords({
       id: item.key,
@@ -107,15 +108,15 @@ export const GridCell = ({ item, currentColumn }: IGridSetProps) => {
           _onChange={_changedValue} />;
 
       case 'Whole.Duration':
-        return <WholeFormat defaultValue={cell.rawValue} type={'duration'}
+        return <WholeFormat defaultValue={cell.valueAsNumber} type={'duration'}
           _onChange={_changedValue} />;
 
       case 'Whole.Language':
-        return <WholeFormat defaultValue={cell.rawValue} type={'language'}
+        return <WholeFormat defaultValue={cell.valueAsNumber} type={'language'}
           _onChange={_changedValue} />;
 
       case 'Whole.TimeZone':
-        return <WholeFormat defaultValue={cell.rawValue} type={'timezone'}
+        return <WholeFormat defaultValue={cell.valueAsNumber} type={'timezone'}
           _onChange={_changedValue} />;
 
       default:

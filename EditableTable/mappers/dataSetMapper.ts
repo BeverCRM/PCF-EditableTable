@@ -10,7 +10,8 @@ export type Column = {
   schemaName: string,
   formattedValue: string,
   rawValue: string,
-  lookupValue: ComponentFramework.EntityReference
+  lookupValue: ComponentFramework.EntityReference,
+  valueAsNumber: any
 };
 
 export const mapDataSetColumns = (dataset: DataSet): IColumn[] =>
@@ -37,6 +38,7 @@ export const mapDataSetItems = (dataset: DataSet): any[] =>
       'rawValue': record.getValue(column.name)?.toString(), // fieldValue | optionsetValue
       'formattedValue': record.getFormattedValue(column.name), // fieldContent
       'lookupValue': record.getValue(column.name) as ComponentFramework.EntityReference,
+      'valueAsNumber': record.getValue(column.name) as any,
     }));
 
     // const fieldContent = item[column?.fieldName as keyof any] as any;
