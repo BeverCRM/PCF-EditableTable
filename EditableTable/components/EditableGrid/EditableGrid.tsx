@@ -15,10 +15,10 @@ import { CommandBar } from './CommandBar';
 import { GridFooter } from './GridFooter';
 import { GridCell } from './GridCell';
 
-import { deleteRecords, saveRecords } from '../../store/features/RecordSlice';
+import { deleteRecords, saveRecords, setChangedRecords } from '../../store/features/RecordSlice';
 import { setLoading } from '../../store/features/LoadingSlice';
 
-import { mapDataSetColumns, mapDataSetItems } from '../../mappers/dataSetMapper';
+import { Column, mapDataSetColumns, mapDataSetItems } from '../../mappers/dataSetMapper';
 import { _onRenderDetailsHeader, _onRenderRow } from '../../utils/Utils';
 
 import { dataSetStyles } from '../../styles/DataSetStyles';
@@ -83,8 +83,25 @@ export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
 
   useLoadStore(dataset);
 
+  const _setChangedValue = (changedItem: any, changedValue: any) => {
+    items.find(item => {
+      if (item.key === changedItem.id) {
+        item.columns.find((column: Column) => {
+          if (column.schemaName === changedItem.fieldName) {
+            column.newValue = changedItem.newValue;
+            column.rawValue = changedValue;
+            column.formattedValue = changedValue;
+            column.valueAsNumber = changedValue;
+          }
+        });
+      }
+    });
+    setItems(items);
+    dispatch(setChangedRecords(changedItem));
+  };
+
   const _renderItemColumn = (item: any, index: number | undefined, column: IColumn | undefined) =>
-    <GridCell item={item} currentColumn={column} />;
+    <GridCell item={item} currentColumn={column} setChangedValue={_setChangedValue} />;
 
   return <div className='container'>
     <Stack horizontal horizontalAlign="end" className={dataSetStyles.buttons} >

@@ -7,25 +7,27 @@ import { OptionSetFormat } from '../InputComponents/OptionSetFormat';
 import { DateTimeFormat } from '../InputComponents/DateTimeFormat';
 import { WholeFormat } from '../InputComponents/WholeFormat';
 
-import { setChangedRecords } from '../../store/features/RecordSlice';
-import { useAppDispatch } from '../../store/hooks';
+// import { setChangedRecords } from '../../store/features/RecordSlice';
+// import { useAppDispatch } from '../../store/hooks';
 import { Column, Row } from '../../mappers/dataSetMapper';
 
 interface IGridSetProps {
   item: Row,
-  currentColumn?: IColumn
+  currentColumn?: IColumn,
+  setChangedValue: Function
 }
 
-export const GridCell = ({ item, currentColumn }: IGridSetProps) => {
-  const dispatch = useAppDispatch();
+export const GridCell = ({ item, currentColumn, setChangedValue }: IGridSetProps) => {
+  // const dispatch = useAppDispatch();
 
   // changedValue should change the item itself
-  const _changedValue = (newValue: any, lookupEntityNavigation?: string): void => {
-    dispatch(setChangedRecords({
+  const _changedValue = (newValue: any, rawValue?: any, lookupEntityNavigation?: string): void => {
+    setChangedValue({
       id: item.key,
       fieldName: lookupEntityNavigation || currentColumn!.key,
       fieldType: currentColumn?.data,
-      newValue }));
+      newValue,
+    }, rawValue ?? newValue);
   };
 
   console.log(item);

@@ -11,7 +11,8 @@ export type Column = {
   formattedValue: string,
   rawValue: string,
   lookupValue: ComponentFramework.EntityReference,
-  valueAsNumber: any
+  valueAsNumber: any,
+  newValue?: any
 };
 
 export const mapDataSetColumns = (dataset: DataSet): IColumn[] =>

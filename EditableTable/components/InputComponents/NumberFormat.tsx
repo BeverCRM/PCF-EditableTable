@@ -40,7 +40,7 @@ export const NumberFormat = ({ fieldName,
       setValue(currentCurrency?.symbol !== undefined
         ? currentCurrency?.symbol + newValue
         : newValue);
-      _onChange(parseFloat(parseFloat(newValue).toFixed(currentNumber?.precision)));
+      _onChange(parseFloat(parseFloat(newValue).toFixed(currentNumber?.precision)), newValue);
     }
   };
 
