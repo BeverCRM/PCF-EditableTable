@@ -46,13 +46,16 @@ export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
   };
 
   const newButtonHandler = () => {
-    const emptyAttributes = columns.map(column => ({ [column.name]: '' }));
+    const emptyColumns = columns.map<Column>(column => ({
+      'schemaName': column.key,
+      'rawValue': '',
+      'formattedValue': '',
+    }));
 
     setItems(previousItems => [
       {
         key: Date.now().toString(),
-        raw: [],
-        ...emptyAttributes,
+        columns: emptyColumns,
       },
       ...previousItems,
     ]);
@@ -83,18 +86,19 @@ export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
 
   useLoadStore(dataset);
 
-  const _setChangedValue = (changedItem: any, changedValue: any) => {
-    items.find(item => {
+  const _setChangedValue = (changedItem: any, changedValue: string) => {
+    items.map(item => {
       if (item.key === changedItem.id) {
-        item.columns.find((column: Column) => {
+        return item.columns.find((column: Column) => {
           if (column.schemaName === changedItem.fieldName) {
             column.newValue = changedItem.newValue;
-            column.rawValue = changedValue;
+            column.rawValue = changedValue || undefined;
             column.formattedValue = changedValue;
-            column.valueAsNumber = changedValue;
+            column.wholeFormatValue = changedValue;
           }
         });
       }
+      return item;
     });
     setItems(items);
     dispatch(setChangedRecords(changedItem));

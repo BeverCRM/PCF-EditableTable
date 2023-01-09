@@ -30,13 +30,8 @@ export const GridCell = ({ item, currentColumn, setChangedValue }: IGridSetProps
     }, rawValue ?? newValue);
   };
 
-  console.log(item);
-
   const cell = item.columns.find((column: Column) => column.schemaName === currentColumn?.key);
 
-  if (!currentColumn?.fieldName) {
-    console.log(currentColumn?.fieldName);
-  }
   if (currentColumn !== undefined && cell !== undefined) {
     switch (currentColumn.data) {
       case 'SingleLine.Text':
@@ -48,18 +43,18 @@ export const GridCell = ({ item, currentColumn, setChangedValue }: IGridSetProps
       case 'DateAndTime.DateAndTime':
         return <DateTimeFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
           dateOnly={false}
-          defaultValue={new Date(cell.rawValue)}
+          defaultValue={new Date(cell.rawValue!)}
           _onChange={_changedValue}
         />;
 
       case 'DateAndTime.DateOnly':
         return <DateTimeFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          dateOnly={true} defaultValue={new Date(cell.rawValue)}
+          dateOnly={true} defaultValue={new Date(cell.rawValue!)}
           _onChange={_changedValue} />;
 
       case 'OptionSet':
         return <OptionSetFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          defaultValue={[cell.rawValue]} isMultiple={false}
+          defaultValue={cell.rawValue ? [cell.rawValue] : []} isMultiple={false}
           _onChange={_changedValue}
         />;
 
@@ -73,7 +68,7 @@ export const GridCell = ({ item, currentColumn, setChangedValue }: IGridSetProps
 
       case 'TwoOptions':
         return <OptionSetFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          defaultValue={[cell.rawValue]} isMultiple={false} isTwoOptions={true}
+          defaultValue={cell.rawValue ? [cell.rawValue] : []} isMultiple={false} isTwoOptions={true}
           _onChange={_changedValue}
         />;
 
@@ -100,7 +95,7 @@ export const GridCell = ({ item, currentColumn, setChangedValue }: IGridSetProps
 
       case 'MultiSelectPicklist':
         return <OptionSetFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          defaultValue={cell.rawValue?.split(',')} isMultiple={true}
+          defaultValue={cell.rawValue ? cell.rawValue.split(',') : []} isMultiple={true}
           _onChange={_changedValue}
         />;
 
@@ -110,15 +105,15 @@ export const GridCell = ({ item, currentColumn, setChangedValue }: IGridSetProps
           _onChange={_changedValue} />;
 
       case 'Whole.Duration':
-        return <WholeFormat defaultValue={cell.valueAsNumber} type={'duration'}
+        return <WholeFormat defaultValue={cell.wholeFormatValue} type={'duration'}
           _onChange={_changedValue} />;
 
       case 'Whole.Language':
-        return <WholeFormat defaultValue={cell.valueAsNumber} type={'language'}
+        return <WholeFormat defaultValue={cell.wholeFormatValue} type={'language'}
           _onChange={_changedValue} />;
 
       case 'Whole.TimeZone':
-        return <WholeFormat defaultValue={cell.valueAsNumber} type={'timezone'}
+        return <WholeFormat defaultValue={cell.wholeFormatValue} type={'timezone'}
           _onChange={_changedValue} />;
 
       default:

@@ -6,7 +6,8 @@ import {
   saveRecord,
   openErrorDialog,
 } from '../../services/DataverseService';
-import { RootState } from '../store';
+import store, { RootState } from '../store';
+import { setLoading } from './LoadingSlice';
 
 export type Record = {
   id: string;
@@ -103,6 +104,7 @@ const RecordSlice = createSlice({
     });
     builder.addCase(saveRecords.rejected, (state, action) => {
       openErrorDialog(action.error);
+      store.dispatch(setLoading(false));
     });
     builder.addCase(deleteRecords.fulfilled, (state, action) => {
       state.changedRecords.filter(record =>

@@ -29,7 +29,7 @@ export const OptionSetFormat =
             setCurrentOptions([...currentOptions, option.key as string]);
           }
           else {
-            _onChange(currentOptions.filter(key => key !== option?.key).join(', '));
+            _onChange(currentOptions.filter(key => key !== option?.key).join(', ') || null);
             setCurrentOptions(currentOptions.filter(key => key !== option?.key));
           }
         }
