@@ -35,11 +35,11 @@ export const mapDataSetItems = (dataset: DataSet): any[] =>
     // }));
 
     const columns = dataset.columns.map<Column>(column => ({
-      'schemaName': column.name,
-      'rawValue': record.getValue(column.name)?.toString(), // fieldValue | optionsetValue
-      'formattedValue': record.getFormattedValue(column.name), // fieldContent
-      'lookupValue': record.getValue(column.name) as ComponentFramework.EntityReference,
-      'wholeFormatValue': record.getValue(column.name) as any,
+      schemaName: column.name,
+      rawValue: record.getValue(column.name)?.toString(), // fieldValue | optionsetValue
+      formattedValue: record.getFormattedValue(column.name), // fieldContent
+      lookupValue: record.getValue(column.name) as ComponentFramework.EntityReference,
+      wholeFormatValue: record.getValue(column.name) as any,
     }));
 
     // const fieldContent = item[column?.fieldName as keyof any] as any;

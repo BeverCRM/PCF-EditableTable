@@ -4,15 +4,13 @@ import { useAppSelector } from '../../store/hooks';
 
 export interface IInputNumberProps {
   fieldName: string | undefined;
-  defaultValue: string;
+  value: string;
   type: string;
   rowId?: string;
   _onChange: Function;
 }
 
-export const NumberFormat = ({ fieldName,
-  defaultValue, rowId, _onChange } : IInputNumberProps) => {
-
+export const NumberFormat = ({ fieldName, value, rowId, _onChange } : IInputNumberProps) => {
   const styles: Partial<ISpinButtonStyles> = {
     arrowButtonsContainer: {
       display: 'none',
@@ -21,8 +19,6 @@ export const NumberFormat = ({ fieldName,
       maxWidth: '150px',
     },
   };
-  const [value, setValue] = React.useState<string>(defaultValue);
-  // const [currentCurrency, setCurrentCurrency] = React.useState<CurrencySymbol>();
 
   const numbers = useAppSelector(state => state.number.numberFieldsMetadata);
   const currencySymbols = useAppSelector(state => state.number.currencySymbols);
@@ -37,9 +33,6 @@ export const NumberFormat = ({ fieldName,
 
   const onNumberChange = (event: React.SyntheticEvent<HTMLElement>, newValue?: string) => {
     if (newValue !== undefined && newValue !== null) {
-      setValue(currentCurrency?.symbol !== undefined
-        ? currentCurrency?.symbol + newValue
-        : newValue);
       _onChange(parseFloat(parseFloat(newValue).toFixed(currentNumber?.precision)), newValue);
     }
   };
@@ -47,9 +40,7 @@ export const NumberFormat = ({ fieldName,
   return (
     <Stack>
       <SpinButton
-        defaultValue={currentCurrency?.symbol !== undefined
-          ? currentCurrency?.symbol
-          : `${defaultValue}`}
+        defaultValue={value}
         min={currentNumber?.minValue}
         max={currentNumber?.maxValue}
         precision={currentNumber?.precision}

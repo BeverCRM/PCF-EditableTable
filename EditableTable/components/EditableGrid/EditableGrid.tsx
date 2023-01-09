@@ -87,20 +87,29 @@ export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
   useLoadStore(dataset);
 
   const _setChangedValue = (changedItem: any, changedValue: string) => {
-    items.map(item => {
+    setItems(items.map(item => {
       if (item.key === changedItem.id) {
-        return item.columns.find((column: Column) => {
-          if (column.schemaName === changedItem.fieldName) {
-            column.newValue = changedItem.newValue;
-            column.rawValue = changedValue || undefined;
-            column.formattedValue = changedValue;
-            column.wholeFormatValue = changedValue;
-          }
-        });
+        return {
+          ...item,
+          columns: item.columns.map((column: Column) => {
+            if (column.schemaName === changedItem.fieldName) {
+              return {
+                ...column,
+                newValue: changedItem.newValue,
+                rawValue: changedValue || undefined,
+                formattedValue: changedValue,
+                wholeFormatValue: changedValue,
+              };
+            }
+
+            return column;
+          }),
+        };
       }
+
       return item;
-    });
-    setItems(items);
+    }));
+
     dispatch(setChangedRecords(changedItem));
   };
 

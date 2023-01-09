@@ -74,17 +74,17 @@ export const GridCell = ({ item, currentColumn, setChangedValue }: IGridSetProps
 
       case 'Decimal':
         return <NumberFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          defaultValue={cell.formattedValue} type={'decimal'}
+          value={cell.formattedValue} type={'decimal'}
           _onChange={_changedValue} />;
 
       case 'Currency':
         return <NumberFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          defaultValue={cell.formattedValue} type={'currency'} rowId={item.key}
+          value={cell.formattedValue} type={'currency'} rowId={item.key}
           _onChange={_changedValue} />;
 
       case 'FP':
         return <NumberFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          defaultValue={cell.formattedValue} type={'float'}
+          value={cell.formattedValue} type={'float'}
           _onChange={_changedValue} />;
 
       case 'Multiple':
@@ -101,7 +101,7 @@ export const GridCell = ({ item, currentColumn, setChangedValue }: IGridSetProps
 
       case 'Whole.None':
         return <NumberFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          defaultValue={cell.formattedValue} type={''}
+          value={cell.formattedValue} type={''}
           _onChange={_changedValue} />;
 
       case 'Whole.Duration':
