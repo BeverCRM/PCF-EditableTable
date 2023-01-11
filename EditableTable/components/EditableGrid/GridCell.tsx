@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useCallback } from 'react';
 import { IColumn, TextField } from '@fluentui/react';
 
 import { LookupFormat } from '../InputComponents/LookupFormat';
@@ -11,20 +11,20 @@ import { Column, Row } from '../../mappers/dataSetMapper';
 
 interface IGridSetProps {
   item: Row,
-  currentColumn?: IColumn,
+  currentColumn: IColumn,
   setChangedValue: Function
 }
 
 export const GridCell = ({ item, currentColumn, setChangedValue }: IGridSetProps) => {
-
-  const _changedValue = (newValue: any, rawValue?: any, lookupEntityNavigation?: string): void => {
-    setChangedValue({
-      id: item.key,
-      fieldName: lookupEntityNavigation || currentColumn!.key,
-      fieldType: currentColumn?.data,
-      newValue,
-    }, rawValue ?? newValue);
-  };
+  const _changedValue = useCallback(
+    (newValue: any, rawValue?: any, lookupEntityNavigation?: string): void => {
+      setChangedValue({
+        id: item.key,
+        fieldName: lookupEntityNavigation || currentColumn.key,
+        fieldType: currentColumn.data,
+        newValue,
+      }, rawValue ?? newValue);
+    }, [setChangedValue]);
 
   const cell = item.columns.find((column: Column) => column.schemaName === currentColumn?.key);
 

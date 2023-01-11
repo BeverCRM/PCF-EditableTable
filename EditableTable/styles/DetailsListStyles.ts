@@ -7,7 +7,7 @@ const theme = getTheme();
 
 export const stackStyles: Partial<IStackStyles> = { root: { height: 44, marginLeft: 100 } };
 
-export const ditailsListStyles = mergeStyleSets({
+export const detailsListStyles = mergeStyleSets({
   content: {
     width: '100%',
     display: 'inline-block',

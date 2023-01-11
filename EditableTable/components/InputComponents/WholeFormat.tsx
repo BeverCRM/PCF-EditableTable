@@ -1,5 +1,5 @@
 import { ComboBox, IComboBox, IComboBoxOption, Stack } from '@fluentui/react';
-import * as React from 'react';
+import React, { memo } from 'react';
 import { useAppSelector } from '../../store/hooks';
 import { durationList } from './durationList';
 
@@ -9,7 +9,8 @@ export interface IWholeFormatProps {
   _onChange: Function;
 }
 
-export const WholeFormat = ({ value, type, _onChange } : IWholeFormatProps) => {
+export const WholeFormat = memo(({ value, type, _onChange } : IWholeFormatProps) => {
+  console.log('whole format');
   const wholeFormat = useAppSelector(state => state.wholeFormat);
 
   let options: IComboBoxOption[] = [];
@@ -29,8 +30,6 @@ export const WholeFormat = ({ value, type, _onChange } : IWholeFormatProps) => {
 
   const onChange = (event: React.FormEvent<IComboBox>, option?: IComboBoxOption): void => {
     const key = option?.key;
-    value = key;
-    // setSelectedKey(key);
     _onChange(key);
   };
 
@@ -52,4 +51,4 @@ export const WholeFormat = ({ value, type, _onChange } : IWholeFormatProps) => {
       />
     </Stack>
   );
-};
+});

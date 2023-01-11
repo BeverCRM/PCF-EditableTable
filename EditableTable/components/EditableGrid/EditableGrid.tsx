@@ -1,9 +1,8 @@
-import * as React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   DetailsList,
   DetailsListLayoutMode,
   IColumn,
-  IDetailsList,
   Stack,
 } from '@fluentui/react';
 
@@ -23,7 +22,7 @@ import {
 } from '../../store/features/RecordSlice';
 import { setLoading } from '../../store/features/LoadingSlice';
 
-import { Column, mapDataSetColumns, mapDataSetItems } from '../../mappers/dataSetMapper';
+import { Row, Column, mapDataSetColumns, mapDataSetItems } from '../../mappers/dataSetMapper';
 import { _onRenderDetailsHeader, _onRenderRow } from '../../utils/Utils';
 import { buttonStyles } from '../../styles/ButtonStyles';
 
@@ -36,9 +35,8 @@ export interface IDataSetProps {
 }
 
 export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
-  const [items, setItems] = React.useState<any[]>([]);
+  const [items, setItems] = useState<Row[]>([]);
   const { selection, selectedRecordIds } = useSelection(dataset);
-  const listRef = React.useRef<IDetailsList>(null);
 
   const columns = mapDataSetColumns(dataset);
 
@@ -82,16 +80,14 @@ export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
       });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const datasetItems = mapDataSetItems(dataset);
     setItems(datasetItems);
-
-    listRef.current?.forceUpdate();
   }, [dataset]);
 
   useLoadStore(dataset);
 
-  const _setChangedValue = (changedItem: any, changedValue: string) => {
+  const _setChangedValue = useCallback((changedItem: any, changedValue: string) => {
     setItems(items.map(item => {
       if (item.key === changedItem.id) {
         return {
@@ -114,10 +110,10 @@ export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
     }));
 
     dispatch(setChangedRecords(changedItem));
-  };
+  }, [items]);
 
-  const _renderItemColumn = (item: any, index: number | undefined, column: IColumn | undefined) =>
-    <GridCell item={item} currentColumn={column} setChangedValue={_setChangedValue} />;
+  const _renderItemColumn = (item: Row, index: number | undefined, column: IColumn | undefined) =>
+    <GridCell item={item} currentColumn={column!} setChangedValue={_setChangedValue} />;
 
   return <div className='container'>
     <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons} >
@@ -137,7 +133,6 @@ export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
         onRenderRow={_onRenderRow}
         onRenderDetailsHeader={_onRenderDetailsHeader}
         layoutMode={DetailsListLayoutMode.fixedColumns}
-        componentRef={listRef}
         styles={{ contentWrapper: { padding: items.length === 0 ? '50px' : '0' } }}
       >
       </DetailsList>

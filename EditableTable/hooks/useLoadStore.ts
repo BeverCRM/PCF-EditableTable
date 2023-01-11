@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { IColumn } from '@fluentui/react';
 
 import { setRelationships, setLookups } from '../store/features/LookupSlice';
@@ -18,49 +20,51 @@ type DataSet = ComponentFramework.PropertyTypes.DataSet;
 export const useLoadStore = (dataset: DataSet) => {
   const dispatch = useAppDispatch();
 
-  const columns = mapDataSetColumns(dataset);
-  const datasetItems = mapDataSetItems(dataset);
+  useEffect(() => {
+    const columns = mapDataSetColumns(dataset);
+    const datasetItems = mapDataSetItems(dataset);
 
-  const getColumnsOfType = (types: string[]): IColumn[] =>
-    columns.filter(column => types.includes(column.data));
+    const getColumnsOfType = (types: string[]): IColumn[] =>
+      columns.filter(column => types.includes(column.data));
 
-  const lookupColumns = getColumnsOfType(['Lookup.Simple']);
-  if (lookupColumns.length > 0) {
-    dispatch(setRelationships(getTargetEntityType())).unwrap()
-      .then(() => {
-        dispatch(setLookups(lookupColumns));
-      });
-  }
-
-  const dropdownColumns = getColumnsOfType(['OptionSet', 'TwoOptions', 'MultiSelectPicklist']);
-  if (dropdownColumns.length > 0) {
-    dispatch(getDropdownsOptions(dropdownColumns));
-  }
-
-  const numberColumns = getColumnsOfType(['Decimal', 'Currency', 'FP', 'Whole.None']);
-  if (numberColumns.length > 0) {
-    dispatch(getNumberFieldsMetadata(numberColumns));
-
-    // for currency symbol go to record by id and get transactioncurrencyid field (lookup)
-    if (numberColumns.some(numberColumn => numberColumn.data === 'Currency')) {
-      dispatch(getCurrencySymbols(datasetItems.map(item => item.key)));
+    const lookupColumns = getColumnsOfType(['Lookup.Simple']);
+    if (lookupColumns.length > 0) {
+      dispatch(setRelationships(getTargetEntityType())).unwrap()
+        .then(() => {
+          dispatch(setLookups(lookupColumns));
+        });
     }
-  }
 
-  const timezoneColumns = getColumnsOfType(['Whole.TimeZone']);
-  if (timezoneColumns.length > 0) {
-    dispatch(getTimeZones());
-  }
+    const dropdownColumns = getColumnsOfType(['OptionSet', 'TwoOptions', 'MultiSelectPicklist']);
+    if (dropdownColumns.length > 0) {
+      dispatch(getDropdownsOptions(dropdownColumns));
+    }
 
-  const languageColumns = getColumnsOfType(['Whole.Language']);
-  if (languageColumns.length > 0) {
-    dispatch(getLanguages());
-  }
+    const numberColumns = getColumnsOfType(['Decimal', 'Currency', 'FP', 'Whole.None']);
+    if (numberColumns.length > 0) {
+      dispatch(getNumberFieldsMetadata(numberColumns));
 
-  const dateColumns = getColumnsOfType(['DateAndTime.DateAndTime', 'DateAndTime.DateOnly']);
-  if (dateColumns.length > 0) {
-    dispatch(getDateBehavior(dateColumns));
-  }
+      // for currency symbol go to record by id and get transactioncurrencyid field (lookup)
+      if (numberColumns.some(numberColumn => numberColumn.data === 'Currency')) {
+        dispatch(getCurrencySymbols(datasetItems.map(item => item.key)));
+      }
+    }
 
-  dispatch(setLoading(false));
+    const timezoneColumns = getColumnsOfType(['Whole.TimeZone']);
+    if (timezoneColumns.length > 0) {
+      dispatch(getTimeZones());
+    }
+
+    const languageColumns = getColumnsOfType(['Whole.Language']);
+    if (languageColumns.length > 0) {
+      dispatch(getLanguages());
+    }
+
+    const dateColumns = getColumnsOfType(['DateAndTime.DateAndTime', 'DateAndTime.DateOnly']);
+    if (dateColumns.length > 0) {
+      dispatch(getDateBehavior(dateColumns));
+    }
+
+    dispatch(setLoading(false));
+  }, [dataset]);
 };
