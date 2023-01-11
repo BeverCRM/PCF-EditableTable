@@ -4,14 +4,12 @@ import { useAppSelector } from '../../store/hooks';
 import { durationList } from './durationList';
 
 export interface IWholeFormatProps {
-  defaultValue: string;
+  value: string | number | undefined;
   type: string;
   _onChange: Function;
 }
 
-export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProps) => {
-  const [selectedKey, setSelectedKey] = React.useState<string | number | undefined>(defaultValue);
-
+export const WholeFormat = ({ value, type, _onChange } : IWholeFormatProps) => {
   const wholeFormat = useAppSelector(state => state.wholeFormat);
 
   let options: IComboBoxOption[] = [];
@@ -31,7 +29,8 @@ export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProp
 
   const onChange = (event: React.FormEvent<IComboBox>, option?: IComboBoxOption): void => {
     const key = option?.key;
-    setSelectedKey(key);
+    value = key;
+    // setSelectedKey(key);
     _onChange(key);
   };
 
@@ -40,7 +39,7 @@ export const WholeFormat = ({ defaultValue, type, _onChange } : IWholeFormatProp
       <ComboBox
         options={options}
         onChange={onChange}
-        selectedKey={selectedKey}
+        selectedKey={value}
         styles={{
           optionsContainer: {
             maxHeight: 260,

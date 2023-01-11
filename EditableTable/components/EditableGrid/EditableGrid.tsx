@@ -15,13 +15,17 @@ import { CommandBar } from './CommandBar';
 import { GridFooter } from './GridFooter';
 import { GridCell } from './GridCell';
 
-import { deleteRecords, saveRecords, setChangedRecords } from '../../store/features/RecordSlice';
+import {
+  clearChangedRecords,
+  deleteRecords,
+  saveRecords,
+  setChangedRecords,
+} from '../../store/features/RecordSlice';
 import { setLoading } from '../../store/features/LoadingSlice';
 
 import { Column, mapDataSetColumns, mapDataSetItems } from '../../mappers/dataSetMapper';
 import { _onRenderDetailsHeader, _onRenderRow } from '../../utils/Utils';
-
-import { dataSetStyles } from '../../styles/DataSetStyles';
+import { buttonStyles } from '../../styles/ButtonStyles';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
@@ -43,6 +47,7 @@ export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
   const refreshButtonHandler = () => {
     dispatch(setLoading(true));
     dataset.refresh();
+    dispatch(clearChangedRecords());
   };
 
   const newButtonHandler = () => {
@@ -95,10 +100,8 @@ export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
             if (column.schemaName === changedItem.fieldName) {
               return {
                 ...column,
-                newValue: changedItem.newValue,
                 rawValue: changedValue || undefined,
                 formattedValue: changedValue,
-                wholeFormatValue: changedValue,
               };
             }
 
@@ -117,7 +120,7 @@ export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
     <GridCell item={item} currentColumn={column} setChangedValue={_setChangedValue} />;
 
   return <div className='container'>
-    <Stack horizontal horizontalAlign="end" className={dataSetStyles.buttons} >
+    <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons} >
       <CommandBar
         refreshButtonHandler={refreshButtonHandler}
         newButtonHandler={newButtonHandler}

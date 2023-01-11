@@ -1,19 +1,35 @@
-import { IIconProps } from '@fluentui/react/lib/components/Icon/Icon.types';
+import { IDetailsColumnStyles } from
+  '@fluentui/react/lib/components/DetailsList/DetailsColumn.types';
+import { IStackStyles } from '@fluentui/react/lib/components/Stack/Stack.types';
 import { FontWeights, getTheme, mergeStyleSets } from '@fluentui/react/lib/Styling';
 
 const theme = getTheme();
 
-export const notesIcon: IIconProps = { iconName: 'EditNote' };
-export const cancelIcon: IIconProps = { iconName: 'Cancel' };
+export const stackStyles: Partial<IStackStyles> = { root: { height: 44, marginLeft: 100 } };
 
-export const modalStyles = mergeStyleSets({
+export const ditailsListStyles = mergeStyleSets({
+  content: {
+    width: '100%',
+    display: 'inline-block',
+    position: 'relative',
+    height: '40px',
+  },
+  detailsList: {
+    paddingTop: '0px',
+  },
+  detailsListContent: {
+    width: 270,
+    maxHeight: 325,
+    fontWeight: FontWeights.regular,
+    margin: '0 2px',
+  },
   container: {
     display: 'flex',
     flexFlow: 'column nowrap',
     alignItems: 'stretch',
   },
   header: [
-    theme.fonts.xLargePlus,
+    theme.fonts.xxLarge,
     {
       flex: '1 1 auto',
       borderTop: `4px solid ${theme.palette.themePrimary}`,
@@ -35,6 +51,10 @@ export const modalStyles = mergeStyleSets({
       'p:last-child': { marginBottom: 0 },
     },
   },
+  title: {
+    marginBottom: 12,
+    fontWeight: FontWeights.semilight,
+  },
   spinner: {
     height: 250,
   },
@@ -42,31 +62,10 @@ export const modalStyles = mergeStyleSets({
     width: 320,
     padding: '20px 24px',
   },
-  detailsListContent: {
-    width: 270,
-    maxHeight: 325,
-    fontWeight: FontWeights.regular,
-    margin: '0 2px',
-  },
-  title: {
-    marginBottom: 12,
-    fontWeight: FontWeights.semilight,
-  },
-  buttons: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    marginTop: 20,
-  },
 });
 
-export const iconButtonStyles = {
-  root: {
-    color: theme.palette.neutralPrimary,
-    marginLeft: 'auto',
-    marginTop: '4px',
-    marginRight: '2px',
-  },
-  rootHovered: {
-    color: theme.palette.neutralDark,
+export const detailsHeaderStyles: Partial<IDetailsColumnStyles> = {
+  cellName: {
+    fontSize: '12px',
   },
 };

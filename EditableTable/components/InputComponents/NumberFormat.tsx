@@ -1,16 +1,16 @@
 import { ISpinButtonStyles, SpinButton, Stack } from '@fluentui/react';
 import * as React from 'react';
 import { useAppSelector } from '../../store/hooks';
+import { formatCurrency, formatDecimal, formatNumber } from '../../utils/formattingUtils';
 
-export interface IInputNumberProps {
+export interface INumberProps {
   fieldName: string | undefined;
   value: string;
-  type: string;
   rowId?: string;
   _onChange: Function;
 }
 
-export const NumberFormat = ({ fieldName, value, rowId, _onChange } : IInputNumberProps) => {
+export const NumberFormat = ({ fieldName, value, rowId, _onChange } : INumberProps) => {
   const styles: Partial<ISpinButtonStyles> = {
     arrowButtonsContainer: {
       display: 'none',
@@ -27,20 +27,21 @@ export const NumberFormat = ({ fieldName, value, rowId, _onChange } : IInputNumb
   const currentCurrency = currencySymbols.find(currency => currency.recordId === rowId) ?? null;
 
   const onValidate = (value: string): string | void => {
-    const newValue = value.slice(0, 1) === currentCurrency?.symbol ? value.slice(1) : value;
-    return String(parseFloat(newValue).toFixed(currentNumber?.precision));
+    const numberValue = formatNumber(value);
+    return currentCurrency
+      ? formatCurrency(numberValue, currentNumber?.precision, currentCurrency?.symbol)
+      : formatDecimal(numberValue, currentNumber?.precision);
   };
 
   const onNumberChange = (event: React.SyntheticEvent<HTMLElement>, newValue?: string) => {
-    if (newValue !== undefined && newValue !== null) {
-      _onChange(parseFloat(parseFloat(newValue).toFixed(currentNumber?.precision)), newValue);
-    }
+    const numberValue = formatNumber(newValue!);
+    _onChange(numberValue, newValue);
   };
 
   return (
     <Stack>
       <SpinButton
-        defaultValue={value}
+        // defaultValue={value}
         min={currentNumber?.minValue}
         max={currentNumber?.maxValue}
         precision={currentNumber?.precision}

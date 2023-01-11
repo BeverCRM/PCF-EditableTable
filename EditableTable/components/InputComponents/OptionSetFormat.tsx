@@ -5,16 +5,15 @@ import { useAppSelector } from '../../store/hooks';
 
 export interface IDropDownProps {
   fieldName: string | undefined;
-  defaultValue: string[];
+  currentOptions: string[];
   isMultiple: boolean;
   isTwoOptions?: boolean;
   _onChange: Function;
 }
 
 export const OptionSetFormat =
-  ({ fieldName, defaultValue, isMultiple,
+  ({ fieldName, currentOptions, isMultiple,
     isTwoOptions, _onChange }: IDropDownProps) => {
-    const [currentOptions, setCurrentOptions] = React.useState<string[]>(defaultValue ?? []);
 
     const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);
     const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
@@ -24,22 +23,23 @@ export const OptionSetFormat =
       (event: React.FormEvent<IComboBox>, option?: IComboBoxOption | undefined) => {
         if (isMultiple) {
           if (option?.selected) {
-            // doesnt work ?
-            _onChange([...currentOptions, option.key as string].join(', '));
-            setCurrentOptions([...currentOptions, option.key as string]);
+            currentOptions.push(option.key as string);
+            _onChange([...currentOptions, option.key as string].join(', '),
+              [...currentOptions, option.key as string].join(','));
           }
           else {
-            _onChange(currentOptions.filter(key => key !== option?.key).join(', ') || null);
-            setCurrentOptions(currentOptions.filter(key => key !== option?.key));
+            currentOptions.filter(key => key !== option?.key);
+            _onChange(currentOptions.filter(key => key !== option?.key).join(', ') || null,
+              currentOptions.filter(key => key !== option?.key).join(',') || null);
           }
         }
         else if (isTwoOptions) {
-          setCurrentOptions([option!.key.toString()]);
-          _onChange(option?.key === '1');
+          _onChange(option?.key === '1', option!.key.toString());
+          currentOptions = [option!.key.toString()];
         }
         else {
-          setCurrentOptions([option!.key.toString()]);
-          _onChange(option?.key);
+          _onChange(option?.key, option!.key.toString());
+          currentOptions = [option!.key.toString()];
         }
       };
 

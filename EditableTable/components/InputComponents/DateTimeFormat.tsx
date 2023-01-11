@@ -15,25 +15,24 @@ import {
   setTimeForDate,
   getDateFormatWithSlash,
   getDateFromString,
+  backToLocalTimezone,
 } from '../../utils/dateTimeUtils';
 import { TimeFormat } from './TimeFormat';
 
 export interface IDatePickerProps {
   fieldName: string,
   dateOnly: boolean,
-  defaultValue: Date,
+  value: Date | undefined,
   _onChange: any
 }
 
 export const DateTimeFormat = (
-  { fieldName, dateOnly, defaultValue, _onChange }: IDatePickerProps) => {
+  { fieldName, dateOnly, value, _onChange }: IDatePickerProps) => {
   const styles = mergeStyleSets({
     root: { selectors: { '> *': { marginBottom: 15 } } },
     control: { maxWidth: dateOnly ? 200 : 150, marginBottom: 15 },
   });
 
-  const [currentDate, setCurrentDate] = React.useState<Date | undefined>(
-    !isNaN(defaultValue.getTime()) ? defaultValue : undefined);
   const [timeKey, setTimeKey] = React.useState<string | number | undefined>();
   const datePickerRef = React.useRef<IDatePicker>(null);
 
@@ -42,37 +41,38 @@ export const DateTimeFormat = (
   const dateBehavior = currentDateMetadata?.dateBehavior ?? '';
   const userTimeZoneOffset = getUserTimeZoneOffset();
 
-  React.useEffect(() => {
-    if (!isNaN(defaultValue.getTime()) && dateBehavior === 'TimeZoneIndependent') {
-      const newDate = getDateInUTC(defaultValue);
-      setCurrentDate(newDate);
+  if (value !== undefined) {
+    if (!isNaN(value.getTime()) && dateBehavior === 'TimeZoneIndependent') {
+      value = getDateInUTC(value);
     }
-    if (!isNaN(defaultValue.getTime()) && dateBehavior === 'UserLocal') {
-      setCurrentDate(new Date(defaultValue.getTime() +
-        ((new Date().getTimezoneOffset() + userTimeZoneOffset) * 60 * 1000)));
+    if (!isNaN(value.getTime()) && dateBehavior === 'UserLocal') {
+      value = new Date(value.getTime() +
+        ((new Date().getTimezoneOffset() + userTimeZoneOffset) * 60 * 1000));
     }
-  }, [dateBehavior, userTimeZoneOffset]);
+  }
 
   const onParseDateFromString = React.useCallback(
-    (newValue: string): Date => getDateFromString(newValue, currentDate),
-    [currentDate],
+    (newValue: string): Date => getDateFromString(newValue, value),
+    [value],
   );
 
   const onDateChange = (date: Date | null | undefined) => {
     if (date !== null && date !== undefined) {
       if (dateOnly) {
-        setCurrentDate(date);
+        value = date;
         _onChange(`${getDateFormatWithHyphen(date)}T00:00:00Z`);
       }
       else {
         const dateTime = setTimeForDate(date, timeKey?.toString());
         if (dateTime !== undefined) {
-          setCurrentDate(dateTime);
+          value = new Date(dateTime.getTime() +
+          ((new Date().getTimezoneOffset() + userTimeZoneOffset) * 60 * 1000));
           if (dateBehavior === 'TimeZoneIndependent') {
             _onChange(`${getDateFormatWithHyphen(dateTime)}T${timeKey ?? '00:00'}:00Z`);
           }
           else {
-            _onChange(`${dateTime.toISOString().split('.')[0]}Z`);
+            const rawValue = backToLocalTimezone(value, userTimeZoneOffset);
+            _onChange(`${dateTime.toISOString().split('.')[0]}Z`, rawValue.toISOString());
           }
         }
       }
@@ -84,7 +84,7 @@ export const DateTimeFormat = (
       <DatePicker
         componentRef={datePickerRef}
         allowTextInput
-        value={currentDate}
+        value={value}
         onSelectDate={onDateChange}
         formatDate={getDateFormatWithSlash}
         parseDateFromString={onParseDateFromString}
@@ -93,7 +93,7 @@ export const DateTimeFormat = (
       />
       {!dateOnly &&
         <TimeFormat
-          currentDate={currentDate}
+          currentDate={value}
           _onChange={_onChange}
           dateBehavior={dateBehavior}
           userTimeZoneOffset={userTimeZoneOffset}

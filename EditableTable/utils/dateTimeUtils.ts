@@ -93,3 +93,6 @@ export const getTimeKeyFromTime = (value: string) => {
   }
   return key;
 };
+
+export const backToLocalTimezone = (date: Date, userTimeZoneOffset: number) =>
+  new Date(date.getTime() - (new Date().getTimezoneOffset() + userTimeZoneOffset) * 60 * 1e3);

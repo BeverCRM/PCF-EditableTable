@@ -5,13 +5,13 @@ import { useAppSelector } from '../../store/hooks';
 
 export interface ILookupProps {
   fieldName: string;
-  defaultValue: ITag[] | undefined;
+  value: ITag[] | undefined;
   _onChange: Function;
   lookupReference: string;
 }
 
-export const LookupFormat = ({ fieldName, defaultValue, _onChange }: ILookupProps) => {
-  const [currentOption, setCurrentOption] = React.useState<ITag[] | undefined>(defaultValue);
+export const LookupFormat = ({ fieldName, value, _onChange }: ILookupProps) => {
+  // const [currentOption, setCurrentOption] = React.useState<ITag[] | undefined>(value);
   const picker = React.useRef(null);
 
   const lookups = useAppSelector(state => state.lookup.lookups);
@@ -44,7 +44,7 @@ export const LookupFormat = ({ fieldName, defaultValue, _onChange }: ILookupProp
   };
 
   const onChange = (items?: ITag[] | undefined): void => {
-    setCurrentOption(items);
+    value = items;
     if (items !== undefined && items.length > 0) {
       _onChange(`/${currentLookup?.entityPluralName}(${items[0].key})`, '',
         currentLookup?.reference?.entityNavigation);
@@ -56,7 +56,7 @@ export const LookupFormat = ({ fieldName, defaultValue, _onChange }: ILookupProp
 
   return <Stack>
     <TagPicker
-      selectedItems={currentOption}
+      selectedItems={value}
       componentRef={picker}
       onChange={onChange}
       onResolveSuggestions={filterSuggestedTags}

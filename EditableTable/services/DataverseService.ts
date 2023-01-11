@@ -218,13 +218,14 @@ export const getTimeZoneDefinitions = async () => {
 };
 
 export const getProvisionedLanguages = async () => {
-  const localeLanguageCodes = await _context.webAPI.retrieveMultipleRecords('languagelocale');
+  // const localeLanguageCodes = await _context.webAPI.retrieveMultipleRecords('languagelocale');
   const request = `${_clientUrl}RetrieveProvisionedLanguages`;
   const results = await getFetchResponse(request);
+  console.log();
 
   return results.RetrieveProvisionedLanguages.map((language: any) => <IComboBoxOption>{
     key: language,
-    text: localeLanguageCodes.entities.find(lang => lang.localeid === language)?.name,
+    text: _context.formatting.formatLanguage(language),
   });
 };
 
@@ -241,3 +242,5 @@ export const getDateMetadata = async (fieldName: string) => {
 export const getColumns = () => _context.mode._customControlProperties.dynamicData.parameters.dataset.columnsForEmptyDataset;
 
 export const getTargetEntityType = () => _targetEntityType;
+
+export const getContext = () => _context;

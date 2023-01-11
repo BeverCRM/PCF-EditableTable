@@ -1,8 +1,8 @@
 import { CommandBarButton } from '@fluentui/react';
 import * as React from 'react';
 import { useAppSelector } from '../../store/hooks';
-import { CommandBarButtonStyles } from '../../styles/DataSetStyles';
-import { addIcon, refreshIcon, deleteIcon, saveIcon } from '../../styles/DataSetStyles';
+import { CommandBarButtonStyles } from '../../styles/ButtonStyles';
+import { addIcon, refreshIcon, deleteIcon, saveIcon } from '../../styles/ButtonStyles';
 import { IIconProps } from '@fluentui/react/lib/components/Icon/Icon.types';
 
 export interface ICommandBarProps {

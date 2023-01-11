@@ -97,6 +97,9 @@ const RecordSlice = createSlice({
       }
       state.changedRecords = changedRecords;
     },
+    clearChangedRecords: state => {
+      state.changedRecords = [];
+    },
   },
   extraReducers(builder) {
     builder.addCase(saveRecords.fulfilled, state => {
@@ -116,6 +119,6 @@ const RecordSlice = createSlice({
   },
 });
 
-export const { setChangedRecords } = RecordSlice.actions;
+export const { setChangedRecords, clearChangedRecords } = RecordSlice.actions;
 
 export default RecordSlice.reducer;
