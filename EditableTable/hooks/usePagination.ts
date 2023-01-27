@@ -12,14 +12,20 @@ export const usePagination = (dataset: DataSet) => {
   const {
     totalResultCount: totalRecords,
     pageSize,
+    hasNextPage,
+    hasPreviousPage,
   } = dataset.paging;
 
-  const totalPages = Math.ceil(totalRecords / pageSize);
-  const hasNextPage = currentPage < totalPages;
-  const hasPreviousPage = currentPage > 1;
+  const totalPages = totalRecords !== -1
+    ? Math.ceil(totalRecords / pageSize)
+    : 5000;
+  // const hasNextPage = currentPage < totalPages;
+  // const hasPreviousPage = currentPage > 1;
 
   const firstItemNumber = (currentPage - 1) * pageSize + 1;
-  const lastItemNumber = (currentPage - 1) * pageSize + pageSize;
+  const lastItemNumber = currentPage !== totalPages
+    ? (currentPage - 1) * pageSize + pageSize
+    : totalRecords;
 
   useEffect(() => {
     if (currentPage !== dataset.paging.firstPageNumber) {

@@ -10,12 +10,14 @@ export interface ICommandBarProps {
   newButtonHandler: () => void;
   deleteButtonHandler: () => void;
   saveButtonHandler: () => void;
+  isControlDisabled: boolean;
 }
 
 type ButtonProps = {
   order: number,
   text: string,
   icon: IIconProps,
+  disabled: boolean,
   onClick: () => void
 }
 
@@ -23,16 +25,40 @@ export const CommandBar = (props: ICommandBarProps) => {
   const isLoading = useAppSelector(state => state.loading.isLoading);
 
   const buttons: ButtonProps[] = [
-    { order: 1, text: 'New', icon: addIcon, onClick: props.newButtonHandler },
-    { order: 2, text: 'Refresh', icon: refreshIcon, onClick: props.refreshButtonHandler },
-    { order: 3, text: 'Delete', icon: deleteIcon, onClick: props.deleteButtonHandler },
-    { order: 4, text: 'Save', icon: saveIcon, onClick: props.saveButtonHandler },
+    {
+      order: 1,
+      text: 'New',
+      icon: addIcon,
+      disabled: isLoading || props.isControlDisabled,
+      onClick: props.newButtonHandler,
+    },
+    {
+      order: 2,
+      text: 'Refresh',
+      icon: refreshIcon,
+      disabled: isLoading,
+      onClick: props.refreshButtonHandler,
+    },
+    {
+      order: 3,
+      text: 'Delete',
+      icon: deleteIcon,
+      disabled: isLoading || props.isControlDisabled,
+      onClick: props.deleteButtonHandler,
+    },
+    {
+      order: 4,
+      text: 'Save',
+      icon: saveIcon,
+      disabled: isLoading || props.isControlDisabled,
+      onClick: props.saveButtonHandler,
+    },
   ];
 
   const listButtons = buttons.map(button =>
     <CommandBarButton
       key={button.order}
-      disabled={isLoading}
+      disabled={button.disabled}
       iconProps={button.icon}
       styles={CommandBarButtonStyles}
       text={button.text}

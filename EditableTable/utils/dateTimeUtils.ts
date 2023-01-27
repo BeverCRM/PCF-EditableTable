@@ -30,14 +30,6 @@ export const getDateFromString = (dateString: string, currentDate: Date | undefi
   return new Date(year, month, day);
 };
 
-export const getDateInUTC = (date: Date) => new Date(
-  date.getUTCFullYear(),
-  date.getUTCMonth(),
-  date.getUTCDate(),
-  date.getUTCHours(),
-  date.getUTCMinutes(),
-  date.getUTCSeconds());
-
 export const setTimeForDate = (value: Date | undefined, time: string | undefined) => {
   if (time === undefined || value === undefined) return value;
 
@@ -88,11 +80,11 @@ export const getTimeKeyFromTime = (value: string) => {
       }
     }
   }
-  else {
+  else if (value.toLowerCase().toString().includes(':')) {
     key = `${value.toString()}`;
+  }
+  else {
+    key = '00:00';
   }
   return key;
 };
-
-export const backToLocalTimezone = (date: Date, userTimeZoneOffset: number) =>
-  new Date(date.getTime() - (new Date().getTimezoneOffset() + userTimeZoneOffset) * 60 * 1e3);

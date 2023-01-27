@@ -13,7 +13,7 @@ import { useAppDispatch } from '../store/hooks';
 
 import { getTargetEntityType } from '../services/DataverseService';
 
-import { mapDataSetColumns, mapDataSetItems } from '../mappers/dataSetMapper';
+import { mapDataSetColumns, mapDataSetRows } from '../mappers/dataSetMapper';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
@@ -22,7 +22,7 @@ export const useLoadStore = (dataset: DataSet) => {
 
   useEffect(() => {
     const columns = mapDataSetColumns(dataset);
-    const datasetItems = mapDataSetItems(dataset);
+    const datasetRows = mapDataSetRows(dataset);
 
     const getColumnsOfType = (types: string[]): IColumn[] =>
       columns.filter(column => types.includes(column.data));
@@ -46,7 +46,7 @@ export const useLoadStore = (dataset: DataSet) => {
 
       // for currency symbol go to record by id and get transactioncurrencyid field (lookup)
       if (numberColumns.some(numberColumn => numberColumn.data === 'Currency')) {
-        dispatch(getCurrencySymbols(datasetItems.map(item => item.key)));
+        dispatch(getCurrencySymbols(datasetRows.map(row => row.key)));
       }
     }
 

@@ -1,6 +1,8 @@
 import { IColumn, IDropdownOption } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getDropdownOptions, openErrorDialog } from '../../services/DataverseService';
+import store from '../store';
+import { setLoading } from './LoadingSlice';
 
 export type DropdownField = {
   fieldName: string,
@@ -68,7 +70,9 @@ const DropdownSlice = createSlice({
     });
     builder.addCase(getDropdownsOptions.rejected, (state, action) => {
       state.dropdownFields = [];
-      openErrorDialog(action.error);
+      openErrorDialog(action.error).then(() => {
+        store.dispatch(setLoading(false));
+      });
     });
   },
 });

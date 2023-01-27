@@ -1,6 +1,8 @@
 import { IColumn } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getDateMetadata, openErrorDialog } from '../../services/DataverseService';
+import store from '../store';
+import { setLoading } from './LoadingSlice';
 
 type DateMetadata = {
   fieldName: string,
@@ -37,7 +39,9 @@ export const dateSlice = createSlice({
     });
     builder.addCase(getDateBehavior.rejected, (state, action) => {
       state.dates.push({ fieldName: '', dateBehavior: '' });
-      openErrorDialog(action.error);
+      openErrorDialog(action.error).then(() => {
+        store.dispatch(setLoading(false));
+      });
     });
   },
 });

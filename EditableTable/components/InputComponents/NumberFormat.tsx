@@ -1,6 +1,7 @@
-import { ISpinButtonStyles, SpinButton, Stack } from '@fluentui/react';
-import * as React from 'react';
+import { SpinButton, Stack } from '@fluentui/react';
+import React, { memo } from 'react';
 import { useAppSelector } from '../../store/hooks';
+import { numberFormatStyles } from '../../styles/ComponentsStyles';
 import { formatCurrency, formatDecimal, formatNumber } from '../../utils/formattingUtils';
 
 export interface INumberProps {
@@ -10,16 +11,7 @@ export interface INumberProps {
   _onChange: Function;
 }
 
-export const NumberFormat = ({ fieldName, value, rowId, _onChange } : INumberProps) => {
-  const styles: Partial<ISpinButtonStyles> = {
-    arrowButtonsContainer: {
-      display: 'none',
-    },
-    spinButtonWrapper: {
-      maxWidth: '150px',
-    },
-  };
-
+export const NumberFormat = memo(({ fieldName, value, rowId, _onChange } : INumberProps) => {
   const numbers = useAppSelector(state => state.number.numberFieldsMetadata);
   const currencySymbols = useAppSelector(state => state.number.currencySymbols);
 
@@ -41,15 +33,14 @@ export const NumberFormat = ({ fieldName, value, rowId, _onChange } : INumberPro
   return (
     <Stack>
       <SpinButton
-        // defaultValue={value}
         min={currentNumber?.minValue}
         max={currentNumber?.maxValue}
-        precision={currentNumber?.precision}
-        styles={styles}
+        precision={currentNumber?.precision ?? 0}
+        styles={numberFormatStyles}
         onChange={onNumberChange}
         onValidate={onValidate}
         value={value}
       />
     </Stack>
   );
-};
+});

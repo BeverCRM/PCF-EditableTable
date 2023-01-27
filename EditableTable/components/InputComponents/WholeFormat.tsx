@@ -1,16 +1,16 @@
 import { ComboBox, IComboBox, IComboBoxOption, Stack } from '@fluentui/react';
 import React, { memo } from 'react';
 import { useAppSelector } from '../../store/hooks';
+import { wholeFormatStyles } from '../../styles/ComponentsStyles';
 import { durationList } from './durationList';
 
 export interface IWholeFormatProps {
-  value: string | number | undefined;
+  value: string | null | undefined;
   type: string;
   _onChange: Function;
 }
 
 export const WholeFormat = memo(({ value, type, _onChange } : IWholeFormatProps) => {
-  console.log('whole format');
   const wholeFormat = useAppSelector(state => state.wholeFormat);
 
   let options: IComboBoxOption[] = [];
@@ -39,15 +39,7 @@ export const WholeFormat = memo(({ value, type, _onChange } : IWholeFormatProps)
         options={options}
         onChange={onChange}
         selectedKey={value}
-        styles={{
-          optionsContainer: {
-            maxHeight: 260,
-            maxWidth: 300,
-          },
-          container: {
-            maxWidth: 200,
-          },
-        }}
+        styles={wholeFormatStyles}
       />
     </Stack>
   );

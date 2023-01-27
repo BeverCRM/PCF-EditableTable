@@ -1,80 +1,80 @@
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
-import { Stack } from '@fluentui/react';
-import * as React from 'react';
+// import { Stack } from '@fluentui/react';
+import React, { memo } from 'react';
 import { useAppSelector } from '../../store/hooks';
+import { lookupFormatStyles } from '../../styles/ComponentsStyles';
+import { ParentEntityMetadata } from '../EditableGrid/GridCell';
 
 export interface ILookupProps {
   fieldName: string;
-  value: ITag[] | undefined;
+  value: ITag | undefined;
+  parentEntityMetadata: ParentEntityMetadata | undefined;
   _onChange: Function;
-  lookupReference: string;
 }
 
-export const LookupFormat = ({ fieldName, value, _onChange }: ILookupProps) => {
-  // const [currentOption, setCurrentOption] = React.useState<ITag[] | undefined>(value);
-  const picker = React.useRef(null);
+export const LookupFormat = memo(
+  ({ fieldName, value, parentEntityMetadata, _onChange }: ILookupProps) => {
+    const picker = React.useRef(null);
 
-  const lookups = useAppSelector(state => state.lookup.lookups);
-  const currentLookup = lookups.find(lookup => lookup.logicalName === fieldName);
-  const options = currentLookup?.options ?? [];
+    const lookups = useAppSelector(state => state.lookup.lookups);
+    const currentLookup = lookups.find(lookup => lookup.logicalName === fieldName);
+    const options = currentLookup?.options ?? [];
+    const currentOption = value ? [value] : [];
 
-  const initialValues = (): ITag[] => {
-    if (options.length > 100) {
-      return options.slice(0, 100);
+    if (value === undefined && parentEntityMetadata !== undefined) {
+      if (currentLookup?.reference?.entityNameRef === parentEntityMetadata.entityTypeName) {
+        currentOption.push({
+          key: parentEntityMetadata.entityId,
+          name: parentEntityMetadata.entityRecordName,
+        });
+        _onChange(`/${currentLookup?.entityPluralName}(${parentEntityMetadata.entityId})`,
+          currentOption[0],
+          currentLookup?.reference?.entityNavigation);
+      }
     }
-    return options;
-  };
 
-  const listContainsTagList = (tag: ITag, tagList?: ITag[]) => {
-    if (!tagList || tagList.length === 0) return false;
+    const initialValues = (): ITag[] => {
+      if (options.length > 100) {
+        return options.slice(0, 100);
+      }
+      return options;
+    };
 
-    return tagList.some(compareTag => compareTag.key === tag.key);
-  };
+    const filterSuggestedTags = (filterText: string): ITag[] => {
+      if (filterText.length === 0) return [];
 
-  const filterSuggestedTags = (filterText: string, selectedItems?: ITag[]): ITag[] => {
-    if (filterText.length === 0) return [];
+      return options.filter(tag => {
+        if (tag.name === null) return false;
 
-    return options.filter(tag => {
-      if (tag.name === null) return false;
+        return tag.name.toLowerCase().includes(filterText.toLowerCase());
+      });
+    };
 
-      if (listContainsTagList(tag, selectedItems)) return false;
+    const onChange = (items?: ITag[] | undefined): void => {
+      if (items !== undefined && items.length > 0) {
+        _onChange(`/${currentLookup?.entityPluralName}(${items[0].key})`, items[0],
+          currentLookup?.reference?.entityNavigation);
+      }
+      else {
+        _onChange(null, null, currentLookup?.reference?.entityNavigation);
+      }
+    };
 
-      return tag.name.toLowerCase().includes(filterText.toLowerCase());
-    });
-  };
-
-  const onChange = (items?: ITag[] | undefined): void => {
-    value = items;
-    if (items !== undefined && items.length > 0) {
-      _onChange(`/${currentLookup?.entityPluralName}(${items[0].key})`, '',
-        currentLookup?.reference?.entityNavigation);
-    }
-    else {
-      _onChange(null, '', currentLookup?.reference?.entityNavigation);
-    }
-  };
-
-  return <Stack>
-    <TagPicker
-      selectedItems={value}
+    return <TagPicker
+      selectedItems={currentOption}
       componentRef={picker}
       onChange={onChange}
       onResolveSuggestions={filterSuggestedTags}
+      resolveDelay={1000}
       onEmptyResolveSuggestions={initialValues}
       itemLimit={1}
       pickerSuggestionsProps={{ noResultsFoundText: 'No Results Found' }}
-      styles={{ text: { minWidth: '30px' }, root: { maxWidth: '300px' } }}
+      styles={lookupFormatStyles}
       onBlur={() => {
         if (picker.current) {
           // @ts-ignore
           picker.current.input.current._updateValue('');
         }
       }}
-    />
-  </Stack>;
-};
-
-// CSS fix
-// when the lookup value is removed, the left border disappears
-// fix with on focus event? by adding extra border-left 2px ! (ms-BasePicker-text text-430)
-// don't forget border radius
+    />;
+  });

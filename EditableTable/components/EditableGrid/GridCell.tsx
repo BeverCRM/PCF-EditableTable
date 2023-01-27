@@ -8,25 +8,46 @@ import { DateTimeFormat } from '../InputComponents/DateTimeFormat';
 import { WholeFormat } from '../InputComponents/WholeFormat';
 
 import { Column, Row } from '../../mappers/dataSetMapper';
+import { useAppDispatch } from '../../store/hooks';
+import { updateRow } from '../../store/features/DatasetSlice';
+import { setChangedRecords } from '../../store/features/RecordSlice';
+import { getParentMetadata } from '../../services/DataverseService';
 
 interface IGridSetProps {
-  item: Row,
+  row: Row,
   currentColumn: IColumn,
-  setChangedValue: Function
 }
 
-export const GridCell = ({ item, currentColumn, setChangedValue }: IGridSetProps) => {
+export type ParentEntityMetadata = {
+  entityId: string,
+  entityRecordName: string,
+  entityTypeName: string
+};
+
+export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
+  const dispatch = useAppDispatch();
   const _changedValue = useCallback(
     (newValue: any, rawValue?: any, lookupEntityNavigation?: string): void => {
-      setChangedValue({
-        id: item.key,
+      dispatch(setChangedRecords({
+        id: row.key,
         fieldName: lookupEntityNavigation || currentColumn.key,
         fieldType: currentColumn.data,
         newValue,
-      }, rawValue ?? newValue);
-    }, [setChangedValue]);
+      }));
+      dispatch(updateRow({
+        rowKey: row.key,
+        columnName: currentColumn.key,
+        newValue: rawValue ?? newValue,
+      }));
+    }, []);
 
-  const cell = item.columns.find((column: Column) => column.schemaName === currentColumn?.key);
+  const cell = row.columns.find((column: Column) => column.schemaName === currentColumn?.key);
+
+  let parentEntityMetadata: ParentEntityMetadata | undefined;
+  if (row.key.length < 15) {
+    parentEntityMetadata = getParentMetadata();
+    // maybe put value in the row?
+  }
 
   if (currentColumn !== undefined && cell !== undefined) {
     switch (currentColumn.data) {
@@ -34,38 +55,36 @@ export const GridCell = ({ item, currentColumn, setChangedValue }: IGridSetProps
         return <TextField value={cell.formattedValue}
           styles={{ root: { maxWidth: '300px' } }}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-            newValue?: string) => _changedValue(newValue || '')} />;
+            newValue?: string) => { console.log('Text'); _changedValue(newValue || ''); }} />;
 
       case 'DateAndTime.DateAndTime':
         return <DateTimeFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
           dateOnly={false}
-          value={cell.rawValue ? new Date(cell.rawValue!) : undefined}
+          value={cell.formattedValue}
           _onChange={_changedValue}
         />;
 
       case 'DateAndTime.DateOnly':
         return <DateTimeFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          dateOnly={true} value={cell.rawValue ? new Date(cell.rawValue!) : undefined}
+          dateOnly={true} value={cell.formattedValue}
           _onChange={_changedValue} />;
 
       case 'Lookup.Simple':
         return <LookupFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          value={cell.rawValue
-            ? [{ name: cell.formattedValue, key: cell.rawValue?.id.guid }]
-            : undefined}
-          _onChange={_changedValue}
-          lookupReference={cell.rawValue?.etn || ''} />;
+          value={cell.lookup}
+          parentEntityMetadata={parentEntityMetadata ?? undefined}
+          _onChange={_changedValue} />;
 
       case 'OptionSet':
         return <OptionSetFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          currentOptions={cell.rawValue ? [cell.rawValue] : []}
+          value={cell.rawValue}
           isMultiple={false}
           _onChange={_changedValue}
         />;
 
       case 'TwoOptions':
         return <OptionSetFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          currentOptions={cell.rawValue ? [cell.rawValue] : []}
+          value={cell.rawValue}
           isMultiple={false}
           isTwoOptions={true}
           _onChange={_changedValue}
@@ -73,7 +92,7 @@ export const GridCell = ({ item, currentColumn, setChangedValue }: IGridSetProps
 
       case 'MultiSelectPicklist':
         return <OptionSetFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          currentOptions={cell.rawValue ? cell.rawValue.split(',') : []} isMultiple={true}
+          value={cell.rawValue} isMultiple={true}
           _onChange={_changedValue}
         />;
 
@@ -85,7 +104,7 @@ export const GridCell = ({ item, currentColumn, setChangedValue }: IGridSetProps
       case 'Currency':
         return <NumberFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
           value={cell.formattedValue ?? ''}
-          rowId={item.key}
+          rowId={row.key}
           _onChange={_changedValue} />;
 
       case 'FP':

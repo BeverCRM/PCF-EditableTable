@@ -14,9 +14,10 @@ export const formatDecimal = (value: number, precision?: number | undefined) => 
 export const formatLanguage = (langageCode: number) =>
   getContext().formatting.formatLanguage(langageCode);
 
-export const formatTime = (value: Date, behavior: 0 | 1 | 3) =>
-  getContext().formatting.formatTime(value, behavior);
-
 // TO DO: change getDateFormatWithSlash to this in DateTimeFormat
 export const formatDateShort = (value: Date, includeTime?: boolean) =>
   getContext().formatting.formatDateShort(value, includeTime);
+
+export const formatUserDateTimeToUTC = (userDateTime: Date, behavior: 0 | 1 | 2 | 3) =>
+  // @ts-ignore
+  getContext().formatting.formatUserDateTimeToUTC(userDateTime, behavior);

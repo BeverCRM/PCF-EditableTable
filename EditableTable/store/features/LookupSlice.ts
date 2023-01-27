@@ -5,8 +5,10 @@ import {
   getLookupOptions,
   getRelationships,
   getEntityPluralName,
+  openErrorDialog,
 } from '../../services/DataverseService';
-import { RootState } from '../store';
+import store, { RootState } from '../store';
+import { setLoading } from './LoadingSlice';
 
 export type Relationship = {
   fieldNameRef: string,
@@ -77,12 +79,18 @@ export const lookupSlice = createSlice({
     builder.addCase(setRelationships.rejected, (state, action) => {
       state.relationships = [];
       console.log(action);
+      openErrorDialog(action.error).then(() => {
+        store.dispatch(setLoading(false));
+      });
     });
     builder.addCase(setLookups.fulfilled, (state, action) => {
       state.lookups = [...action.payload];
     });
     builder.addCase(setLookups.rejected, (state, action) => {
       console.log(action.payload, action.error);
+      openErrorDialog(action.error).then(() => {
+        store.dispatch(setLoading(false));
+      });
     });
   },
 });

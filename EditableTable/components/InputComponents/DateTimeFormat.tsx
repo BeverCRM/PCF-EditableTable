@@ -1,82 +1,105 @@
-import * as React from 'react';
+import React, { memo } from 'react';
 import {
   DatePicker, IDatePicker,
   defaultDatePickerStrings,
-  mergeStyleSets,
+  // mergeStyleSets,
   Stack,
+  ComboBox,
+  IComboBox,
+  IComboBoxOption,
 } from '@fluentui/react';
-import { stackComboBox } from '../../styles/ComboBoxStyles';
+import { comboBoxStyles, stackComboBox } from '../../styles/ComponentsStyles';
 import { useAppSelector } from '../../store/hooks';
 import { shallowEqual } from 'react-redux';
-import { getUserTimeZoneOffset } from '../../services/DataverseService';
+// import { getUserTimeZoneOffset } from '../../services/DataverseService';
 import {
   getDateFormatWithHyphen,
-  getDateInUTC,
   setTimeForDate,
   getDateFormatWithSlash,
   getDateFromString,
-  backToLocalTimezone,
+  getTimeKeyFromTime,
+  getTimeKeyFromDate,
+  formatTimeto12Hours,
 } from '../../utils/dateTimeUtils';
-import { TimeFormat } from './TimeFormat';
+import { dateFormatStyles } from '../../styles/ComponentsStyles';
+import { formatDateShort, formatUserDateTimeToUTC } from '../../utils/formattingUtils';
+import { timesList } from './timeList';
 
 export interface IDatePickerProps {
   fieldName: string,
   dateOnly: boolean,
-  value: Date | undefined,
+  value: string | null,
   _onChange: any
 }
 
-export const DateTimeFormat = (
+export const DateTimeFormat = memo((
   { fieldName, dateOnly, value, _onChange }: IDatePickerProps) => {
-  const styles = mergeStyleSets({
-    root: { selectors: { '> *': { marginBottom: 15 } } },
-    control: { maxWidth: dateOnly ? 200 : 150, marginBottom: 15 },
-  });
+  let currentDate = value ? new Date(value) : undefined;
+  let timeKey: string | number | undefined;
+  const options = timesList;
 
-  const [timeKey, setTimeKey] = React.useState<string | number | undefined>();
   const datePickerRef = React.useRef<IDatePicker>(null);
 
-  const dates = useAppSelector(state => state.date.dates, shallowEqual);
-  const currentDateMetadata = dates.find(date => date.fieldName === fieldName);
+  const dateFields = useAppSelector(state => state.date.dates, shallowEqual);
+  const currentDateMetadata = dateFields.find(dateField => dateField.fieldName === fieldName);
   const dateBehavior = currentDateMetadata?.dateBehavior ?? '';
-  const userTimeZoneOffset = getUserTimeZoneOffset();
 
-  if (value !== undefined) {
-    if (!isNaN(value.getTime()) && dateBehavior === 'TimeZoneIndependent') {
-      value = getDateInUTC(value);
+  if (currentDate !== undefined && !isNaN(currentDate.getTime())) {
+    const newKey = getTimeKeyFromDate(currentDate);
+    timeKey = newKey;
+    if (options.find(option => option.key === newKey) === undefined) {
+      options.push({
+        key: newKey,
+        text: formatTimeto12Hours(currentDate),
+      });
     }
-    if (!isNaN(value.getTime()) && dateBehavior === 'UserLocal') {
-      value = new Date(value.getTime() +
-        ((new Date().getTimezoneOffset() + userTimeZoneOffset) * 60 * 1000));
-    }
+  }
+  else {
+    timeKey = undefined;
   }
 
   const onParseDateFromString = React.useCallback(
-    (newValue: string): Date => getDateFromString(newValue, value),
-    [value],
+    (newValue: string): Date => getDateFromString(newValue, currentDate),
+    [currentDate],
   );
+
+  const setChangedDateTime = (date: Date | undefined, key: string | number | undefined) => {
+    const currentDateTime = setTimeForDate(date, key?.toString());
+    if (currentDateTime !== undefined) {
+      if (dateBehavior === 'TimeZoneIndependent') {
+        _onChange(`${getDateFormatWithHyphen(currentDateTime)}T${key ?? '00:00'}:00Z`,
+          formatDateShort(currentDateTime, true));
+      }
+      else {
+        const dateInUTC = new Date(formatUserDateTimeToUTC(currentDateTime, 1));
+        _onChange(`${getDateFormatWithHyphen(dateInUTC)}T${getTimeKeyFromDate(dateInUTC)}:00Z`,
+          formatDateShort(currentDateTime, true));
+      }
+    }
+  };
 
   const onDateChange = (date: Date | null | undefined) => {
     if (date !== null && date !== undefined) {
       if (dateOnly) {
-        value = date;
+        currentDate = date;
         _onChange(`${getDateFormatWithHyphen(date)}T00:00:00Z`);
       }
       else {
-        const dateTime = setTimeForDate(date, timeKey?.toString());
-        if (dateTime !== undefined) {
-          value = new Date(dateTime.getTime() +
-          ((new Date().getTimezoneOffset() + userTimeZoneOffset) * 60 * 1000));
-          if (dateBehavior === 'TimeZoneIndependent') {
-            _onChange(`${getDateFormatWithHyphen(dateTime)}T${timeKey ?? '00:00'}:00Z`);
-          }
-          else {
-            const rawValue = backToLocalTimezone(value, userTimeZoneOffset);
-            _onChange(`${dateTime.toISOString().split('.')[0]}Z`, rawValue.toISOString());
-          }
-        }
+        setChangedDateTime(date, timeKey);
       }
     }
+  };
+
+  const onTimeChange = (event: React.FormEvent<IComboBox>, option?: IComboBoxOption,
+    index?: number, value?: string): void => {
+    let key = option?.key;
+    if (!option && value) {
+      key = getTimeKeyFromTime(value);
+      options.push({ key: key!, text: value.toUpperCase() });
+    }
+    timeKey = key;
+
+    setChangedDateTime(currentDate, key);
   };
 
   return (
@@ -84,22 +107,22 @@ export const DateTimeFormat = (
       <DatePicker
         componentRef={datePickerRef}
         allowTextInput
-        value={value}
+        value={currentDate}
         onSelectDate={onDateChange}
         formatDate={getDateFormatWithSlash}
         parseDateFromString={onParseDateFromString}
-        className={styles.control}
+        className={dateFormatStyles(dateOnly).control}
         strings={defaultDatePickerStrings}
       />
       {!dateOnly &&
-        <TimeFormat
-          currentDate={value}
-          _onChange={_onChange}
-          dateBehavior={dateBehavior}
-          userTimeZoneOffset={userTimeZoneOffset}
-          setKey={setTimeKey}
+        <ComboBox
+          options={options}
+          allowFreeform={true}
+          onChange={onTimeChange}
+          styles={comboBoxStyles}
+          selectedKey={timeKey}
         />
       }
     </Stack>
   );
-};
+});

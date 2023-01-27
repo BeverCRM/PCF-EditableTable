@@ -1,4 +1,4 @@
-import { IColumn } from '@fluentui/react';
+import { IColumn, ITag } from '@fluentui/react';
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
 export type Row = {
@@ -9,7 +9,8 @@ export type Row = {
 export type Column = {
   schemaName: string,
   formattedValue: string,
-  rawValue: any | string | ComponentFramework.EntityReference | undefined,
+  rawValue: string | null,
+  lookup?: ITag,
 };
 
 export const mapDataSetColumns = (dataset: DataSet): IColumn[] =>
@@ -24,14 +25,21 @@ export const mapDataSetColumns = (dataset: DataSet): IColumn[] =>
       data: column.dataType,
     }));
 
-export const mapDataSetItems = (dataset: DataSet): Row[] =>
+export const mapDataSetRows = (dataset: DataSet): Row[] =>
   dataset.sortedRecordIds.map(id => {
     const record = dataset.records[id];
 
     const columns = dataset.columns.map<Column>(column => ({
       schemaName: column.name,
-      rawValue: record.getValue(column.name), // fieldValue | optionsetValue
+      rawValue: record.getValue(column.name)?.toString() as string || null, // fieldValue | optionsetValue
       formattedValue: record.getFormattedValue(column.name), // fieldContent
+      lookup: record.getValue(column.name)
+        ? {
+          name: record.getFormattedValue(column.name) ?? '(No Name)',
+          // eslint-disable-next-line no-extra-parens
+          key: (record.getValue(column.name) as ComponentFramework.EntityReference)?.id?.guid,
+        }
+        : undefined,
     }));
 
     return {

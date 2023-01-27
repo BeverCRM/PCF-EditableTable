@@ -6,9 +6,11 @@ import dropdownReducer from './features/DropdownSlice';
 import numberReducer from './features/NumberSlice';
 import wholeFormatReducer from './features/WholeFormatSlice';
 import dateReducer from './features/DateSlice';
+import datasetReducer from './features/DatasetSlice';
 
 const store = configureStore({
   reducer: {
+    dataset: datasetReducer,
     lookup: lookupReducer,
     number: numberReducer,
     dropdown: dropdownReducer,

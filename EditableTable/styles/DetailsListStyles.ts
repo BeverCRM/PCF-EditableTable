@@ -1,5 +1,4 @@
-import { IDetailsColumnStyles } from
-  '@fluentui/react/lib/components/DetailsList/DetailsColumn.types';
+import { IDetailsHeaderStyles, IDetailsListStyles } from '@fluentui/react';
 import { IStackStyles } from '@fluentui/react/lib/components/Stack/Stack.types';
 import { FontWeights, getTheme, mergeStyleSets } from '@fluentui/react/lib/Styling';
 
@@ -29,7 +28,7 @@ export const detailsListStyles = mergeStyleSets({
     alignItems: 'stretch',
   },
   header: [
-    theme.fonts.xxLarge,
+    theme.fonts.large,
     {
       flex: '1 1 auto',
       borderTop: `4px solid ${theme.palette.themePrimary}`,
@@ -64,8 +63,23 @@ export const detailsListStyles = mergeStyleSets({
   },
 });
 
-export const detailsHeaderStyles: Partial<IDetailsColumnStyles> = {
-  cellName: {
+// export const detailsHeaderStyles: Partial<IDetailsColumnStyles> = {
+//   cellName: {
+//     fontSize: '12px',
+//   },
+// };
+
+export const customStyles: Partial<IDetailsHeaderStyles> = {
+  root: {
+    backgroundColor: 'white',
     fontSize: '12px',
+    paddingTop: '0px',
+    borderTop: '1px solid rgb(215, 215, 215)',
   },
 };
+
+export const gridStyles = (rowsLength: number): Partial<IDetailsListStyles> => mergeStyleSets({
+  contentWrapper: {
+    padding: rowsLength === 0 ? '50px' : '0',
+  },
+});

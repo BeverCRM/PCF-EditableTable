@@ -1,4 +1,3 @@
-import { IColumn } from '@fluentui/react';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   deleteRecord,
@@ -22,14 +21,10 @@ export type Record = {
 
 interface IRecordState {
   changedRecords: Record[],
-  items: any,
-  columns: IColumn[]
 }
 
 const initialState: IRecordState = {
   changedRecords: [],
-  items: [],
-  columns: [],
 };
 
 type AsyncThunkConfig = {
@@ -46,17 +41,20 @@ export const saveRecords = createAsyncThunk<void, undefined, AsyncThunkConfig>(
 
 export const deleteRecords = createAsyncThunk<string[], string[], AsyncThunkConfig>(
   'record/deleteRecords',
-  async recordIds => {
+  async (recordIds, thunkApi) => {
+    const newRecordIds = recordIds.filter(id => id.length < 15);
+
     const response = await openRecordDeleteDialog();
     if (response.confirmed) {
       await Promise.all(recordIds.map(async id => {
-        await deleteRecord(id);
+        if (id.length > 15) await deleteRecord(id);
       }));
 
-      return recordIds;
+      // return newRecordIds;
+      return thunkApi.fulfillWithValue(newRecordIds);
     }
 
-    return [];
+    return thunkApi.rejectWithValue(response.confirmed);
   },
 );
 
@@ -106,15 +104,23 @@ const RecordSlice = createSlice({
       state.changedRecords = [];
     });
     builder.addCase(saveRecords.rejected, (state, action) => {
-      openErrorDialog(action.error);
-      store.dispatch(setLoading(false));
+      openErrorDialog(action.error).then(() => {
+        store.dispatch(setLoading(false));
+      });
     });
     builder.addCase(deleteRecords.fulfilled, (state, action) => {
-      state.changedRecords.filter(record =>
-        action.payload.find(id => record.id !== id));
+      const recordsToRemove = new Set(action.payload);
+      state.changedRecords = state.changedRecords.filter(record =>
+        !recordsToRemove.has(record.id));
+
+      console.log(state.changedRecords);
     });
     builder.addCase(deleteRecords.rejected, (state, action) => {
-      openErrorDialog(action.error);
+      if (action.payload) {
+        openErrorDialog(action.error).then(() => {
+          store.dispatch(setLoading(false));
+        });
+      }
     });
   },
 });

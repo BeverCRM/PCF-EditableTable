@@ -1,6 +1,12 @@
 import { IColumn } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getNumberFieldMetadata, getCurrencySymbol } from '../../services/DataverseService';
+import {
+  getNumberFieldMetadata,
+  getCurrencySymbol,
+  openErrorDialog,
+} from '../../services/DataverseService';
+import store from '../store';
+import { setLoading } from './LoadingSlice';
 
 export type NumberFieldMetadata = {
   fieldName: string,
@@ -82,6 +88,9 @@ const NumberSlice = createSlice({
     builder.addCase(getNumberFieldsMetadata.rejected, (state, action) => {
       console.log(state, action);
       state.numberFieldsMetadata = [];
+      openErrorDialog(action.error).then(() => {
+        store.dispatch(setLoading(false));
+      });
     });
     builder.addCase(getCurrencySymbols.fulfilled, (state, action) => {
       state.currencySymbols = [...action.payload];
@@ -89,6 +98,9 @@ const NumberSlice = createSlice({
     builder.addCase(getCurrencySymbols.rejected, (state, action) => {
       console.log(action.error);
       state.currencySymbols = [];
+      openErrorDialog(action.error).then(() => {
+        store.dispatch(setLoading(false));
+      });
     });
   },
 });

@@ -25,7 +25,8 @@ export const GridFooter = ({ dataset, selectedCount } : IGridFooterProps) => {
   } = usePagination(dataset);
 
   // const isLoading = useAppSelector(state => state.loading.isLoading);
-  const selected = `${firstItemNumber} - ${lastItemNumber} of ${totalRecords}
+  const selected = `${firstItemNumber} - ${lastItemNumber} of
+    ${totalRecords === -1 ? '5000+' : totalRecords}
     ${selectedCount !== 0 ? `(${selectedCount} Selected)` : ''}`;
 
   return (

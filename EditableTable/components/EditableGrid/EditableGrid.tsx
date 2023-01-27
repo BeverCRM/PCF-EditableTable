@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import {
   DetailsList,
   DetailsListLayoutMode,
@@ -8,7 +8,7 @@ import {
 
 import { useSelection } from '../../hooks/useSelection';
 import { useLoadStore } from '../../hooks/useLoadStore';
-import { useAppDispatch } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 
 import { CommandBar } from './CommandBar';
 import { GridFooter } from './GridFooter';
@@ -18,25 +18,35 @@ import {
   clearChangedRecords,
   deleteRecords,
   saveRecords,
-  setChangedRecords,
 } from '../../store/features/RecordSlice';
 import { setLoading } from '../../store/features/LoadingSlice';
+import {
+  addNewRow,
+  readdNewRowsAfterDelete,
+  removeNewRows,
+  setRows,
+} from '../../store/features/DatasetSlice';
 
-import { Row, Column, mapDataSetColumns, mapDataSetItems } from '../../mappers/dataSetMapper';
-import { _onRenderDetailsHeader, _onRenderRow } from '../../utils/Utils';
+import { Row, Column, mapDataSetColumns, mapDataSetRows } from '../../mappers/dataSetMapper';
+import { _onRenderDetailsHeader, _onRenderRow } from '../../styles/RenderStyles';
 import { buttonStyles } from '../../styles/ButtonStyles';
+import { openForm } from '../../services/DataverseService';
+import { gridStyles } from '../../styles/DetailsListStyles';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
 export interface IDataSetProps {
   dataset: DataSet;
+  isControlDisabled: boolean;
   width: number;
   height: number;
 }
 
-export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
-  const [items, setItems] = useState<Row[]>([]);
+export const EditableGrid = ({ dataset, isControlDisabled, height, width }: IDataSetProps) => {
   const { selection, selectedRecordIds } = useSelection(dataset);
+
+  const rows: Row[] = useAppSelector(state => state.dataset.rows);
+  const newRows: Row[] = useAppSelector(state => state.dataset.newRows);
 
   const columns = mapDataSetColumns(dataset);
 
@@ -46,30 +56,30 @@ export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
     dispatch(setLoading(true));
     dataset.refresh();
     dispatch(clearChangedRecords());
+    dispatch(removeNewRows());
   };
 
   const newButtonHandler = () => {
     const emptyColumns = columns.map<Column>(column => ({
-      'schemaName': column.key,
-      'rawValue': '',
-      'formattedValue': '',
+      schemaName: column.key,
+      rawValue: '',
+      formattedValue: '',
     }));
 
-    setItems(previousItems => [
-      {
-        key: Date.now().toString(),
-        columns: emptyColumns,
-      },
-      ...previousItems,
-    ]);
+    dispatch(addNewRow({
+      key: Date.now().toString(),
+      columns: emptyColumns,
+    }));
   };
 
   const deleteButtonHandler = () => {
     dispatch(setLoading(true));
     dispatch(deleteRecords(selectedRecordIds)).unwrap()
-      .then(() => {
+      .then(newRecordIds => {
         dataset.refresh();
-      });
+        dispatch(readdNewRowsAfterDelete(newRecordIds));
+      })
+      .catch(() => dispatch(setLoading(false)));
   };
 
   const saveButtonHandler = () => {
@@ -77,43 +87,22 @@ export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
     dispatch(saveRecords()).unwrap()
       .then(() => {
         dataset.refresh();
+        dispatch(removeNewRows());
       });
   };
 
   useEffect(() => {
-    const datasetItems = mapDataSetItems(dataset);
-    setItems(datasetItems);
+    const datasetRows = mapDataSetRows(dataset);
+    newRows.map(newRow => datasetRows.unshift(newRow));
+    dispatch(setRows(datasetRows));
   }, [dataset]);
 
   useLoadStore(dataset);
 
-  const _setChangedValue = useCallback((changedItem: any, changedValue: string) => {
-    setItems(items.map(item => {
-      if (item.key === changedItem.id) {
-        return {
-          ...item,
-          columns: item.columns.map((column: Column) => {
-            if (column.schemaName === changedItem.fieldName) {
-              return {
-                ...column,
-                rawValue: changedValue || undefined,
-                formattedValue: changedValue,
-              };
-            }
-
-            return column;
-          }),
-        };
-      }
-
-      return item;
-    }));
-
-    dispatch(setChangedRecords(changedItem));
-  }, [items]);
-
   const _renderItemColumn = (item: Row, index: number | undefined, column: IColumn | undefined) =>
-    <GridCell item={item} currentColumn={column!} setChangedValue={_setChangedValue} />;
+    <GridCell row={item} currentColumn={column!} />;
+
+  const _onItemInvoked = (item: any) => openForm(item);
 
   return <div className='container'>
     <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons} >
@@ -122,26 +111,28 @@ export const EditableGrid = ({ dataset, height, width }: IDataSetProps) => {
         newButtonHandler={newButtonHandler}
         deleteButtonHandler={deleteButtonHandler}
         saveButtonHandler={saveButtonHandler}
+        isControlDisabled={isControlDisabled}
       ></CommandBar>
     </Stack>
     <Stack style={{ width, height }}>
       <DetailsList
-        items={items}
+        items={rows}
         columns={columns}
         onRenderItemColumn={_renderItemColumn}
         selection={selection}
         onRenderRow={_onRenderRow}
         onRenderDetailsHeader={_onRenderDetailsHeader}
         layoutMode={DetailsListLayoutMode.fixedColumns}
-        styles={{ contentWrapper: { padding: items.length === 0 ? '50px' : '0' } }}
+        styles={gridStyles(rows.length)}
+        onItemInvoked={_onItemInvoked}
       >
       </DetailsList>
-      {items.length === 0 &&
+      {rows.length === 0 &&
         <Stack horizontalAlign='center' className='noDataContainer'>
           <div className='nodata'><span>No data available</span></div>
         </Stack>
       }
-      <GridFooter dataset={dataset} selectedCount={selection.count}></GridFooter>
+      <GridFooter dataset={dataset} selectedCount={selectedRecordIds.length}></GridFooter>
     </Stack>
   </div>;
 };

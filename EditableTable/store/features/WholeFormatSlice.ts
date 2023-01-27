@@ -1,6 +1,12 @@
 import { IComboBoxOption } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getTimeZoneDefinitions, getProvisionedLanguages } from '../../services/DataverseService';
+import {
+  getTimeZoneDefinitions,
+  getProvisionedLanguages,
+  openErrorDialog,
+} from '../../services/DataverseService';
+import store from '../store';
+import { setLoading } from './LoadingSlice';
 
 interface IWholeFormatState {
   timezones: IComboBoxOption[];
@@ -39,12 +45,18 @@ const WholeFormatSlice = createSlice({
     });
     builder.addCase(getTimeZones.rejected, (state, action) => {
       console.log(action.payload);
+      openErrorDialog(action.error).then(() => {
+        store.dispatch(setLoading(false));
+      });
     });
     builder.addCase(getLanguages.fulfilled, (state, action) => {
       state.languages = [...action.payload];
     });
     builder.addCase(getLanguages.rejected, (state, action) => {
       console.log(action.payload);
+      openErrorDialog(action.error).then(() => {
+        store.dispatch(setLoading(false));
+      });
     });
   },
 });
