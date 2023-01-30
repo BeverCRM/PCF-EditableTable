@@ -19,8 +19,6 @@ export const usePagination = (dataset: DataSet) => {
   const totalPages = totalRecords !== -1
     ? Math.ceil(totalRecords / pageSize)
     : 5000;
-  // const hasNextPage = currentPage < totalPages;
-  // const hasPreviousPage = currentPage > 1;
 
   const firstItemNumber = (currentPage - 1) * pageSize + 1;
   const lastItemNumber = currentPage !== totalPages

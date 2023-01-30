@@ -78,8 +78,7 @@ export const EditableGrid = ({ dataset, isControlDisabled, height, width }: IDat
       .then(newRecordIds => {
         dataset.refresh();
         dispatch(readdNewRowsAfterDelete(newRecordIds));
-      })
-      .catch(() => dispatch(setLoading(false)));
+      });
   };
 
   const saveButtonHandler = () => {

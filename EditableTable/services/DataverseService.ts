@@ -8,11 +8,6 @@ let _context: ComponentFramework.Context<IInputs>;
 let _targetEntityType: string;
 let _clientUrl: string;
 
-// const getEntitySetName = async (entityName: string) => {
-//   const entityMetadata = await _context.utils.getEntityMetadata(entityName);
-//   return entityMetadata.EntitySetName;
-// };
-
 export const setContext = (context: ComponentFramework.Context<IInputs>) => {
   _context = context;
   _targetEntityType = context.parameters.dataset.getTargetEntityType();
@@ -20,9 +15,6 @@ export const setContext = (context: ComponentFramework.Context<IInputs>) => {
   // @ts-ignore
   _clientUrl = `${_context.page.getClientUrl()}/api/data/v9.2/`;
 };
-
-// @ts-ignore
-export const getUserTimeZoneOffset = (): number => _context.client.userTimeZoneUtcOffsetMinutes;
 
 export const openForm = (item: any) => {
   const options = {
@@ -33,34 +25,7 @@ export const openForm = (item: any) => {
   _context.navigation.openForm(options);
 };
 
-// const getReferencingEntityName = async (relationshipSchemaName: string) => {
-//   const request =
-//     `${_clientUrl}RelationshipDefinitions?$filter=SchemaName eq '${relationshipSchemaName}'`;
-//   const result = await getFetchResponse(request);
-
-//   return result.value[0]?.ReferencingEntityNavigationPropertyName;
-// };
-
 const createNewRecord = async (data: {}): Promise<void> => {
-  // // @ts-ignore
-  // const relationshipNameRef = _context.mode._customControlProperties.dynamicData
-  //   .parameters.dataset.previousDataSetDefinition.RelationshipName;
-  // const relationshipName = relationshipNameRef !== null
-  //   ? await getReferencingEntityName(relationshipNameRef)
-  //   : relationshipNameRef;
-  // // @ts-ignore
-  // const parentEntityId = _context.mode.contextInfo.entityId;
-  // // @ts-ignore
-  // const parentEntityName = _context.mode.contextInfo.entityTypeName;
-
-  // const entitySetName = await getEntitySetName(parentEntityName);
-  // // create relation to an entity for related grid records
-  // if (relationshipName !== null && parentEntityName !== null && entitySetName !== null) {
-  //   data = {
-  //     ...data,
-  //     [`${relationshipName}@odata.bind`]: `/${entitySetName}(${parentEntityId})`,
-  //   };
-  // }
   await _context.webAPI.createRecord(_targetEntityType, data);
 };
 
@@ -227,7 +192,6 @@ export const getTimeZoneDefinitions = async () => {
 };
 
 export const getProvisionedLanguages = async () => {
-  // const localeLanguageCodes = await _context.webAPI.retrieveMultipleRecords('languagelocale');
   const request = `${_clientUrl}RetrieveProvisionedLanguages`;
   const results = await getFetchResponse(request);
   console.log();
@@ -245,10 +209,6 @@ export const getDateMetadata = async (fieldName: string) => {
 
   return results.value[0].DateTimeBehavior.Value;
 };
-
-// @ts-ignore
-// eslint-disable-next-line max-len
-export const getColumns = () => _context.mode._customControlProperties.dynamicData.parameters.dataset.columnsForEmptyDataset;
 
 export const getTargetEntityType = () => _targetEntityType;
 

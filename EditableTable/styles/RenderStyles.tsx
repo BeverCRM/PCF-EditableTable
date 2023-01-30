@@ -1,38 +1,23 @@
 import * as React from 'react';
-import { IDetailsListProps, IDetailsHeaderStyles, CheckboxVisibility,
-  IDetailsRowStyles, DetailsHeader, DetailsRow } from '@fluentui/react';
+import {
+  IDetailsListProps,
+  CheckboxVisibility,
+  DetailsHeader,
+  DetailsRow,
+} from '@fluentui/react';
+import { detailsHeaderStyles, detailsRowStyles } from './DetailsListStyles';
 
 export const _onRenderDetailsHeader: IDetailsListProps['onRenderDetailsHeader'] = props => {
-  const customStyles: Partial<IDetailsHeaderStyles> = {};
-
   if (props) {
-    customStyles.root = {
-      backgroundColor: 'white',
-      fontSize: '12px',
-      paddingTop: '0px',
-      borderTop: '1px solid rgb(215, 215, 215)',
-    };
-
     props.checkboxVisibility = CheckboxVisibility.always;
-    return <DetailsHeader {...props} styles={customStyles} />;
+    return <DetailsHeader {...props} styles={detailsHeaderStyles} />;
   }
   return null;
 };
 
 export const _onRenderRow: IDetailsListProps['onRenderRow'] = props => {
-  const customStyles: Partial<IDetailsRowStyles> = {};
-
   if (props) {
-    customStyles.root = {
-      height: '43px',
-      backgroundColor: 'white',
-      fontSize: '14px',
-      color: 'black',
-      borderTop: '1px solid rgb(250, 250, 250)',
-      borderBottom: '1px solid rgb(219 219 219)',
-    };
-
-    return <DetailsRow {...props} styles={customStyles} />;
+    return <DetailsRow {...props} styles={detailsRowStyles} />;
   }
   return null;
 };

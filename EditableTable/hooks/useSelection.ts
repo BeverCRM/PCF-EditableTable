@@ -10,10 +10,8 @@ export const useSelection = (dataset: DataSet) => {
   const selection = new Selection({
     onSelectionChanged: () => {
       const recordIds = selection.getSelection()
-        // .filter((row: Entity) => row.key.length > 15)
         .map<string>((row : Entity) => row.key);
 
-      // dataset.setSelectedRecordIds(recordIds);
       setSelectedRecordIds(recordIds);
       console.log(dataset.getSelectedRecordIds());
     },

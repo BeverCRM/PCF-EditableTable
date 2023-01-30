@@ -23,23 +23,19 @@ export const OptionSetFormat =
       (event: React.FormEvent<IComboBox>, option?: IComboBoxOption | undefined) => {
         if (isMultiple) {
           if (option?.selected) {
-            // currentOptions.push(option.key as string);
             _onChange([...currentOptions, option.key as string].join(', '),
               [...currentOptions, option.key as string].join(','));
           }
           else {
-            // currentOptions.filter(key => key !== option?.key);
             _onChange(currentOptions.filter(key => key !== option?.key).join(', ') || null,
               currentOptions.filter(key => key !== option?.key).join(',') || null);
           }
         }
         else if (isTwoOptions) {
           _onChange(option?.key === '1', option!.key.toString());
-          // currentOptions = [option!.key.toString()];
         }
         else {
           _onChange(option?.key, option!.key.toString());
-          // currentOptions = [option!.key.toString()];
         }
       };
 

@@ -31,8 +31,8 @@ export const mapDataSetRows = (dataset: DataSet): Row[] =>
 
     const columns = dataset.columns.map<Column>(column => ({
       schemaName: column.name,
-      rawValue: record.getValue(column.name)?.toString() as string || null, // fieldValue | optionsetValue
-      formattedValue: record.getFormattedValue(column.name), // fieldContent
+      rawValue: record.getValue(column.name)?.toString() as string || null,
+      formattedValue: record.getFormattedValue(column.name),
       lookup: record.getValue(column.name)
         ? {
           name: record.getFormattedValue(column.name) ?? '(No Name)',

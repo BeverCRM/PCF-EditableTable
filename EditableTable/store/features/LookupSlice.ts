@@ -1,4 +1,3 @@
-// import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IColumn, ITag } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {

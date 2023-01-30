@@ -14,7 +14,6 @@ export const formatDecimal = (value: number, precision?: number | undefined) => 
 export const formatLanguage = (langageCode: number) =>
   getContext().formatting.formatLanguage(langageCode);
 
-// TO DO: change getDateFormatWithSlash to this in DateTimeFormat
 export const formatDateShort = (value: Date, includeTime?: boolean) =>
   getContext().formatting.formatDateShort(value, includeTime);
 

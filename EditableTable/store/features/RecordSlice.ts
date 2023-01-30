@@ -50,7 +50,6 @@ export const deleteRecords = createAsyncThunk<string[], string[], AsyncThunkConf
         if (id.length > 15) await deleteRecord(id);
       }));
 
-      // return newRecordIds;
       return thunkApi.fulfillWithValue(newRecordIds);
     }
 
@@ -121,6 +120,7 @@ const RecordSlice = createSlice({
           store.dispatch(setLoading(false));
         });
       }
+      store.dispatch(setLoading(false));
     });
   },
 });

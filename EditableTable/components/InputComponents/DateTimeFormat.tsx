@@ -2,7 +2,6 @@ import React, { memo } from 'react';
 import {
   DatePicker, IDatePicker,
   defaultDatePickerStrings,
-  // mergeStyleSets,
   Stack,
   ComboBox,
   IComboBox,
@@ -11,7 +10,6 @@ import {
 import { comboBoxStyles, stackComboBox } from '../../styles/ComponentsStyles';
 import { useAppSelector } from '../../store/hooks';
 import { shallowEqual } from 'react-redux';
-// import { getUserTimeZoneOffset } from '../../services/DataverseService';
 import {
   getDateFormatWithHyphen,
   setTimeForDate,

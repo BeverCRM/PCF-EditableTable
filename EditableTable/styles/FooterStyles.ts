@@ -18,7 +18,6 @@ export const footerStyles = mergeStyleSets({
     alignItems: 'center',
     paddingLeft: '20px',
     paddingRight: '20px',
-
   },
 });
 

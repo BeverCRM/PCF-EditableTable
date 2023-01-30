@@ -46,7 +46,6 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
   let parentEntityMetadata: ParentEntityMetadata | undefined;
   if (row.key.length < 15) {
     parentEntityMetadata = getParentMetadata();
-    // maybe put value in the row?
   }
 
   if (currentColumn !== undefined && cell !== undefined) {
@@ -72,7 +71,7 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
       case 'Lookup.Simple':
         return <LookupFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
           value={cell.lookup}
-          parentEntityMetadata={parentEntityMetadata ?? undefined}
+          parentEntityMetadata={parentEntityMetadata}
           _onChange={_changedValue} />;
 
       case 'OptionSet':

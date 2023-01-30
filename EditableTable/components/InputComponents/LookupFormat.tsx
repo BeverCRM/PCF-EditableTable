@@ -1,5 +1,4 @@
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
-// import { Stack } from '@fluentui/react';
 import React, { memo } from 'react';
 import { useAppSelector } from '../../store/hooks';
 import { lookupFormatStyles } from '../../styles/ComponentsStyles';

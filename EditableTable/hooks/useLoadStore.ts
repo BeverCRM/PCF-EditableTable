@@ -44,7 +44,6 @@ export const useLoadStore = (dataset: DataSet) => {
     if (numberColumns.length > 0) {
       dispatch(getNumberFieldsMetadata(numberColumns));
 
-      // for currency symbol go to record by id and get transactioncurrencyid field (lookup)
       if (numberColumns.some(numberColumn => numberColumn.data === 'Currency')) {
         dispatch(getCurrencySymbols(datasetRows.map(row => row.key)));
       }

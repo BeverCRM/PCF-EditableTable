@@ -55,3 +55,9 @@ export const wholeFormatStyles = {
     maxWidth: 200,
   },
 };
+
+export const loadingStyles = mergeStyleSets({
+  spinner: {
+    height: 250,
+  },
+});
