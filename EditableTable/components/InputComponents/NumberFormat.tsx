@@ -43,11 +43,6 @@ export const NumberFormat = memo(({ fieldName, value, rowId,
         onValidate={onValidate}
         value={value}
         onDoubleClick={() => _onDoubleClick()}
-        // onClick={(event: any) => {
-        //   if (event.detail === 2) {
-        //     _onDoubleClick();
-        //   }
-        // }}
       />
     </Stack>
   );

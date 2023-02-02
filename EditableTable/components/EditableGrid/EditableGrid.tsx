@@ -48,9 +48,9 @@ export const EditableGrid = ({ dataset, isControlDisabled, height, width }: IDat
   const rows: Row[] = useAppSelector(state => state.dataset.rows);
   const newRows: Row[] = useAppSelector(state => state.dataset.newRows);
 
-  const columns = mapDataSetColumns(dataset);
-
   const dispatch = useAppDispatch();
+
+  const columns = mapDataSetColumns(dataset);
 
   const refreshButtonHandler = () => {
     dispatch(setLoading(true));
@@ -75,9 +75,9 @@ export const EditableGrid = ({ dataset, isControlDisabled, height, width }: IDat
   const deleteButtonHandler = () => {
     dispatch(setLoading(true));
     dispatch(deleteRecords(selectedRecordIds)).unwrap()
-      .then(newRecordIds => {
+      .then(selectedNewRecordIds => {
         dataset.refresh();
-        dispatch(readdNewRowsAfterDelete(newRecordIds));
+        dispatch(readdNewRowsAfterDelete(selectedNewRecordIds));
       })
       .catch(() => dispatch(setLoading(false)));
   };
@@ -92,8 +92,11 @@ export const EditableGrid = ({ dataset, isControlDisabled, height, width }: IDat
   };
 
   useEffect(() => {
-    const datasetRows = mapDataSetRows(dataset);
-    newRows.map(newRow => datasetRows.unshift(newRow));
+    const datasetRows = [
+      ...newRows,
+      ...mapDataSetRows(dataset),
+    ];
+
     dispatch(setRows(datasetRows));
   }, [dataset]);
 

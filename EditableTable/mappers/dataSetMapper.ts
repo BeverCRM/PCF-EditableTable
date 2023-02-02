@@ -13,6 +13,8 @@ export type Column = {
   lookup?: ITag,
 };
 
+export const isNewRow = (row: Row) => row.key.length > 15;
+
 export const mapDataSetColumns = (dataset: DataSet): IColumn[] =>
   dataset.columns
     .sort((column1, column2) => column1.order - column2.order)

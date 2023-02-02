@@ -14,6 +14,8 @@ export interface ILookupProps {
   _onDoubleClick: Function;
 }
 
+const MAX_NUMBER_OF_OPTIONS = 100;
+
 export const LookupFormat = memo(
   ({ fieldName, value, parentEntityMetadata, _onChange, _onDoubleClick }: ILookupProps) => {
     const picker = React.useRef(null);
@@ -29,6 +31,7 @@ export const LookupFormat = memo(
           key: parentEntityMetadata.entityId,
           name: parentEntityMetadata.entityRecordName,
         });
+
         _onChange(`/${currentLookup?.entityPluralName}(${parentEntityMetadata.entityId})`,
           currentOption[0],
           currentLookup?.reference?.entityNavigation);
@@ -36,8 +39,8 @@ export const LookupFormat = memo(
     }
 
     const initialValues = (): ITag[] => {
-      if (options.length > 100) {
-        return options.slice(0, 100);
+      if (options.length > MAX_NUMBER_OF_OPTIONS) {
+        return options.slice(0, MAX_NUMBER_OF_OPTIONS);
       }
       return options;
     };

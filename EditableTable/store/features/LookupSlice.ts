@@ -75,6 +75,7 @@ export const lookupSlice = createSlice({
     builder.addCase(setRelationships.fulfilled, (state, action) => {
       state.relationships = [...action.payload];
     });
+
     builder.addCase(setRelationships.rejected, (state, action) => {
       state.relationships = [];
       console.log(action);
@@ -82,9 +83,11 @@ export const lookupSlice = createSlice({
         store.dispatch(setLoading(false));
       });
     });
+
     builder.addCase(setLookups.fulfilled, (state, action) => {
       state.lookups = [...action.payload];
     });
+
     builder.addCase(setLookups.rejected, (state, action) => {
       console.log(action.payload, action.error);
       openErrorDialog(action.error).then(() => {

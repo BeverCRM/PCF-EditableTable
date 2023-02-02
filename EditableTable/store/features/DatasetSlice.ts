@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Row } from '../../mappers/dataSetMapper';
+import { Row, isNewRow } from '../../mappers/dataSetMapper';
 
-export type updates = {
+type Updates = {
   rowKey: string;
   columnName: string;
   newValue: any;
@@ -24,28 +24,29 @@ export const datasetSlice = createSlice({
     setRows: (state, action: PayloadAction<Row[]>) => {
       state.rows = action.payload;
     },
-    updateRow: (state, action: PayloadAction<updates>) => {
-      state.rows.find(row => {
-        if (row.key === action.payload.rowKey) {
-          row.columns.find(column => {
-            if (column.schemaName === action.payload.columnName) {
-              column.rawValue = action.payload.newValue || undefined;
-              column.formattedValue = action.payload.newValue;
-              column.lookup = action.payload.newValue;
-            }
-          });
-        }
-      });
+
+    updateRow: (state, action: PayloadAction<Updates>) => {
+      const changedRow = state.rows.find(row => row.key === action.payload.rowKey);
+      const changedColumn = changedRow!.columns
+        .find(column => column.schemaName === action.payload.columnName);
+
+      changedColumn!.rawValue = action.payload.newValue || undefined;
+      changedColumn!.formattedValue = action.payload.newValue;
+      changedColumn!.lookup = action.payload.newValue;
     },
+
     addNewRow: (state, action: PayloadAction<Row>) => {
       state.rows.unshift(action.payload);
     },
+
     readdNewRowsAfterDelete: (state, action: PayloadAction<string[]>) => {
-      const rowsToRemove = new Set(action.payload);
-      state.newRows = state.rows.filter(row => !rowsToRemove.has(row.key) && row.key.length < 15);
+      const newRowsToRemove = action.payload;
+      state.newRows = state.rows
+        .filter(row => isNewRow(row) && !newRowsToRemove.includes(row.key));
     },
+
     removeNewRows: state => {
-      state.rows = state.rows.filter(row => row.key.length > 15);
+      state.rows = state.rows.filter(row => isNewRow(row));
       state.newRows = [];
     },
   },

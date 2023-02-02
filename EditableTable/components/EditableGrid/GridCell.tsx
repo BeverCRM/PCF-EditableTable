@@ -7,7 +7,7 @@ import { OptionSetFormat } from '../InputComponents/OptionSetFormat';
 import { DateTimeFormat } from '../InputComponents/DateTimeFormat';
 import { WholeFormat } from '../InputComponents/WholeFormat';
 
-import { Column, Row } from '../../mappers/dataSetMapper';
+import { Column, Row, isNewRow } from '../../mappers/dataSetMapper';
 import { useAppDispatch } from '../../store/hooks';
 import { updateRow } from '../../store/features/DatasetSlice';
 import { setChangedRecords } from '../../store/features/RecordSlice';
@@ -26,6 +26,7 @@ export type ParentEntityMetadata = {
 
 export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
   const dispatch = useAppDispatch();
+
   const _changedValue = useCallback(
     (newValue: any, rawValue?: any, lookupEntityNavigation?: string): void => {
       dispatch(setChangedRecords({
@@ -34,6 +35,7 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
         fieldType: currentColumn.data,
         newValue,
       }));
+
       dispatch(updateRow({
         rowKey: row.key,
         columnName: currentColumn.key,
@@ -44,13 +46,13 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
   const cell = row.columns.find((column: Column) => column.schemaName === currentColumn?.key);
 
   let parentEntityMetadata: ParentEntityMetadata | undefined;
-  if (row.key.length < 15) {
+  if (isNewRow(row)) {
     parentEntityMetadata = getParentMetadata();
   }
 
   const props = { fieldName: currentColumn?.fieldName ? currentColumn?.fieldName : '',
     _onChange: _changedValue,
-    _onDoubleClick: () => { console.log('111'); openForm(row.key); },
+    _onDoubleClick: () => openForm(row.key),
   };
 
   if (currentColumn !== undefined && cell !== undefined) {
