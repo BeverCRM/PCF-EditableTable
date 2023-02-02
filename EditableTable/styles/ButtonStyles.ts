@@ -1,7 +1,7 @@
 import { IButtonStyles, IIconProps } from '@fluentui/react';
-import { getTheme, mergeStyleSets } from '@fluentui/react/lib/Styling';
+import { mergeStyleSets } from '@fluentui/react/lib/Styling';
 
-const theme = getTheme();
+// const theme = getTheme();
 
 export const buttonStyles = mergeStyleSets({
   commandBarButton: {
@@ -27,20 +27,14 @@ export const CommandBarButtonStyles: Partial<IButtonStyles> = {
     color: 'black',
     backgroundColor: 'white',
   },
+  rootHovered: {
+    pointerEvents: 'cursor',
+  },
   icon: {
     color: 'black',
   },
-};
-
-export const iconButtonStyles = {
-  root: {
-    color: theme.palette.neutralPrimary,
-    marginLeft: 'auto',
-    marginTop: '4px',
-    marginRight: '2px',
-  },
-  rootHovered: {
-    color: theme.palette.neutralDark,
+  iconHovered: {
+    color: 'red',
   },
 };
 

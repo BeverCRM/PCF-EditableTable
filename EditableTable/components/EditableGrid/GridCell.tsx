@@ -11,7 +11,7 @@ import { Column, Row } from '../../mappers/dataSetMapper';
 import { useAppDispatch } from '../../store/hooks';
 import { updateRow } from '../../store/features/DatasetSlice';
 import { setChangedRecords } from '../../store/features/RecordSlice';
-import { getParentMetadata } from '../../services/DataverseService';
+import { getParentMetadata, openForm } from '../../services/DataverseService';
 
 interface IGridSetProps {
   row: Row,
@@ -48,97 +48,74 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
     parentEntityMetadata = getParentMetadata();
   }
 
+  const props = { fieldName: currentColumn?.fieldName ? currentColumn?.fieldName : '',
+    _onChange: _changedValue,
+    _onDoubleClick: () => { console.log('111'); openForm(row.key); },
+  };
+
   if (currentColumn !== undefined && cell !== undefined) {
     switch (currentColumn.data) {
       case 'SingleLine.Text':
         return <TextField value={cell.formattedValue}
           styles={{ root: { maxWidth: '300px' } }}
+          onDoubleClick={() => openForm(row.key)}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
             newValue?: string) => { console.log('Text'); _changedValue(newValue || ''); }} />;
 
       case 'DateAndTime.DateAndTime':
-        return <DateTimeFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          dateOnly={false}
-          value={cell.formattedValue}
-          _onChange={_changedValue}
-        />;
+        return <DateTimeFormat dateOnly={false} value={cell.formattedValue} {...props} />;
 
       case 'DateAndTime.DateOnly':
-        return <DateTimeFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          dateOnly={true} value={cell.formattedValue}
-          _onChange={_changedValue} />;
+        return <DateTimeFormat dateOnly={true} value={cell.formattedValue} {...props} />;
 
       case 'Lookup.Simple':
-        return <LookupFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          value={cell.lookup}
-          parentEntityMetadata={parentEntityMetadata}
-          _onChange={_changedValue} />;
+        return <LookupFormat value={cell.lookup} parentEntityMetadata={parentEntityMetadata}
+          {...props} />;
 
       case 'OptionSet':
-        return <OptionSetFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          value={cell.rawValue}
-          isMultiple={false}
-          _onChange={_changedValue}
-        />;
+        return <OptionSetFormat value={cell.rawValue} isMultiple={false} {... props} />;
 
       case 'TwoOptions':
-        return <OptionSetFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          value={cell.rawValue}
-          isMultiple={false}
-          isTwoOptions={true}
-          _onChange={_changedValue}
-        />;
+        return <OptionSetFormat value={cell.rawValue} isMultiple={false} isTwoOptions={true}
+          {...props} />;
 
       case 'MultiSelectPicklist':
-        return <OptionSetFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          value={cell.rawValue} isMultiple={true}
-          _onChange={_changedValue}
-        />;
+        return <OptionSetFormat value={cell.rawValue} isMultiple={true} {...props} />;
 
       case 'Decimal':
-        return <NumberFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          value={cell.formattedValue ?? ''}
-          _onChange={_changedValue} />;
+        return <NumberFormat value={cell.formattedValue ?? ''} {...props} />;
 
       case 'Currency':
-        return <NumberFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          value={cell.formattedValue ?? ''}
-          rowId={row.key}
-          _onChange={_changedValue} />;
+        return <NumberFormat value={cell.formattedValue ?? ''} rowId={row.key} {...props} />;
 
       case 'FP':
-        return <NumberFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          value={cell.formattedValue ?? ''}
-          _onChange={_changedValue} />;
+        return <NumberFormat value={cell.formattedValue ?? ''} {...props} />;
 
       case 'Whole.None':
-        return <NumberFormat fieldName={currentColumn?.fieldName ? currentColumn?.fieldName : ''}
-          value={cell.formattedValue ?? ''}
-          _onChange={_changedValue} />;
+        return <NumberFormat value={cell.formattedValue ?? ''} {...props} />;
 
       case 'Whole.Duration':
-        return <WholeFormat value={cell.rawValue} type={'duration'}
-          _onChange={_changedValue} />;
+        return <WholeFormat value={cell.rawValue} type={'duration'} {...props} />;
 
       case 'Whole.Language':
-        return <WholeFormat value={cell.rawValue} type={'language'}
-          _onChange={_changedValue} />;
+        return <WholeFormat value={cell.rawValue} type={'language'} {...props} />;
 
       case 'Whole.TimeZone':
-        return <WholeFormat value={cell.rawValue} type={'timezone'}
-          _onChange={_changedValue} />;
+        return <WholeFormat value={cell.rawValue} type={'timezone'} {...props} />;
 
       case 'Multiple':
         return <TextField value={cell.formattedValue}
           styles={{ root: { maxWidth: '400px' } }}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-            newValue?: string) => _changedValue(newValue || '')} />;
+            newValue?: string) => _changedValue(newValue || '')}
+          onDoubleClick={() => openForm(row.key)} />;
 
       default:
         return <TextField value={cell.formattedValue}
           styles={{ root: { maxWidth: '300px' } }}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-            newValue?: string) => _changedValue(newValue || '')} />;
+            newValue?: string) => _changedValue(newValue || '')}
+          onDoubleClick={() => openForm(row.key)}/>;
     }
   }
 

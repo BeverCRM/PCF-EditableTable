@@ -120,7 +120,7 @@ const RecordSlice = createSlice({
           store.dispatch(setLoading(false));
         });
       }
-      store.dispatch(setLoading(false));
+      // store.dispatch(setLoading(false));
     });
   },
 });

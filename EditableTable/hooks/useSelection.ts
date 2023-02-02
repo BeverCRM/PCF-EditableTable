@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { Selection } from '@fluentui/react/lib/DetailsList';
 
-type DataSet = ComponentFramework.PropertyTypes.DataSet;
 type Entity = ComponentFramework.WebApi.Entity;
 
-export const useSelection = (dataset: DataSet) => {
+export const useSelection = () => {
   const [selectedRecordIds, setSelectedRecordIds] = React.useState<string[]>([]);
 
   const selection = new Selection({
@@ -13,7 +12,6 @@ export const useSelection = (dataset: DataSet) => {
         .map<string>((row : Entity) => row.key);
 
       setSelectedRecordIds(recordIds);
-      console.log(dataset.getSelectedRecordIds());
     },
   });
 

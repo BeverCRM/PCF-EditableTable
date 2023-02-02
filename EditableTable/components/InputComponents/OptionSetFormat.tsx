@@ -9,11 +9,12 @@ export interface IDropDownProps {
   isMultiple: boolean;
   isTwoOptions?: boolean;
   _onChange: Function;
+  _onDoubleClick: Function;
 }
 
 export const OptionSetFormat =
   memo(({ fieldName, value, isMultiple,
-    isTwoOptions, _onChange }: IDropDownProps) => {
+    isTwoOptions, _onChange, _onDoubleClick }: IDropDownProps) => {
     const currentOptions: string[] = value ? value.split(',') : [];
     const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);
     const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
@@ -47,6 +48,7 @@ export const OptionSetFormat =
           selectedKey={currentOptions}
           onChange={onChange}
           styles={{ container: { maxWidth: '200px' } }}
+          onDoubleClick={() => _onDoubleClick()}
         />
       </Stack>
     );

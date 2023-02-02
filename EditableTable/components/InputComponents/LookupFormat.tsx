@@ -1,7 +1,9 @@
+import { DefaultButton } from '@fluentui/react';
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
 import React, { memo } from 'react';
+import { openForm } from '../../services/DataverseService';
 import { useAppSelector } from '../../store/hooks';
-import { lookupFormatStyles } from '../../styles/ComponentsStyles';
+import { lookupFormatStyles, lookupSelectedOptionStyles } from '../../styles/ComponentsStyles';
 import { ParentEntityMetadata } from '../EditableGrid/GridCell';
 
 export interface ILookupProps {
@@ -9,10 +11,11 @@ export interface ILookupProps {
   value: ITag | undefined;
   parentEntityMetadata: ParentEntityMetadata | undefined;
   _onChange: Function;
+  _onDoubleClick: Function;
 }
 
 export const LookupFormat = memo(
-  ({ fieldName, value, parentEntityMetadata, _onChange }: ILookupProps) => {
+  ({ fieldName, value, parentEntityMetadata, _onChange, _onDoubleClick }: ILookupProps) => {
     const picker = React.useRef(null);
 
     const lookups = useAppSelector(state => state.lookup.lookups);
@@ -59,6 +62,24 @@ export const LookupFormat = memo(
       }
     };
 
+    const _onRenderItem = () =>
+      <DefaultButton
+        text={currentOption[0].name}
+        split
+        menuProps={{ items: [] }}
+        menuIconProps={{
+          iconName: 'Cancel',
+          onClick: () => onChange(undefined),
+        }}
+        onClick={(event: any) => {
+          if (event.detail === 2) {
+            openForm(currentOption[0].key.toString(),
+              currentLookup?.reference?.entityNameRef);
+          }
+        }}
+        styles={lookupSelectedOptionStyles}
+      />;
+
     return <TagPicker
       selectedItems={currentOption}
       componentRef={picker}
@@ -69,11 +90,16 @@ export const LookupFormat = memo(
       itemLimit={1}
       pickerSuggestionsProps={{ noResultsFoundText: 'No Results Found' }}
       styles={lookupFormatStyles}
+      onRenderItem={_onRenderItem}
       onBlur={() => {
         if (picker.current) {
           // @ts-ignore
           picker.current.input.current._updateValue('');
         }
+      }}
+      inputProps={{
+        onDoubleClick: () => _onDoubleClick(),
+        disabled: false,
       }}
     />;
   });

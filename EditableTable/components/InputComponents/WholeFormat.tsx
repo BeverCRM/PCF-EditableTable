@@ -8,9 +8,11 @@ export interface IWholeFormatProps {
   value: string | null | undefined;
   type: string;
   _onChange: Function;
+  _onDoubleClick: Function;
 }
 
-export const WholeFormat = memo(({ value, type, _onChange } : IWholeFormatProps) => {
+export const WholeFormat = memo(({ value, type, _onChange,
+  _onDoubleClick } : IWholeFormatProps) => {
   const wholeFormat = useAppSelector(state => state.wholeFormat);
 
   let options: IComboBoxOption[] = [];
@@ -40,6 +42,7 @@ export const WholeFormat = memo(({ value, type, _onChange } : IWholeFormatProps)
         onChange={onChange}
         selectedKey={value}
         styles={wholeFormatStyles}
+        onDoubleClick={() => _onDoubleClick()}
       />
     </Stack>
   );

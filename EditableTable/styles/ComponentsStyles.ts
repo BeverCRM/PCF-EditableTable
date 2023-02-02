@@ -1,6 +1,7 @@
 import {
   IBasePickerStyleProps,
   IBasePickerStyles,
+  IButtonStyles,
   IComboBoxStyles,
   ISpinButtonStyles,
   IStackStyles,
@@ -33,9 +34,26 @@ export const dateFormatStyles = (dateOnly: boolean) => mergeStyleSets({
 export const lookupFormatStyles:
   IStyleFunctionOrObject<IBasePickerStyleProps, IBasePickerStyles> = {
     text: { minWidth: 30, overflow: 'hidden' },
-    root: { minWidth: 30, maxWidth: 300, overflow: 'hidden' },
-    input: { maxWidth: 300, overflow: 'hidden' },
+    root: { minWidth: 30, overflow: 'hidden' },
+    input: { overflow: 'hidden' },
   };
+
+export const lookupSelectedOptionStyles: IButtonStyles = {
+  root: {
+    textAlign: 'left',
+    padding: 0,
+    fontSize: '13px',
+    maxHeight: 30,
+    border: 'none',
+  },
+  splitButtonMenuButton: {
+    borderTop: 'none',
+    borderBottom: 'none',
+  },
+  label: {
+    fontWeight: 400,
+  },
+};
 
 export const numberFormatStyles: Partial<ISpinButtonStyles> = {
   arrowButtonsContainer: {

@@ -16,10 +16,11 @@ export const setContext = (context: ComponentFramework.Context<IInputs>) => {
   _clientUrl = `${_context.page.getClientUrl()}/api/data/v9.2/`;
 };
 
-export const openForm = (item: any) => {
+export const openForm = (id: string, entityName?: string) => {
+  console.log(id);
   const options = {
-    entityId: item.key,
-    entityName: _targetEntityType,
+    entityId: id,
+    entityName: entityName ?? _targetEntityType,
     openInNewWindow: true,
   };
   _context.navigation.openForm(options);

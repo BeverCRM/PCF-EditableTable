@@ -27,11 +27,12 @@ export interface IDatePickerProps {
   fieldName: string,
   dateOnly: boolean,
   value: string | null,
-  _onChange: any
+  _onChange: any,
+  _onDoubleClick: Function;
 }
 
 export const DateTimeFormat = memo((
-  { fieldName, dateOnly, value, _onChange }: IDatePickerProps) => {
+  { fieldName, dateOnly, value, _onChange, _onDoubleClick }: IDatePickerProps) => {
   let currentDate = value ? new Date(value) : undefined;
   let timeKey: string | number | undefined;
   const options = timesList;
@@ -111,6 +112,7 @@ export const DateTimeFormat = memo((
         parseDateFromString={onParseDateFromString}
         className={dateFormatStyles(dateOnly).control}
         strings={defaultDatePickerStrings}
+        onDoubleClick={() => _onDoubleClick()}
       />
       {!dateOnly &&
         <ComboBox
@@ -119,6 +121,7 @@ export const DateTimeFormat = memo((
           onChange={onTimeChange}
           styles={comboBoxStyles}
           selectedKey={timeKey}
+          onDoubleClick={() => _onDoubleClick()}
         />
       }
     </Stack>

@@ -43,7 +43,7 @@ export interface IDataSetProps {
 }
 
 export const EditableGrid = ({ dataset, isControlDisabled, height, width }: IDataSetProps) => {
-  const { selection, selectedRecordIds } = useSelection(dataset);
+  const { selection, selectedRecordIds } = useSelection();
 
   const rows: Row[] = useAppSelector(state => state.dataset.rows);
   const newRows: Row[] = useAppSelector(state => state.dataset.newRows);
@@ -78,7 +78,8 @@ export const EditableGrid = ({ dataset, isControlDisabled, height, width }: IDat
       .then(newRecordIds => {
         dataset.refresh();
         dispatch(readdNewRowsAfterDelete(newRecordIds));
-      });
+      })
+      .catch(() => dispatch(setLoading(false)));
   };
 
   const saveButtonHandler = () => {
@@ -101,7 +102,7 @@ export const EditableGrid = ({ dataset, isControlDisabled, height, width }: IDat
   const _renderItemColumn = (item: Row, index: number | undefined, column: IColumn | undefined) =>
     <GridCell row={item} currentColumn={column!} />;
 
-  const _onItemInvoked = (item: any) => openForm(item);
+  const _onItemInvoked = (item: any) => openForm(item.key);
 
   return <div className='container'>
     <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons} >

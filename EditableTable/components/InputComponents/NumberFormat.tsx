@@ -9,9 +9,11 @@ export interface INumberProps {
   value: string;
   rowId?: string;
   _onChange: Function;
+  _onDoubleClick: Function;
 }
 
-export const NumberFormat = memo(({ fieldName, value, rowId, _onChange } : INumberProps) => {
+export const NumberFormat = memo(({ fieldName, value, rowId,
+  _onChange, _onDoubleClick } : INumberProps) => {
   const numbers = useAppSelector(state => state.number.numberFieldsMetadata);
   const currencySymbols = useAppSelector(state => state.number.currencySymbols);
 
@@ -40,6 +42,12 @@ export const NumberFormat = memo(({ fieldName, value, rowId, _onChange } : INumb
         onChange={onNumberChange}
         onValidate={onValidate}
         value={value}
+        onDoubleClick={() => _onDoubleClick()}
+        // onClick={(event: any) => {
+        //   if (event.detail === 2) {
+        //     _onDoubleClick();
+        //   }
+        // }}
       />
     </Stack>
   );
