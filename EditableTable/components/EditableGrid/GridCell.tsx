@@ -12,6 +12,7 @@ import { useAppDispatch } from '../../store/hooks';
 import { updateRow } from '../../store/features/DatasetSlice';
 import { setChangedRecords } from '../../store/features/RecordSlice';
 import { getParentMetadata, openForm } from '../../services/DataverseService';
+import { MultipleLinesFieldStyles, textFieldStyles } from '../../styles/ComponentsStyles';
 
 interface IGridSetProps {
   row: Row,
@@ -52,17 +53,17 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
 
   const props = { fieldName: currentColumn?.fieldName ? currentColumn?.fieldName : '',
     _onChange: _changedValue,
-    _onDoubleClick: () => openForm(row.key),
+    _onDoubleClick: useCallback(() => openForm(row.key), []),
   };
 
   if (currentColumn !== undefined && cell !== undefined) {
     switch (currentColumn.data) {
       case 'SingleLine.Text':
         return <TextField value={cell.formattedValue}
-          styles={{ root: { maxWidth: '300px' } }}
+          styles={textFieldStyles}
           onDoubleClick={() => openForm(row.key)}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-            newValue?: string) => { console.log('Text'); _changedValue(newValue || ''); }} />;
+            newValue?: string) => _changedValue(newValue || '')} />;
 
       case 'DateAndTime.DateAndTime':
         return <DateTimeFormat dateOnly={false} value={cell.formattedValue} {...props} />;
@@ -107,14 +108,14 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
 
       case 'Multiple':
         return <TextField value={cell.formattedValue}
-          styles={{ root: { maxWidth: '400px' } }}
+          styles={MultipleLinesFieldStyles}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
             newValue?: string) => _changedValue(newValue || '')}
           onDoubleClick={() => openForm(row.key)} />;
 
       default:
         return <TextField value={cell.formattedValue}
-          styles={{ root: { maxWidth: '300px' } }}
+          styles={textFieldStyles}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
             newValue?: string) => _changedValue(newValue || '')}
           onDoubleClick={() => openForm(row.key)}/>;

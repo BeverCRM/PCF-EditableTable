@@ -85,6 +85,7 @@ const NumberSlice = createSlice({
     builder.addCase(getNumberFieldsMetadata.fulfilled, (state, action) => {
       state.numberFieldsMetadata = [...action.payload];
     });
+
     builder.addCase(getNumberFieldsMetadata.rejected, (state, action) => {
       console.log(state, action);
       state.numberFieldsMetadata = [];
@@ -92,9 +93,11 @@ const NumberSlice = createSlice({
         store.dispatch(setLoading(false));
       });
     });
+
     builder.addCase(getCurrencySymbols.fulfilled, (state, action) => {
       state.currencySymbols = [...action.payload];
     });
+
     builder.addCase(getCurrencySymbols.rejected, (state, action) => {
       console.log(action.error);
       state.currencySymbols = [];

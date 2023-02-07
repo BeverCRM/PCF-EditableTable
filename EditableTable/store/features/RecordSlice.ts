@@ -102,11 +102,13 @@ const RecordSlice = createSlice({
     builder.addCase(saveRecords.fulfilled, state => {
       state.changedRecords = [];
     });
+
     builder.addCase(saveRecords.rejected, (state, action) => {
       openErrorDialog(action.error).then(() => {
         store.dispatch(setLoading(false));
       });
     });
+
     builder.addCase(deleteRecords.fulfilled, (state, action) => {
       const recordsToRemove = new Set(action.payload);
       state.changedRecords = state.changedRecords.filter(record =>
@@ -114,13 +116,13 @@ const RecordSlice = createSlice({
 
       console.log(state.changedRecords);
     });
+
     builder.addCase(deleteRecords.rejected, (state, action) => {
       if (action.payload) {
         openErrorDialog(action.error).then(() => {
           store.dispatch(setLoading(false));
         });
       }
-      // store.dispatch(setLoading(false));
     });
   },
 });

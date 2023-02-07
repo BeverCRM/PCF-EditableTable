@@ -3,6 +3,7 @@ import {
   DetailsList,
   DetailsListLayoutMode,
   IColumn,
+  ScrollablePane,
   Stack,
 } from '@fluentui/react';
 
@@ -39,10 +40,9 @@ export interface IDataSetProps {
   dataset: DataSet;
   isControlDisabled: boolean;
   width: number;
-  height: number;
 }
 
-export const EditableGrid = ({ dataset, isControlDisabled, height, width }: IDataSetProps) => {
+export const EditableGrid = ({ dataset, isControlDisabled, width }: IDataSetProps) => {
   const { selection, selectedRecordIds } = useSelection();
 
   const rows: Row[] = useAppSelector(state => state.dataset.rows);
@@ -107,35 +107,41 @@ export const EditableGrid = ({ dataset, isControlDisabled, height, width }: IDat
 
   const _onItemInvoked = (item: any) => openForm(item.key);
 
+  const getListHeight = () => rows.length < 10
+    ? (rows.length * 50) + 150
+    : window.innerHeight - 270;
+
   return <div className='container'>
-    <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons} >
-      <CommandBar
-        refreshButtonHandler={refreshButtonHandler}
-        newButtonHandler={newButtonHandler}
-        deleteButtonHandler={deleteButtonHandler}
-        saveButtonHandler={saveButtonHandler}
-        isControlDisabled={isControlDisabled}
-      ></CommandBar>
-    </Stack>
-    <Stack style={{ width, height }}>
-      <DetailsList
-        items={rows}
-        columns={columns}
-        onRenderItemColumn={_renderItemColumn}
-        selection={selection}
-        onRenderRow={_onRenderRow}
-        onRenderDetailsHeader={_onRenderDetailsHeader}
-        layoutMode={DetailsListLayoutMode.fixedColumns}
-        styles={gridStyles(rows.length)}
-        onItemInvoked={_onItemInvoked}
-      >
-      </DetailsList>
-      {rows.length === 0 &&
-        <Stack horizontalAlign='center' className='noDataContainer'>
-          <div className='nodata'><span>No data available</span></div>
+    <Stack style={{ width, height: getListHeight() }} data-is-scrollable={true} >
+      <ScrollablePane>
+        <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons} >
+          <CommandBar
+            refreshButtonHandler={refreshButtonHandler}
+            newButtonHandler={newButtonHandler}
+            deleteButtonHandler={deleteButtonHandler}
+            saveButtonHandler={saveButtonHandler}
+            isControlDisabled={isControlDisabled}
+          ></CommandBar>
         </Stack>
-      }
-      <GridFooter dataset={dataset} selectedCount={selectedRecordIds.length}></GridFooter>
+        <DetailsList
+          items={rows}
+          columns={columns}
+          onRenderItemColumn={_renderItemColumn}
+          selection={selection}
+          onRenderRow={_onRenderRow}
+          onRenderDetailsHeader={_onRenderDetailsHeader}
+          layoutMode={DetailsListLayoutMode.fixedColumns}
+          styles={gridStyles(rows.length)}
+          onItemInvoked={_onItemInvoked}
+        >
+        </DetailsList>
+        {rows.length === 0 &&
+          <Stack horizontalAlign='center' className='noDataContainer'>
+            <div className='nodata'><span>No data available</span></div>
+          </Stack>
+        }
+        <GridFooter dataset={dataset} selectedCount={selectedRecordIds.length}></GridFooter>
+      </ScrollablePane>
     </Stack>
   </div>;
 };

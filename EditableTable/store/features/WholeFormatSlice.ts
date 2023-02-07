@@ -43,15 +43,18 @@ const WholeFormatSlice = createSlice({
     builder.addCase(getTimeZones.fulfilled, (state, action) => {
       state.timezones = [...action.payload];
     });
+
     builder.addCase(getTimeZones.rejected, (state, action) => {
       console.log(action.payload);
       openErrorDialog(action.error).then(() => {
         store.dispatch(setLoading(false));
       });
     });
+
     builder.addCase(getLanguages.fulfilled, (state, action) => {
       state.languages = [...action.payload];
     });
+
     builder.addCase(getLanguages.rejected, (state, action) => {
       console.log(action.payload);
       openErrorDialog(action.error).then(() => {

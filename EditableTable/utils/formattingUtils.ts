@@ -1,13 +1,12 @@
 import { getContext } from '../services/DataverseService';
 
-// eslint-disable-next-line no-useless-escape
-export const formatNumber = (value: string) => Number(value.replace(/[^0-9\.-]+/g, ''));
+export const formatNumber = (value: string) => Number(value.replace(/[^0-9.-]+/g, ''));
 
 export const formatCurrency = (value: number, precision?: number, symbol?: string) =>
   getContext().formatting.formatCurrency(value, precision, symbol);
 
 export const formatDecimal = (value: number, precision?: number | undefined) => {
-  if (value === null || value === undefined || value === 0) return '';
+  if (value === null || value === undefined) return '';
   return getContext().formatting.formatDecimal(value, precision);
 };
 

@@ -55,6 +55,10 @@ export const lookupSelectedOptionStyles: IButtonStyles = {
   },
 };
 
+export const optionSetFormatStyles = {
+  container: { maxWidth: '200px' },
+};
+
 export const numberFormatStyles: Partial<ISpinButtonStyles> = {
   arrowButtonsContainer: {
     display: 'none',
@@ -72,6 +76,14 @@ export const wholeFormatStyles = {
   container: {
     maxWidth: 200,
   },
+};
+
+export const textFieldStyles = {
+  root: { maxWidth: '300px' },
+};
+
+export const MultipleLinesFieldStyles = {
+  root: { maxWidth: '400px' },
 };
 
 export const loadingStyles = mergeStyleSets({

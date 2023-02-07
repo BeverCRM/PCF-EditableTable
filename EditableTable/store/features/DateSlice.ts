@@ -22,6 +22,7 @@ export const getDateBehavior = createAsyncThunk<DateMetadata[], IColumn[]>(
   async dateFields =>
     await Promise.all(dateFields.map(async date => {
       const behavior = await getDateMetadata(date.key);
+
       return {
         fieldName: date.key,
         dateBehavior: behavior,
@@ -37,6 +38,7 @@ export const dateSlice = createSlice({
     builder.addCase(getDateBehavior.fulfilled, (state, action) => {
       state.dates = [...action.payload];
     });
+
     builder.addCase(getDateBehavior.rejected, (state, action) => {
       state.dates.push({ fieldName: '', dateBehavior: '' });
       openErrorDialog(action.error).then(() => {

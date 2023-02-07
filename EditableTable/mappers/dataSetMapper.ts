@@ -13,7 +13,7 @@ export type Column = {
   lookup?: ITag,
 };
 
-export const isNewRow = (row: Row) => row.key.length > 15;
+export const isNewRow = (row: Row) => row.key.length < 15;
 
 export const mapDataSetColumns = (dataset: DataSet): IColumn[] =>
   dataset.columns

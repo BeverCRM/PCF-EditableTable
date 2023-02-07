@@ -25,7 +25,6 @@ export class EditableTable implements ComponentFramework.ReactControl<IInputs, I
       dataset: context.parameters.dataset,
       isControlDisabled: context.mode.isControlDisabled,
       width: context.mode.allocatedWidth,
-      height: context.mode.allocatedHeight,
     };
     return React.createElement(Wrapper, props);
   }

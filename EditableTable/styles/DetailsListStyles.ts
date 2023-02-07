@@ -1,6 +1,13 @@
-import { IDetailsHeaderStyles, IDetailsListStyles, IDetailsRowStyles } from '@fluentui/react';
+import {
+  IDetailsHeaderStyles,
+  IDetailsListStyles,
+  IDetailsRowStyles,
+  IScrollablePaneStyles,
+} from '@fluentui/react';
 import { IStackStyles } from '@fluentui/react/lib/components/Stack/Stack.types';
-import { mergeStyleSets } from '@fluentui/react/lib/Styling';
+import { getTheme, mergeStyleSets } from '@fluentui/react/lib/Styling';
+
+const theme = getTheme();
 
 export const stackStyles: Partial<IStackStyles> = { root: { height: 44, marginLeft: 100 } };
 
@@ -29,3 +36,10 @@ export const gridStyles = (rowsLength: number): Partial<IDetailsListStyles> => m
     padding: rowsLength === 0 ? '50px' : '0',
   },
 });
+
+export const scrollablePaneStyles: Partial<IScrollablePaneStyles> = {
+  root: {
+    maxWidth: 400,
+    border: `1px solid ${theme.palette.neutralLight}`,
+  },
+};

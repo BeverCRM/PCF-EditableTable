@@ -68,6 +68,7 @@ const DropdownSlice = createSlice({
     builder.addCase(getDropdownsOptions.fulfilled, (state, action) => {
       state.dropdownFields = [...action.payload];
     });
+
     builder.addCase(getDropdownsOptions.rejected, (state, action) => {
       state.dropdownFields = [];
       openErrorDialog(action.error).then(() => {

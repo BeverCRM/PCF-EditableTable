@@ -21,6 +21,8 @@ export const NumberFormat = memo(({ fieldName, value, rowId,
   const currentCurrency = currencySymbols.find(currency => currency.recordId === rowId) ?? null;
 
   const onValidate = (value: string): string | void => {
+    if (value === '') return '';
+
     const numberValue = formatNumber(value);
     return currentCurrency
       ? formatCurrency(numberValue, currentNumber?.precision, currentCurrency?.symbol)
@@ -28,8 +30,8 @@ export const NumberFormat = memo(({ fieldName, value, rowId,
   };
 
   const onNumberChange = (event: React.SyntheticEvent<HTMLElement>, newValue?: string) => {
-    const numberValue = formatNumber(newValue!);
-    _onChange(numberValue, newValue);
+    const numberValue = newValue === '' ? null : formatNumber(newValue!);
+    _onChange(numberValue);
   };
 
   return (
