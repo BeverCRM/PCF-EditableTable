@@ -19,7 +19,7 @@ export const buttonStyles = mergeStyleSets({
   },
 });
 
-export const CommandBarButtonStyles: Partial<IButtonStyles> = {
+export const commandBarButtonStyles: Partial<IButtonStyles> = {
 
   root: {
     color: 'black',

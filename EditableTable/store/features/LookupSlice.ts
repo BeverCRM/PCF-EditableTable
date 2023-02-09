@@ -78,7 +78,6 @@ export const lookupSlice = createSlice({
 
     builder.addCase(setRelationships.rejected, (state, action) => {
       state.relationships = [];
-      console.log(action);
       openErrorDialog(action.error).then(() => {
         store.dispatch(setLoading(false));
       });
@@ -89,7 +88,6 @@ export const lookupSlice = createSlice({
     });
 
     builder.addCase(setLookups.rejected, (state, action) => {
-      console.log(action.payload, action.error);
       openErrorDialog(action.error).then(() => {
         store.dispatch(setLoading(false));
       });

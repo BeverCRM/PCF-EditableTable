@@ -87,7 +87,6 @@ const NumberSlice = createSlice({
     });
 
     builder.addCase(getNumberFieldsMetadata.rejected, (state, action) => {
-      console.log(state, action);
       state.numberFieldsMetadata = [];
       openErrorDialog(action.error).then(() => {
         store.dispatch(setLoading(false));

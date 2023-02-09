@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import {
-  DatePicker, IDatePicker,
+  DatePicker,
   defaultDatePickerStrings,
   Stack,
   ComboBox,
@@ -19,7 +19,6 @@ import {
   getTimeKeyFromDate,
   formatTimeto12Hours,
 } from '../../utils/dateTimeUtils';
-import { dateFormatStyles } from '../../styles/ComponentsStyles';
 import { formatDateShort, formatUserDateTimeToUTC } from '../../utils/formattingUtils';
 import { timesList } from './timeList';
 
@@ -36,8 +35,6 @@ export const DateTimeFormat = memo((
   let currentDate = value ? new Date(value) : undefined;
   let timeKey: string | number | undefined;
   const options = timesList;
-
-  const datePickerRef = React.useRef<IDatePicker>(null);
 
   const dateFields = useAppSelector(state => state.date.dates, shallowEqual);
   const currentDateMetadata = dateFields.find(dateField => dateField.fieldName === fieldName);
@@ -104,13 +101,11 @@ export const DateTimeFormat = memo((
   return (
     <Stack styles={stackComboBox}>
       <DatePicker
-        componentRef={datePickerRef}
         allowTextInput
         value={currentDate}
         onSelectDate={onDateChange}
         formatDate={getDateFormatWithSlash}
         parseDateFromString={onParseDateFromString}
-        className={dateFormatStyles(dateOnly).control}
         strings={defaultDatePickerStrings}
         onDoubleClick={() => _onDoubleClick()}
       />

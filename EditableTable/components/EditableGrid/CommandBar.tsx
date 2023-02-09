@@ -1,7 +1,7 @@
 import { CommandBarButton } from '@fluentui/react';
 import * as React from 'react';
 import { useAppSelector } from '../../store/hooks';
-import { CommandBarButtonStyles } from '../../styles/ButtonStyles';
+import { commandBarButtonStyles } from '../../styles/ButtonStyles';
 import { addIcon, refreshIcon, deleteIcon, saveIcon } from '../../styles/ButtonStyles';
 import { IIconProps } from '@fluentui/react/lib/components/Icon/Icon.types';
 
@@ -60,7 +60,7 @@ export const CommandBar = (props: ICommandBarProps) => {
       key={button.order}
       disabled={button.disabled}
       iconProps={button.icon}
-      styles={CommandBarButtonStyles}
+      styles={commandBarButtonStyles}
       text={button.text}
       onClick={button.onClick}
     />);

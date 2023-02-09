@@ -113,8 +113,6 @@ const RecordSlice = createSlice({
       const recordsToRemove = new Set(action.payload);
       state.changedRecords = state.changedRecords.filter(record =>
         !recordsToRemove.has(record.id));
-
-      console.log(state.changedRecords);
     });
 
     builder.addCase(deleteRecords.rejected, (state, action) => {

@@ -45,7 +45,6 @@ const WholeFormatSlice = createSlice({
     });
 
     builder.addCase(getTimeZones.rejected, (state, action) => {
-      console.log(action.payload);
       openErrorDialog(action.error).then(() => {
         store.dispatch(setLoading(false));
       });
@@ -56,7 +55,6 @@ const WholeFormatSlice = createSlice({
     });
 
     builder.addCase(getLanguages.rejected, (state, action) => {
-      console.log(action.payload);
       openErrorDialog(action.error).then(() => {
         store.dispatch(setLoading(false));
       });

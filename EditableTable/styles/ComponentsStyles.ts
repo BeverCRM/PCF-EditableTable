@@ -12,24 +12,20 @@ import {
 export const comboBoxStyles : Partial<IComboBoxStyles> = {
   root: {
     display: 'inline-block',
-    maxWidth: '100px',
+    maxWidth: '150px',
   },
   optionsContainer: { maxHeight: 260 },
   container: { flexShrink: '2 !important',
     marginLeft: '-1px',
-    maxWidth: 100 },
+    maxWidth: 150 },
 };
 
 export const stackComboBox : IStackStyles = {
   root: {
     flexFlow: 'row nowrap',
+    maxWidth: 1000,
   },
 };
-
-export const dateFormatStyles = (dateOnly: boolean) => mergeStyleSets({
-  root: { selectors: { '> *': { marginBottom: 15 } } },
-  control: { maxWidth: dateOnly ? 200 : 150, marginBottom: 15 },
-});
 
 export const lookupFormatStyles:
   IStyleFunctionOrObject<IBasePickerStyleProps, IBasePickerStyles> = {
@@ -55,35 +51,16 @@ export const lookupSelectedOptionStyles: IButtonStyles = {
   },
 };
 
-export const optionSetFormatStyles = {
-  container: { maxWidth: '200px' },
-};
-
 export const numberFormatStyles: Partial<ISpinButtonStyles> = {
   arrowButtonsContainer: {
     display: 'none',
-  },
-  spinButtonWrapper: {
-    maxWidth: '150px',
   },
 };
 
 export const wholeFormatStyles = {
   optionsContainer: {
     maxHeight: 260,
-    maxWidth: 300,
   },
-  container: {
-    maxWidth: 200,
-  },
-};
-
-export const textFieldStyles = {
-  root: { maxWidth: '300px' },
-};
-
-export const MultipleLinesFieldStyles = {
-  root: { maxWidth: '400px' },
 };
 
 export const loadingStyles = mergeStyleSets({

@@ -2,7 +2,6 @@ import React, { memo } from 'react';
 import { Stack, ComboBox, IComboBox, IComboBoxOption } from '@fluentui/react';
 
 import { useAppSelector } from '../../store/hooks';
-import { optionSetFormatStyles } from '../../styles/ComponentsStyles';
 
 export interface IDropDownProps {
   fieldName: string | undefined;
@@ -48,7 +47,6 @@ export const OptionSetFormat =
           multiSelect={isMultiple}
           selectedKey={currentOptions}
           onChange={onChange}
-          styles={optionSetFormatStyles}
           onDoubleClick={() => _onDoubleClick()}
         />
       </Stack>

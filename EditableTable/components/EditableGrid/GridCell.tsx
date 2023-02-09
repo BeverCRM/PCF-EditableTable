@@ -12,7 +12,6 @@ import { useAppDispatch } from '../../store/hooks';
 import { updateRow } from '../../store/features/DatasetSlice';
 import { setChangedRecords } from '../../store/features/RecordSlice';
 import { getParentMetadata, openForm } from '../../services/DataverseService';
-import { MultipleLinesFieldStyles, textFieldStyles } from '../../styles/ComponentsStyles';
 
 interface IGridSetProps {
   row: Row,
@@ -60,7 +59,6 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
     switch (currentColumn.data) {
       case 'SingleLine.Text':
         return <TextField value={cell.formattedValue}
-          styles={textFieldStyles}
           onDoubleClick={() => openForm(row.key)}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
             newValue?: string) => _changedValue(newValue || '')} />;
@@ -108,14 +106,12 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
 
       case 'Multiple':
         return <TextField value={cell.formattedValue}
-          styles={MultipleLinesFieldStyles}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
             newValue?: string) => _changedValue(newValue || '')}
           onDoubleClick={() => openForm(row.key)} />;
 
       default:
         return <TextField value={cell.formattedValue}
-          styles={textFieldStyles}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
             newValue?: string) => _changedValue(newValue || '')}
           onDoubleClick={() => openForm(row.key)}/>;
