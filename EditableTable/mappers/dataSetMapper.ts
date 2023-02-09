@@ -21,10 +21,11 @@ export const mapDataSetColumns = (dataset: DataSet): IColumn[] =>
     .map<IColumn>((column): IColumn => ({
       name: column.displayName,
       fieldName: column.name,
-      minWidth: column.visualSizeFactor,
+      minWidth: 20,
       key: column.name,
       isResizable: true,
       data: column.dataType,
+      calculatedWidth: column.visualSizeFactor,
     }));
 
 export const mapDataSetRows = (dataset: DataSet): Row[] =>

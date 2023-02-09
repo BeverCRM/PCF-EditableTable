@@ -31,7 +31,7 @@ export const NumberFormat = memo(({ fieldName, value, rowId,
 
   const onNumberChange = (event: React.SyntheticEvent<HTMLElement>, newValue?: string) => {
     const numberValue = newValue === '' ? null : formatNumber(newValue!);
-    _onChange(numberValue);
+    _onChange(numberValue, newValue);
   };
 
   return (

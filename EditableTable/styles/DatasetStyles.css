@@ -39,10 +39,10 @@
 
 .noDataContainer {
   position: absolute;
+  top: 66px;
   width: -webkit-fill-available;
   height: -webkit-fill-available;
   justify-content: center;
-  align-content: center;
 }
 
 .nodata {

@@ -101,9 +101,6 @@ const NumberSlice = createSlice({
     builder.addCase(getCurrencySymbols.rejected, (state, action) => {
       console.log(action.error);
       state.currencySymbols = [];
-      openErrorDialog(action.error).then(() => {
-        store.dispatch(setLoading(false));
-      });
     });
   },
 });

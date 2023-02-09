@@ -32,7 +32,7 @@ import { Row, Column, mapDataSetColumns, mapDataSetRows } from '../../mappers/da
 import { _onRenderDetailsHeader, _onRenderRow } from '../../styles/RenderStyles';
 import { buttonStyles } from '../../styles/ButtonStyles';
 import { openForm } from '../../services/DataverseService';
-import { gridStyles } from '../../styles/DetailsListStyles';
+import { containerStackStyles, gridStyles } from '../../styles/DetailsListStyles';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
@@ -107,12 +107,8 @@ export const EditableGrid = ({ dataset, isControlDisabled, width }: IDataSetProp
 
   const _onItemInvoked = (item: any) => openForm(item.key);
 
-  const getListHeight = () => rows.length < 10
-    ? (rows.length * 50) + 150
-    : window.innerHeight - 270;
-
   return <div className='container'>
-    <Stack style={{ width, height: getListHeight() }} data-is-scrollable={true} >
+    <Stack style={containerStackStyles(width, rows.length)} >
       <ScrollablePane>
         <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons} >
           <CommandBar

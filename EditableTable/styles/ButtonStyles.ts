@@ -1,8 +1,6 @@
 import { IButtonStyles, IIconProps } from '@fluentui/react';
 import { mergeStyleSets } from '@fluentui/react/lib/Styling';
 
-// const theme = getTheme();
-
 export const buttonStyles = mergeStyleSets({
   commandBarButton: {
     root: {

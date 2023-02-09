@@ -180,7 +180,8 @@ export const getCurrencySymbol = async (recordId: string): Promise<string> => {
     '?$select=_transactioncurrencyid_value&$expand=transactioncurrencyid($select=currencysymbol)',
   );
 
-  return fetchedCurrency.transactioncurrencyid?.currencysymbol;
+  return fetchedCurrency.transactioncurrencyid?.currencysymbol ||
+    _context.userSettings.numberFormattingInfo.currencySymbol;
 };
 
 export const getTimeZoneDefinitions = async () => {
