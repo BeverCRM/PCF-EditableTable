@@ -21,10 +21,12 @@ export type Record = {
 
 interface IRecordState {
   changedRecords: Record[],
+  isPendingSave: boolean,
 }
 
 const initialState: IRecordState = {
   changedRecords: [],
+  isPendingSave: false,
 };
 
 type AsyncThunkConfig = {
@@ -93,14 +95,17 @@ const RecordSlice = createSlice({
         }
       }
       state.changedRecords = changedRecords;
+      state.isPendingSave = true;
     },
     clearChangedRecords: state => {
       state.changedRecords = [];
+      state.isPendingSave = false;
     },
   },
   extraReducers(builder) {
     builder.addCase(saveRecords.fulfilled, state => {
       state.changedRecords = [];
+      state.isPendingSave = false;
     });
 
     builder.addCase(saveRecords.rejected, (state, action) => {

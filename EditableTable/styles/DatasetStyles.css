@@ -14,12 +14,12 @@
 }
 
 .ms-DetailsHeader-cell{
-  margin: 0px 2px; 
+  margin: 0px 4px; 
 }
 
 .ms-DetailsRow-cell {
   padding: 0px;
-  margin: 0px 2px;
+  margin: 0px 4px;
 }
 
 @media screen and (max-width: 500px) {
@@ -64,3 +64,12 @@
   opacity: 80%;
   z-index: 10;
 }
+
+.bvr-container .ms-DetailsRow {
+  display: flex;
+}
+
+.bvr-container .ms-DetailsRow-fields, .bvr-container .ms-DetailsHeader-cell {
+  flex: 1 1 auto;
+}
+

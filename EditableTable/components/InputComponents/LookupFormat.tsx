@@ -72,10 +72,10 @@ export const LookupFormat = memo(
         menuProps={{ items: [] }}
         menuIconProps={{
           iconName: 'Cancel',
-          onClick: () => onChange(undefined),
         }}
+        onMenuClick={() => onChange(undefined)}
         onClick={(event: any) => {
-          if (event.detail === 2) {
+          if (event.detail === 1) {
             openForm(currentOption[0].key.toString(),
               currentLookup?.reference?.entityNameRef);
           }
@@ -101,7 +101,9 @@ export const LookupFormat = memo(
         }
       }}
       inputProps={{
-        onDoubleClick: () => _onDoubleClick(),
+        onDoubleClick: () => {
+          _onDoubleClick();
+        },
         disabled: false,
       }}
     />;

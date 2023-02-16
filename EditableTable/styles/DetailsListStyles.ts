@@ -36,7 +36,7 @@ export const gridStyles = (rowsLength: number): Partial<IDetailsListStyles> => m
 
 export const containerStackStyles = (width: number, rowsLength: number) => {
   const height = rowsLength === 0
-    ? 265
+    ? 282
     : rowsLength < 10
       ? (rowsLength * 50) + 150
       : window.innerHeight - 280;

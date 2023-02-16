@@ -21,7 +21,7 @@ export const openForm = (id: string, entityName?: string) => {
   const options = {
     entityId: id,
     entityName: entityName ?? _targetEntityType,
-    openInNewWindow: true,
+    openInNewWindow: false,
   };
   _context.navigation.openForm(options);
 };
@@ -219,3 +219,5 @@ export const getContext = () => _context;
 
 // @ts-ignore
 export const getParentMetadata = () => _context.mode.contextInfo;
+
+export const getAllocatedWidth = () => _context.mode.allocatedWidth;

@@ -1,4 +1,4 @@
-import { CommandBarButton } from '@fluentui/react';
+import { CommandBarButton, IButtonStyles } from '@fluentui/react';
 import * as React from 'react';
 import { useAppSelector } from '../../store/hooks';
 import { commandBarButtonStyles } from '../../styles/ButtonStyles';
@@ -18,11 +18,13 @@ type ButtonProps = {
   text: string,
   icon: IIconProps,
   disabled: boolean,
-  onClick: () => void
+  onClick: () => void,
+  styles?: IButtonStyles,
 }
 
 export const CommandBar = (props: ICommandBarProps) => {
   const isLoading = useAppSelector(state => state.loading.isLoading);
+  const isPendingSave = useAppSelector(state => state.record.isPendingSave);
 
   const buttons: ButtonProps[] = [
     {
@@ -52,6 +54,10 @@ export const CommandBar = (props: ICommandBarProps) => {
       icon: saveIcon,
       disabled: isLoading || props.isControlDisabled,
       onClick: props.saveButtonHandler,
+      styles: {
+        icon: { color: isPendingSave ? 'blue' : 'black' },
+        textContainer: { color: isPendingSave ? 'blue' : 'black' },
+      },
     },
   ];
 
@@ -60,7 +66,7 @@ export const CommandBar = (props: ICommandBarProps) => {
       key={button.order}
       disabled={button.disabled}
       iconProps={button.icon}
-      styles={commandBarButtonStyles}
+      styles={button.styles ?? commandBarButtonStyles}
       text={button.text}
       onClick={button.onClick}
     />);
