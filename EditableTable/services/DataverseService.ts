@@ -55,7 +55,7 @@ export const openRecordDeleteDialog =
   async (): Promise<ComponentFramework.NavigationApi.ConfirmDialogResponse> => {
     const entityMetadata = await _context.utils.getEntityMetadata(_targetEntityType);
     const confirmStrings = {
-      text: `Do you want to delete this ${entityMetadata._displayName}?
+      text: `Do you want to delete selected ${entityMetadata._displayName}?
             You can't undo this action.`,
       title: 'Confirm Deletion',
     };

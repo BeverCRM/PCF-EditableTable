@@ -1,4 +1,5 @@
 import { IColumn, ITag } from '@fluentui/react';
+import { getAllocatedWidth } from '../services/DataverseService';
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
 export type Row = {
@@ -15,8 +16,23 @@ export type Column = {
 
 export const isNewRow = (row: Row) => row.key.length < 15;
 
-export const mapDataSetColumns = (dataset: DataSet): IColumn[] =>
-  dataset.columns
+export const getColumnsTotalWidth = (dataset: DataSet) =>
+  dataset.columns.reduce((a, b) => a + b.visualSizeFactor, 0);
+
+const calculateAdditinalWidth = (dataset: DataSet, columnTotalWidth: number) => {
+  const tableWidth = getAllocatedWidth();
+  const widthDiff = tableWidth - columnTotalWidth;
+  const columnCount = dataset.columns.length;
+
+  if (widthDiff > 0) {
+    return Math.floor((widthDiff / columnCount) - (48 + 16 * columnCount) / columnCount) - 20;
+  }
+  return 0;
+};
+
+export const mapDataSetColumns = (dataset: DataSet): IColumn[] => {
+  const columnTotalWidth = getColumnsTotalWidth(dataset);
+  return dataset.columns
     .sort((column1, column2) => column1.order - column2.order)
     .map<IColumn>((column): IColumn => ({
       name: column.displayName,
@@ -25,8 +41,9 @@ export const mapDataSetColumns = (dataset: DataSet): IColumn[] =>
       key: column.name,
       isResizable: true,
       data: column.dataType,
-      calculatedWidth: column.visualSizeFactor,
+      calculatedWidth: column.visualSizeFactor + calculateAdditinalWidth(dataset, columnTotalWidth),
     }));
+};
 
 export const mapDataSetRows = (dataset: DataSet): Row[] =>
   dataset.sortedRecordIds.map(id => {

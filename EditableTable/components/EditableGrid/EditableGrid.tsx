@@ -28,7 +28,8 @@ import {
   setRows,
 } from '../../store/features/DatasetSlice';
 
-import { Row, Column, mapDataSetColumns, mapDataSetRows } from '../../mappers/dataSetMapper';
+import { Row, Column, mapDataSetColumns,
+  mapDataSetRows, getColumnsTotalWidth } from '../../mappers/dataSetMapper';
 import { _onRenderDetailsHeader, _onRenderRow } from '../../styles/RenderStyles';
 import { buttonStyles } from '../../styles/ButtonStyles';
 import { openForm } from '../../services/DataverseService';
@@ -121,6 +122,7 @@ export const EditableGrid = ({ dataset, isControlDisabled, width }: IDataSetProp
           ></CommandBar>
         </Stack>
         <DetailsList
+          key={getColumnsTotalWidth(dataset) > width ? 0 : width}
           items={rows}
           columns={columns}
           onRenderItemColumn={_renderItemColumn}
