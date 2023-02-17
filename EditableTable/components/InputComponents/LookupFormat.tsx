@@ -15,6 +15,7 @@ export interface ILookupProps {
 }
 
 const MAX_NUMBER_OF_OPTIONS = 100;
+const SINGLE_CLICK_CODE = 1;
 
 export const LookupFormat = memo(
   ({ fieldName, value, parentEntityMetadata, _onChange, _onDoubleClick }: ILookupProps) => {
@@ -75,7 +76,7 @@ export const LookupFormat = memo(
         }}
         onMenuClick={() => onChange(undefined)}
         onClick={(event: any) => {
-          if (event.detail === 1) {
+          if (event.detail === SINGLE_CLICK_CODE) {
             openForm(currentOption[0].key.toString(),
               currentLookup?.reference?.entityNameRef);
           }
@@ -101,9 +102,7 @@ export const LookupFormat = memo(
         }
       }}
       inputProps={{
-        onDoubleClick: () => {
-          _onDoubleClick();
-        },
+        onDoubleClick: () => _onDoubleClick(),
         disabled: false,
       }}
     />;

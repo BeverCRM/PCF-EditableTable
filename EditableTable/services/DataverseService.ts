@@ -17,7 +17,6 @@ export const setContext = (context: ComponentFramework.Context<IInputs>) => {
 };
 
 export const openForm = (id: string, entityName?: string) => {
-  console.log(id);
   const options = {
     entityId: id,
     entityName: entityName ?? _targetEntityType,
@@ -197,7 +196,6 @@ export const getTimeZoneDefinitions = async () => {
 export const getProvisionedLanguages = async () => {
   const request = `${_clientUrl}RetrieveProvisionedLanguages`;
   const results = await getFetchResponse(request);
-  console.log();
 
   return results.RetrieveProvisionedLanguages.map((language: any) => <IComboBoxOption>{
     key: language.toString(),

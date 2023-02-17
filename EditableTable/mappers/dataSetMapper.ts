@@ -14,10 +14,14 @@ export type Column = {
   lookup?: ITag,
 };
 
+const SELECTION_WIDTH = 48;
+const PADDING_WIDTH = 16;
+const EXCESS_WIDTH = 20;
+
 export const isNewRow = (row: Row) => row.key.length < 15;
 
 export const getColumnsTotalWidth = (dataset: DataSet) =>
-  dataset.columns.reduce((a, b) => a + b.visualSizeFactor, 0);
+  dataset.columns.reduce((result, column) => result + column.visualSizeFactor, 0);
 
 const calculateAdditinalWidth = (dataset: DataSet, columnTotalWidth: number) => {
   const tableWidth = getAllocatedWidth();
@@ -25,7 +29,8 @@ const calculateAdditinalWidth = (dataset: DataSet, columnTotalWidth: number) => 
   const columnCount = dataset.columns.length;
 
   if (widthDiff > 0) {
-    return Math.floor((widthDiff / columnCount) - (48 + 16 * columnCount) / columnCount) - 20;
+    return Math.floor((widthDiff / columnCount) -
+      (SELECTION_WIDTH + PADDING_WIDTH * columnCount) / columnCount) - EXCESS_WIDTH;
   }
   return 0;
 };
