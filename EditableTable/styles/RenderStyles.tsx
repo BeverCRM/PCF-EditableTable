@@ -6,6 +6,7 @@ import {
   DetailsRow,
 } from '@fluentui/react';
 import { detailsHeaderStyles, detailsRowStyles } from './DetailsListStyles';
+import { openForm } from '../services/DataverseService';
 
 export const _onRenderDetailsHeader: IDetailsListProps['onRenderDetailsHeader'] = props => {
   if (props) {
@@ -17,7 +18,9 @@ export const _onRenderDetailsHeader: IDetailsListProps['onRenderDetailsHeader'] 
 
 export const _onRenderRow: IDetailsListProps['onRenderRow'] = props => {
   if (props) {
-    return <DetailsRow {...props} styles={detailsRowStyles} />;
+    return <div onDoubleClick={() => openForm(props.item.key)}>
+      <DetailsRow {...props} styles={detailsRowStyles} />
+    </div>;
   }
   return null;
 };

@@ -11,6 +11,7 @@ export interface ICommandBarProps {
   deleteButtonHandler: () => void;
   saveButtonHandler: () => void;
   isControlDisabled: boolean;
+  selectedCount: number;
 }
 
 type ButtonProps = {
@@ -47,6 +48,10 @@ export const CommandBar = (props: ICommandBarProps) => {
       icon: deleteIcon,
       disabled: isLoading || props.isControlDisabled,
       onClick: props.deleteButtonHandler,
+      styles: {
+        root: { display: props.selectedCount > 0 ? 'flex' : 'none' },
+        icon: { color: 'black' },
+      },
     },
     {
       order: 4,
