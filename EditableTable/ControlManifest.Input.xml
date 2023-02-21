@@ -18,7 +18,7 @@
       -->
     </external-service-usage>
     <!-- dataset node represents a set of entity records on CDS; allow more than one datasets -->
-    <data-set name="dataset" display-name-key="Dataset_Display_Key">
+    <data-set name="dataset" display-name-key="Dataset_Display_Key" cds-data-set-options="displayViewSelector:true;displayQuickFind:true" >
       <!-- 'property-set' node represents a unique, configurable property that each record in the dataset must provide. -->
       <!-- UNCOMMENT TO ADD PROPERTY-SET NODE
       <property-set name="samplePropertySet" display-name-key="Property_Display_Key" description-key="Property_Desc_Key" of-type="SingleLine.Text" usage="bound" required="true" />

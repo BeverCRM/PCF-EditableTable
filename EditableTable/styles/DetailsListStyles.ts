@@ -8,18 +8,17 @@ import { mergeStyleSets } from '@fluentui/react/lib/Styling';
 
 export const stackStyles: Partial<IStackStyles> = { root: { height: 44, marginLeft: 100 } };
 
-export const detailsHeaderStyles: Partial<IDetailsHeaderStyles> = {
+export const detailsHeaderStyles: Partial<IDetailsHeaderStyles> = mergeStyleSets({
   root: {
     backgroundColor: 'white',
     fontSize: '12px',
     paddingTop: '0px',
     borderTop: '1px solid rgb(215, 215, 215)',
   },
-};
+});
 
 export const detailsRowStyles: Partial<IDetailsRowStyles> = {
   root: {
-    height: '43px',
     backgroundColor: 'white',
     fontSize: '14px',
     color: 'black',
@@ -38,7 +37,7 @@ export const containerStackStyles = (width: number, rowsLength: number) => {
   const height = rowsLength === 0
     ? 282
     : rowsLength < 10
-      ? (rowsLength * 50) + 150
+      ? (rowsLength * 50) + 155
       : window.innerHeight - 280;
 
   return { width, height };
