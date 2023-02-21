@@ -119,6 +119,7 @@ export const EditableGrid = ({ dataset, isControlDisabled, width }: IDataSetProp
             deleteButtonHandler={deleteButtonHandler}
             saveButtonHandler={saveButtonHandler}
             isControlDisabled={isControlDisabled}
+            selectedCount={selectedRecordIds.length}
           ></CommandBar>
         </Stack>
         <DetailsList
