@@ -3,8 +3,6 @@ import {
   DetailsList,
   DetailsListLayoutMode,
   IColumn,
-  // IDetailsListCheckboxProps,
-  // IRenderFunction,
   ScrollablePane,
   Stack,
 } from '@fluentui/react';
