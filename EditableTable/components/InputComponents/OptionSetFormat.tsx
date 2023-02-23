@@ -1,7 +1,8 @@
 import React, { memo } from 'react';
-import { Stack, ComboBox, IComboBox, IComboBoxOption } from '@fluentui/react';
+import { Stack, ComboBox, IComboBox, IComboBoxOption, FontIcon } from '@fluentui/react';
 
 import { useAppSelector } from '../../store/hooks';
+import { asteriskClassStyle, optionSetStyles } from '../../styles/ComponentsStyles';
 
 export interface IDropDownProps {
   fieldName: string | undefined;
@@ -10,10 +11,11 @@ export interface IDropDownProps {
   isTwoOptions?: boolean;
   _onChange: Function;
   _onDoubleClick: Function;
+  isRequired: boolean;
 }
 
 export const OptionSetFormat =
-  memo(({ fieldName, value, isMultiple,
+  memo(({ fieldName, value, isMultiple, isRequired,
     isTwoOptions, _onChange, _onDoubleClick }: IDropDownProps) => {
     const currentOptions: string[] = value ? value.split(',') : [];
     const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);
@@ -48,7 +50,9 @@ export const OptionSetFormat =
           selectedKey={currentOptions}
           onChange={onChange}
           onDoubleClick={() => _onDoubleClick()}
+          styles={optionSetStyles(isRequired)}
         />
+        <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
       </Stack>
     );
   });

@@ -8,10 +8,11 @@ import { DateTimeFormat } from '../InputComponents/DateTimeFormat';
 import { WholeFormat } from '../InputComponents/WholeFormat';
 
 import { Column, Row, isNewRow } from '../../mappers/dataSetMapper';
-import { useAppDispatch } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { updateRow } from '../../store/features/DatasetSlice';
 import { setChangedRecords } from '../../store/features/RecordSlice';
 import { getParentMetadata, openForm } from '../../services/DataverseService';
+import { textFieldStyles } from '../../styles/ComponentsStyles';
 
 interface IGridSetProps {
   row: Row,
@@ -26,6 +27,7 @@ export type ParentEntityMetadata = {
 
 export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
   const dispatch = useAppDispatch();
+  const fieldsRequirementLevels = useAppSelector(state => state.dataset.requirementLevels);
 
   const _changedValue = useCallback(
     (newValue: any, rawValue?: any, lookupEntityNavigation?: string): void => {
@@ -43,7 +45,10 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
       }));
     }, []);
 
-  const cell = row.columns.find((column: Column) => column.schemaName === currentColumn?.key);
+  const cell = row.columns.find((column: Column) => column.schemaName === currentColumn.key);
+
+  const isRequired = fieldsRequirementLevels.find(field => field.fieldName === currentColumn.key)
+    ?.isRequired || false;
 
   let parentEntityMetadata: ParentEntityMetadata | undefined;
   if (isNewRow(row)) {
@@ -51,6 +56,7 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
   }
 
   const props = { fieldName: currentColumn?.fieldName ? currentColumn?.fieldName : '',
+    isRequired,
     _onChange: _changedValue,
     _onDoubleClick: useCallback(() => openForm(row.key), []),
   };
@@ -59,6 +65,8 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
     switch (currentColumn.data) {
       case 'SingleLine.Text':
         return <TextField value={cell.formattedValue}
+          styles={textFieldStyles(isRequired)}
+          required={isRequired}
           onDoubleClick={() => openForm(row.key)}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
             newValue?: string) => _changedValue(newValue || '')} />;

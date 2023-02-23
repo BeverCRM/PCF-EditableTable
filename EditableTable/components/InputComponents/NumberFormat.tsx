@@ -1,7 +1,7 @@
-import { SpinButton, Stack } from '@fluentui/react';
+import { FontIcon, SpinButton, Stack } from '@fluentui/react';
 import React, { memo } from 'react';
 import { useAppSelector } from '../../store/hooks';
-import { numberFormatStyles } from '../../styles/ComponentsStyles';
+import { asteriskClassStyle, numberFormatStyles } from '../../styles/ComponentsStyles';
 import { formatCurrency, formatDecimal, formatNumber } from '../../utils/formattingUtils';
 
 export interface INumberProps {
@@ -10,9 +10,10 @@ export interface INumberProps {
   rowId?: string;
   _onChange: Function;
   _onDoubleClick: Function;
+  isRequired: boolean;
 }
 
-export const NumberFormat = memo(({ fieldName, value, rowId,
+export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
   _onChange, _onDoubleClick } : INumberProps) => {
   const numbers = useAppSelector(state => state.number.numberFieldsMetadata);
   const currencySymbols = useAppSelector(state => state.number.currencySymbols);
@@ -40,12 +41,13 @@ export const NumberFormat = memo(({ fieldName, value, rowId,
         min={currentNumber?.minValue}
         max={currentNumber?.maxValue}
         precision={currentNumber?.precision ?? 0}
-        styles={numberFormatStyles}
+        styles={numberFormatStyles(isRequired)}
         onChange={onNumberChange}
         onValidate={onValidate}
         value={value}
         onDoubleClick={() => _onDoubleClick()}
       />
+      <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
     </Stack>
   );
 });

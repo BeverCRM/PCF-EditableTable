@@ -1,7 +1,7 @@
-import { ComboBox, IComboBox, IComboBoxOption, Stack } from '@fluentui/react';
+import { ComboBox, FontIcon, IComboBox, IComboBoxOption, Stack } from '@fluentui/react';
 import React, { memo } from 'react';
 import { useAppSelector } from '../../store/hooks';
-import { wholeFormatStyles } from '../../styles/ComponentsStyles';
+import { asteriskClassStyle, wholeFormatStyles } from '../../styles/ComponentsStyles';
 import { durationList } from './durationList';
 
 export interface IWholeFormatProps {
@@ -9,9 +9,10 @@ export interface IWholeFormatProps {
   type: string;
   _onChange: Function;
   _onDoubleClick: Function;
+  isRequired: boolean;
 }
 
-export const WholeFormat = memo(({ value, type, _onChange,
+export const WholeFormat = memo(({ value, type, _onChange, isRequired,
   _onDoubleClick } : IWholeFormatProps) => {
   const wholeFormat = useAppSelector(state => state.wholeFormat);
 
@@ -41,9 +42,10 @@ export const WholeFormat = memo(({ value, type, _onChange,
         options={options}
         onChange={onChange}
         selectedKey={value}
-        styles={wholeFormatStyles}
+        styles={wholeFormatStyles(isRequired)}
         onDoubleClick={() => _onDoubleClick()}
       />
+      <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
     </Stack>
   );
 });

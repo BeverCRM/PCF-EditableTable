@@ -14,6 +14,7 @@ import { useAppDispatch } from '../store/hooks';
 import { getTargetEntityType } from '../services/DataverseService';
 
 import { mapDataSetColumns, mapDataSetRows } from '../mappers/dataSetMapper';
+import { setRequirementLevels } from '../store/features/DatasetSlice';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
@@ -63,6 +64,8 @@ export const useLoadStore = (dataset: DataSet) => {
     if (dateColumns.length > 0) {
       dispatch(getDateBehavior(dateColumns));
     }
+
+    dispatch(setRequirementLevels(columns));
 
     dispatch(setLoading(false));
   }, [dataset]);

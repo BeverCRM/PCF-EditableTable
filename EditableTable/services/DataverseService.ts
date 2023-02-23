@@ -1,6 +1,6 @@
 import { IInputs } from '../generated/ManifestTypes';
 import { IComboBoxOption, IDropdownOption, ITag } from '@fluentui/react';
-import { Record } from '../store/features/RecordSlice';
+import { ParentMetadata, Record } from '../store/features/RecordSlice';
 import { Relationship } from '../store/features/LookupSlice';
 import { getFetchResponse } from '../utils/fetchUtils';
 
@@ -15,6 +15,9 @@ export const setContext = (context: ComponentFramework.Context<IInputs>) => {
   // @ts-ignore
   _clientUrl = `${_context.page.getClientUrl()}/api/data/v9.2/`;
 };
+
+// @ts-ignore
+export const getParentMetadata = () => <ParentMetadata>_context.mode.contextInfo;
 
 export const openForm = (id: string, entityName?: string) => {
   const options = {
@@ -74,18 +77,41 @@ export const openErrorDialog = (error: any): Promise<void> => {
   return _context.navigation.openErrorDialog(errorDialogOptions);
 };
 
-export const saveRecord = async (record: Record): Promise<void> => {
-  const data = record.data.reduce((obj, recordData) =>
-    Object.assign(obj, recordData.fieldType === 'Lookup.Simple'
-      ? { [`${recordData.fieldName}@odata.bind`]: recordData.newValue }
-      : { [recordData.fieldName]: recordData.newValue }), {});
-  if (record.id.length < 15) {
-    await createNewRecord(data);
-  }
-  else {
-    await _context.webAPI.updateRecord(_targetEntityType, record.id, data);
-  }
+const getFieldSchemaName = async (): Promise<string> => {
+  // @ts-ignore
+  const logicalName = _context.page.entityTypeName;
+  const endpoint = `EntityDefinitions(LogicalName='${logicalName}')/OneToManyRelationships`;
+  const options =
+  `$filter=ReferencingEntity eq '${_targetEntityType}'&$select=ReferencingAttribute`;
+  const request = `${_clientUrl}${endpoint}?${options}`;
+  const data = await getFetchResponse(request);
+  return data.value[0]?.ReferencingAttribute;
 };
+
+const parentFieldIsValid = (record: Record, subgridParentFieldName: string | undefined) =>
+  subgridParentFieldName &&
+  !record.data.some(recordData => recordData.fieldName === subgridParentFieldName);
+
+export const saveRecord =
+  async (record: Record, parentValue: string): Promise<void> => {
+    const data = record.data.reduce((obj, recordData) =>
+      Object.assign(obj,
+        recordData.fieldType === 'Lookup.Simple'
+          ? { [`${recordData.fieldName}@odata.bind`]: recordData.newValue }
+          : { [recordData.fieldName]: recordData.newValue }), {});
+
+    const subgridParentFieldName = await getFieldSchemaName();
+    if (parentFieldIsValid(record, subgridParentFieldName)) {
+      Object.assign(data, { [`${subgridParentFieldName}@odata.bind`]: parentValue });
+    }
+
+    if (record.id.length < 15) {
+      await createNewRecord(data);
+    }
+    else {
+      await _context.webAPI.updateRecord(_targetEntityType, record.id, data);
+    }
+  };
 
 export const getRelationships = async (): Promise<Relationship[]> => {
   // eslint-disable-next-line max-len
@@ -215,7 +241,12 @@ export const getTargetEntityType = () => _targetEntityType;
 
 export const getContext = () => _context;
 
-// @ts-ignore
-export const getParentMetadata = () => _context.mode.contextInfo;
-
 export const getAllocatedWidth = () => _context.mode.allocatedWidth;
+
+export const getReqirementLevel = async (fieldName: string) => {
+  // eslint-disable-next-line max-len
+  const request = `${_clientUrl}EntityDefinitions(LogicalName='${_targetEntityType}')/Attributes(LogicalName='${fieldName}')?$select=RequiredLevel`;
+  const results = await getFetchResponse(request);
+
+  return results.RequiredLevel.Value;
+};
