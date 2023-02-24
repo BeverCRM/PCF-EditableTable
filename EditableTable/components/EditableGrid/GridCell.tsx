@@ -114,12 +114,16 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
 
       case 'Multiple':
         return <TextField value={cell.formattedValue}
+          required={isRequired}
+          styles={textFieldStyles(isRequired)}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
             newValue?: string) => _changedValue(newValue || '')}
           onDoubleClick={() => openForm(row.key)} />;
 
       default:
         return <TextField value={cell.formattedValue}
+          required={isRequired}
+          styles={textFieldStyles(isRequired)}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
             newValue?: string) => _changedValue(newValue || '')}
           onDoubleClick={() => openForm(row.key)}/>;

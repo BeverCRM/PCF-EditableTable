@@ -81,11 +81,11 @@ const getFieldSchemaName = async (): Promise<string> => {
   // @ts-ignore
   const logicalName = _context.page.entityTypeName;
   const endpoint = `EntityDefinitions(LogicalName='${logicalName}')/OneToManyRelationships`;
-  const options =
-  `$filter=ReferencingEntity eq '${_targetEntityType}'&$select=ReferencingAttribute`;
+  const options = `$filter=ReferencingEntity eq '${
+    _targetEntityType}'&$select=ReferencingEntityNavigationPropertyName`;
   const request = `${_clientUrl}${endpoint}?${options}`;
   const data = await getFetchResponse(request);
-  return data.value[0]?.ReferencingAttribute;
+  return data.value[0]?.ReferencingEntityNavigationPropertyName;
 };
 
 const parentFieldIsValid = (record: Record, subgridParentFieldName: string | undefined) =>
