@@ -1,7 +1,5 @@
 import { useEffect } from 'react';
 
-import { IColumn } from '@fluentui/react';
-
 import { setRelationships, setLookups } from '../store/features/LookupSlice';
 import { getDropdownsOptions } from '../store/features/DropdownSlice';
 import { getCurrencySymbols, getNumberFieldsMetadata } from '../store/features/NumberSlice';
@@ -11,11 +9,16 @@ import { setLoading } from '../store/features/LoadingSlice';
 
 import { useAppDispatch } from '../store/hooks';
 
-import { getTargetEntityType } from '../services/DataverseService';
-
 import { mapDataSetColumns, mapDataSetRows } from '../mappers/dataSetMapper';
+import { setRequirementLevels } from '../store/features/DatasetSlice';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
+
+export type Field = {
+  key: string,
+  fieldName: string | undefined,
+  data: string | undefined,
+}
 
 export const useLoadStore = (dataset: DataSet) => {
   const dispatch = useAppDispatch();
@@ -24,12 +27,19 @@ export const useLoadStore = (dataset: DataSet) => {
     const columns = mapDataSetColumns(dataset);
     const datasetRows = mapDataSetRows(dataset);
 
-    const getColumnsOfType = (types: string[]): IColumn[] =>
-      columns.filter(column => types.includes(column.data));
+    const columnKeys = columns.map(column => column.key);
+
+    const getColumnsOfType = (types: string[]): Field[] =>
+      columns.filter(column => types.includes(column.data))
+        .map(column => ({
+          key: column.key,
+          fieldName: column.fieldName,
+          data: column.data,
+        }));
 
     const lookupColumns = getColumnsOfType(['Lookup.Simple']);
     if (lookupColumns.length > 0) {
-      dispatch(setRelationships(getTargetEntityType())).unwrap()
+      dispatch(setRelationships()).unwrap()
         .then(() => {
           dispatch(setLookups(lookupColumns));
         });
@@ -63,6 +73,8 @@ export const useLoadStore = (dataset: DataSet) => {
     if (dateColumns.length > 0) {
       dispatch(getDateBehavior(dateColumns));
     }
+
+    dispatch(setRequirementLevels(columnKeys));
 
     dispatch(setLoading(false));
   }, [dataset]);

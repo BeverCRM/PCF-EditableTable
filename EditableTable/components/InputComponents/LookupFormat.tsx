@@ -1,9 +1,13 @@
-import { DefaultButton } from '@fluentui/react';
+import { DefaultButton, FontIcon } from '@fluentui/react';
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
 import React, { memo } from 'react';
 import { openForm } from '../../services/DataverseService';
 import { useAppSelector } from '../../store/hooks';
-import { lookupFormatStyles, lookupSelectedOptionStyles } from '../../styles/ComponentsStyles';
+import {
+  asteriskClassStyle,
+  lookupFormatStyles,
+  lookupSelectedOptionStyles,
+} from '../../styles/ComponentsStyles';
 import { ParentEntityMetadata } from '../EditableGrid/GridCell';
 
 export interface ILookupProps {
@@ -12,13 +16,15 @@ export interface ILookupProps {
   parentEntityMetadata: ParentEntityMetadata | undefined;
   _onChange: Function;
   _onDoubleClick: Function;
+  isRequired: boolean;
 }
 
 const MAX_NUMBER_OF_OPTIONS = 100;
 const SINGLE_CLICK_CODE = 1;
 
 export const LookupFormat = memo(
-  ({ fieldName, value, parentEntityMetadata, _onChange, _onDoubleClick }: ILookupProps) => {
+  ({ fieldName, value, parentEntityMetadata,
+    isRequired, _onChange, _onDoubleClick }: ILookupProps) => {
     const picker = React.useRef(null);
 
     const lookups = useAppSelector(state => state.lookup.lookups);
@@ -84,26 +90,29 @@ export const LookupFormat = memo(
         styles={lookupSelectedOptionStyles}
       />;
 
-    return <TagPicker
-      selectedItems={currentOption}
-      componentRef={picker}
-      onChange={onChange}
-      onResolveSuggestions={filterSuggestedTags}
-      resolveDelay={1000}
-      onEmptyResolveSuggestions={initialValues}
-      itemLimit={1}
-      pickerSuggestionsProps={{ noResultsFoundText: 'No Results Found' }}
-      styles={lookupFormatStyles}
-      onRenderItem={_onRenderItem}
-      onBlur={() => {
-        if (picker.current) {
-          // @ts-ignore
-          picker.current.input.current._updateValue('');
-        }
-      }}
-      inputProps={{
-        onDoubleClick: () => _onDoubleClick(),
-        disabled: false,
-      }}
-    />;
+    return <div>
+      <TagPicker
+        selectedItems={currentOption}
+        componentRef={picker}
+        onChange={onChange}
+        onResolveSuggestions={filterSuggestedTags}
+        resolveDelay={1000}
+        onEmptyResolveSuggestions={initialValues}
+        itemLimit={1}
+        pickerSuggestionsProps={{ noResultsFoundText: 'No Results Found' }}
+        styles={lookupFormatStyles(isRequired)}
+        onRenderItem={_onRenderItem}
+        onBlur={() => {
+          if (picker.current) {
+            // @ts-ignore
+            picker.current.input.current._updateValue('');
+          }
+        }}
+        inputProps={{
+          onDoubleClick: () => _onDoubleClick(),
+          disabled: false,
+        }}
+      />
+      <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
+    </div>;
   });

@@ -1,5 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Row, isNewRow } from '../../mappers/dataSetMapper';
+import { getReqirementLevel } from '../../services/DataverseService';
+import { RootState } from '../store';
 
 type Updates = {
   rowKey: string;
@@ -7,15 +9,34 @@ type Updates = {
   newValue: any;
 }
 
+export type RequirementLevel = {
+  fieldName: string;
+  isRequired: boolean;
+}
+
 interface IDatasetState {
   rows: Row[],
   newRows: Row[],
+  requirementLevels: RequirementLevel[]
 }
 
 const initialState: IDatasetState = {
   rows: [],
   newRows: [],
+  requirementLevels: [],
 };
+
+type AsyncThunkConfig = {
+  state: RootState,
+};
+
+export const setRequirementLevels = createAsyncThunk<any[], string[], AsyncThunkConfig>(
+  'dataset/setRequirementLevels',
+  async columnKeys => await Promise.all(columnKeys.map(async columnKey => {
+    const isRequired = await getReqirementLevel(columnKey) !== 'None';
+    return { fieldName: columnKey, isRequired };
+  })),
+);
 
 export const datasetSlice = createSlice({
   name: 'dataset',
@@ -49,6 +70,15 @@ export const datasetSlice = createSlice({
       state.rows = state.rows.filter(row => isNewRow(row));
       state.newRows = [];
     },
+  },
+  extraReducers: builder => {
+    builder.addCase(setRequirementLevels.fulfilled, (state, action) => {
+      state.requirementLevels = [...action.payload];
+    });
+
+    builder.addCase(setRequirementLevels.rejected, state => {
+      state.requirementLevels = [];
+    });
   },
 });
 

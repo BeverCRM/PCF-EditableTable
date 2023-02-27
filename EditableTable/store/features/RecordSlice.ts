@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Row } from '../../mappers/dataSetMapper';
 import {
   deleteRecord,
   openRecordDeleteDialog,
@@ -6,6 +7,7 @@ import {
   openErrorDialog,
 } from '../../services/DataverseService';
 import store, { RootState } from '../store';
+import { RequirementLevel } from './DatasetSlice';
 import { setLoading } from './LoadingSlice';
 
 export type Record = {
@@ -17,6 +19,12 @@ export type Record = {
       fieldType: string
     }
   ]
+}
+
+export type ParentMetadata = {
+  entityId: string,
+  entityRecordName: string,
+  entityTypeName: string,
 }
 
 interface IRecordState {
@@ -33,10 +41,22 @@ type AsyncThunkConfig = {
   state: RootState,
 };
 
+const isRequiredFieldEmpty = (requirementLevels: RequirementLevel[], rows: Row[]) =>
+  rows.some(row =>
+    row.columns.some(column =>
+      requirementLevels.find(requirementLevel =>
+        requirementLevel.fieldName === column.schemaName)?.isRequired && !column.rawValue));
+
 export const saveRecords = createAsyncThunk<void, undefined, AsyncThunkConfig>(
   'record/saveRecords',
   async (a, thunkApi) => {
     const { changedRecords } = thunkApi.getState().record;
+    const { requirementLevels, rows } = thunkApi.getState().dataset;
+
+    if (isRequiredFieldEmpty(requirementLevels, rows)) {
+      return thunkApi.rejectWithValue({ message: 'All required fields must be filled in.' });
+    }
+
     await Promise.all(changedRecords.map(record => saveRecord(record)));
   },
 );
@@ -97,6 +117,7 @@ const RecordSlice = createSlice({
       state.changedRecords = changedRecords;
       state.isPendingSave = true;
     },
+
     clearChangedRecords: state => {
       state.changedRecords = [];
       state.isPendingSave = false;
@@ -109,7 +130,7 @@ const RecordSlice = createSlice({
     });
 
     builder.addCase(saveRecords.rejected, (state, action) => {
-      openErrorDialog(action.error).then(() => {
+      openErrorDialog(action.payload || action.error).then(() => {
         store.dispatch(setLoading(false));
       });
     });

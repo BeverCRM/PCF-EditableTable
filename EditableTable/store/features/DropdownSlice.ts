@@ -1,5 +1,6 @@
-import { IColumn, IDropdownOption } from '@fluentui/react';
+import { IDropdownOption } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { Field } from '../../hooks/useLoadStore';
 import { getDropdownOptions, openErrorDialog } from '../../services/DataverseService';
 import store from '../store';
 import { setLoading } from './LoadingSlice';
@@ -17,7 +18,7 @@ const initialState: IDropdownState = {
   dropdownFields: [],
 };
 
-export const getDropdownsOptions = createAsyncThunk<DropdownField[], IColumn[]>(
+export const getDropdownsOptions = createAsyncThunk<DropdownField[], Field[]>(
   'dropdown/getDropdownsOptions',
   async dropdownFields =>
     await Promise.all(dropdownFields.map(async dropdownField => {

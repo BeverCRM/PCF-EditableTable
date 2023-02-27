@@ -6,8 +6,14 @@ import {
   ComboBox,
   IComboBox,
   IComboBoxOption,
+  FontIcon,
 } from '@fluentui/react';
-import { comboBoxStyles, stackComboBox } from '../../styles/ComponentsStyles';
+import {
+  asteriskClassStyle,
+  timePickerStyles,
+  datePickerStyles,
+  stackComboBox,
+} from '../../styles/ComponentsStyles';
 import { useAppSelector } from '../../store/hooks';
 import { shallowEqual } from 'react-redux';
 import {
@@ -28,10 +34,11 @@ export interface IDatePickerProps {
   value: string | null,
   _onChange: any,
   _onDoubleClick: Function;
+  isRequired: boolean;
 }
 
 export const DateTimeFormat = memo((
-  { fieldName, dateOnly, value, _onChange, _onDoubleClick }: IDatePickerProps) => {
+  { fieldName, dateOnly, value, isRequired, _onChange, _onDoubleClick }: IDatePickerProps) => {
   let currentDate = value ? new Date(value) : undefined;
   let timeKey: string | number | undefined;
   const options = timesList;
@@ -108,17 +115,19 @@ export const DateTimeFormat = memo((
         parseDateFromString={onParseDateFromString}
         strings={defaultDatePickerStrings}
         onDoubleClick={() => _onDoubleClick()}
+        styles={datePickerStyles(dateOnly ? isRequired : false)}
       />
       {!dateOnly &&
         <ComboBox
           options={options}
           allowFreeform={true}
           onChange={onTimeChange}
-          styles={comboBoxStyles}
+          styles={timePickerStyles(isRequired)}
           selectedKey={timeKey}
           onDoubleClick={() => _onDoubleClick()}
         />
       }
+      <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
     </Stack>
   );
 });

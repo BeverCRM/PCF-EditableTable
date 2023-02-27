@@ -1,5 +1,5 @@
-import { IColumn } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { Field } from '../../hooks/useLoadStore';
 import { getDateMetadata, openErrorDialog } from '../../services/DataverseService';
 import store from '../store';
 import { setLoading } from './LoadingSlice';
@@ -17,7 +17,7 @@ const initialState: IDateState = {
   dates: [],
 };
 
-export const getDateBehavior = createAsyncThunk<DateMetadata[], IColumn[]>(
+export const getDateBehavior = createAsyncThunk<DateMetadata[], Field[]>(
   'date/getDateBehavior',
   async dateFields =>
     await Promise.all(dateFields.map(async date => {
