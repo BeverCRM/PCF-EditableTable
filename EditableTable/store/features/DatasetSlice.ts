@@ -1,4 +1,3 @@
-import { IColumn } from '@fluentui/react';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Row, isNewRow } from '../../mappers/dataSetMapper';
 import { getReqirementLevel } from '../../services/DataverseService';
@@ -31,11 +30,11 @@ type AsyncThunkConfig = {
   state: RootState,
 };
 
-export const setRequirementLevels = createAsyncThunk<any[], IColumn[], AsyncThunkConfig>(
+export const setRequirementLevels = createAsyncThunk<any[], string[], AsyncThunkConfig>(
   'dataset/setRequirementLevels',
-  async columns => await Promise.all(columns.map(async column => {
-    const isRequired = await getReqirementLevel(column.key) !== 'None';
-    return { fieldName: column.key, isRequired };
+  async columnKeys => await Promise.all(columnKeys.map(async columnKey => {
+    const isRequired = await getReqirementLevel(columnKey) !== 'None';
+    return { fieldName: columnKey, isRequired };
   })),
 );
 
@@ -77,9 +76,8 @@ export const datasetSlice = createSlice({
       state.requirementLevels = [...action.payload];
     });
 
-    builder.addCase(setRequirementLevels.rejected, (state, action) => {
+    builder.addCase(setRequirementLevels.rejected, state => {
       state.requirementLevels = [];
-      console.log(action);
     });
   },
 });

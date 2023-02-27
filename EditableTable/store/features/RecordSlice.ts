@@ -5,8 +5,6 @@ import {
   openRecordDeleteDialog,
   saveRecord,
   openErrorDialog,
-  getParentMetadata,
-  getEntityPluralName,
 } from '../../services/DataverseService';
 import store, { RootState } from '../store';
 import { RequirementLevel } from './DatasetSlice';
@@ -46,8 +44,8 @@ type AsyncThunkConfig = {
 const isRequiredFieldEmpty = (requirementLevels: RequirementLevel[], rows: Row[]) =>
   rows.some(row =>
     row.columns.some(column =>
-      requirementLevels.find(field =>
-        field.fieldName === column.schemaName)?.isRequired && !column.rawValue));
+      requirementLevels.find(requirementLevel =>
+        requirementLevel.fieldName === column.schemaName)?.isRequired && !column.rawValue));
 
 export const saveRecords = createAsyncThunk<void, undefined, AsyncThunkConfig>(
   'record/saveRecords',
@@ -59,11 +57,7 @@ export const saveRecords = createAsyncThunk<void, undefined, AsyncThunkConfig>(
       return thunkApi.rejectWithValue({ message: 'All required fields must be filled in.' });
     }
 
-    const parentMetadata = getParentMetadata();
-    const parentEntityPluralName = await getEntityPluralName(parentMetadata.entityTypeName);
-    const parentValue = `/${parentEntityPluralName}(${parentMetadata.entityId})`;
-
-    await Promise.all(changedRecords.map(record => saveRecord(record, parentValue)));
+    await Promise.all(changedRecords.map(record => saveRecord(record)));
   },
 );
 

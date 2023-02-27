@@ -1,5 +1,5 @@
-import { IColumn } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { Field } from '../../hooks/useLoadStore';
 import {
   getNumberFieldMetadata,
   getCurrencySymbol,
@@ -30,7 +30,7 @@ const initialState: INumberState = {
   currencySymbols: [],
 };
 
-export const getNumberFieldsMetadata = createAsyncThunk<NumberFieldMetadata[], IColumn[]>(
+export const getNumberFieldsMetadata = createAsyncThunk<NumberFieldMetadata[], Field[]>(
   'number/getNumberFieldsMetadata',
   async numberFields =>
     await Promise.all(numberFields.map(async numberField => {

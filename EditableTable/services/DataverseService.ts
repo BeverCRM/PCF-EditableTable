@@ -7,17 +7,31 @@ import { getFetchResponse } from '../utils/fetchUtils';
 let _context: ComponentFramework.Context<IInputs>;
 let _targetEntityType: string;
 let _clientUrl: string;
+let _parentValue: string;
+const NEW_RECORD_ID_LENGTH_CHECK = 15;
 
-export const setContext = (context: ComponentFramework.Context<IInputs>) => {
+// @ts-ignore
+export const getParentMetadata = () => <ParentMetadata>_context.mode.contextInfo;
+
+export const getEntityPluralName = async (entityName: string): Promise<string> => {
+  const metadata = await _context.utils.getEntityMetadata(entityName);
+  return metadata.EntitySetName;
+};
+
+export const getParentPluralName = async (): Promise<string> => {
+  const parentMetadata = getParentMetadata();
+  const parentEntityPluralName = await getEntityPluralName(parentMetadata.entityTypeName);
+  return `/${parentEntityPluralName}(${parentMetadata.entityId})`;
+};
+
+export const setContext = async (context: ComponentFramework.Context<IInputs>) => {
   _context = context;
   _targetEntityType = context.parameters.dataset.getTargetEntityType();
 
   // @ts-ignore
   _clientUrl = `${_context.page.getClientUrl()}/api/data/v9.2/`;
+  _parentValue = await getParentPluralName();
 };
-
-// @ts-ignore
-export const getParentMetadata = () => <ParentMetadata>_context.mode.contextInfo;
 
 export const openForm = (id: string, entityName?: string) => {
   const options = {
@@ -92,30 +106,30 @@ const parentFieldIsValid = (record: Record, subgridParentFieldName: string | und
   subgridParentFieldName &&
   !record.data.some(recordData => recordData.fieldName === subgridParentFieldName);
 
-export const saveRecord =
-  async (record: Record, parentValue: string): Promise<void> => {
-    const data = record.data.reduce((obj, recordData) =>
-      Object.assign(obj,
-        recordData.fieldType === 'Lookup.Simple'
-          ? { [`${recordData.fieldName}@odata.bind`]: recordData.newValue }
-          : { [recordData.fieldName]: recordData.newValue }), {});
+export const saveRecord = async (record: Record): Promise<void> => {
+  const data = record.data.reduce((obj, recordData) =>
+    Object.assign(obj,
+      recordData.fieldType === 'Lookup.Simple'
+        ? { [`${recordData.fieldName}@odata.bind`]: recordData.newValue }
+        : { [recordData.fieldName]: recordData.newValue }), {});
 
-    const subgridParentFieldName = await getFieldSchemaName();
-    if (parentFieldIsValid(record, subgridParentFieldName)) {
-      Object.assign(data, { [`${subgridParentFieldName}@odata.bind`]: parentValue });
-    }
+  const subgridParentFieldName = await getFieldSchemaName();
+  if (parentFieldIsValid(record, subgridParentFieldName)) {
+    Object.assign(data, { [`${subgridParentFieldName}@odata.bind`]: _parentValue });
+  }
 
-    if (record.id.length < 15) {
-      await createNewRecord(data);
-    }
-    else {
-      await _context.webAPI.updateRecord(_targetEntityType, record.id, data);
-    }
-  };
+  if (record.id.length < NEW_RECORD_ID_LENGTH_CHECK) {
+    await createNewRecord(data);
+  }
+  else {
+    await _context.webAPI.updateRecord(_targetEntityType, record.id, data);
+  }
+};
 
 export const getRelationships = async (): Promise<Relationship[]> => {
-  // eslint-disable-next-line max-len
-  const request = `${_clientUrl}EntityDefinitions(LogicalName='${_targetEntityType}')?$expand=ManyToManyRelationships,ManyToOneRelationships,OneToManyRelationships`;
+  const relationships = `ManyToManyRelationships,ManyToOneRelationships,OneToManyRelationships`;
+  const request = `${_clientUrl}EntityDefinitions(LogicalName='${
+    _targetEntityType}')?$expand=${relationships}`;
   const results = await getFetchResponse(request);
 
   return [
@@ -157,8 +171,9 @@ export const getLookupOptions = async (entityName: string) => {
 
 export const getDropdownOptions =
   async (fieldName: string, attributeType: string, isTwoOptions: boolean) => {
-    // eslint-disable-next-line max-len
-    const request = `${_clientUrl}EntityDefinitions(LogicalName='${_targetEntityType}')/Attributes/Microsoft.Dynamics.CRM.${attributeType}?$select=LogicalName&$filter=LogicalName eq '${fieldName}'&$expand=OptionSet`;
+    const request = `${_clientUrl}EntityDefinitions(LogicalName='${
+      _targetEntityType}')/Attributes/Microsoft.Dynamics.CRM.${
+      attributeType}?$select=LogicalName&$filter=LogicalName eq '${fieldName}'&$expand=OptionSet`;
     let options: IDropdownOption[] = [];
     const results = await getFetchResponse(request);
     if (!isTwoOptions) {
@@ -179,15 +194,11 @@ export const getDropdownOptions =
     return { fieldName, options };
   };
 
-export const getEntityPluralName = async (entityName: string): Promise<string> => {
-  const metadata = await _context.utils.getEntityMetadata(entityName);
-  return metadata.EntitySetName;
-};
-
 export const getNumberFieldMetadata =
   async (fieldName: string, attributeType: string, selection: string) => {
-    // eslint-disable-next-line max-len
-    const request = `${_clientUrl}EntityDefinitions(LogicalName='${_targetEntityType}')/Attributes/Microsoft.Dynamics.CRM.${attributeType}?$select=${selection}&$filter=LogicalName eq '${fieldName}'`;
+    const request = `${_clientUrl}EntityDefinitions(LogicalName='${
+      _targetEntityType}')/Attributes/Microsoft.Dynamics.CRM.${attributeType}?$select=${
+      selection}&$filter=LogicalName eq '${fieldName}'`;
     const results = await getFetchResponse(request);
 
     return {
@@ -230,8 +241,9 @@ export const getProvisionedLanguages = async () => {
 };
 
 export const getDateMetadata = async (fieldName: string) => {
-  // eslint-disable-next-line max-len
-  const request = `${_clientUrl}EntityDefinitions(LogicalName='${_targetEntityType}')/Attributes/Microsoft.Dynamics.CRM.DateTimeAttributeMetadata?$filter=LogicalName eq '${fieldName}'`;
+  const filter = `$filter=LogicalName eq '${fieldName}'`;
+  const request = `${_clientUrl}EntityDefinitions(LogicalName='${
+    _targetEntityType}')/Attributes/Microsoft.Dynamics.CRM.DateTimeAttributeMetadata?${filter}`;
   const results = await getFetchResponse(request);
 
   return results.value[0].DateTimeBehavior.Value;
@@ -244,8 +256,8 @@ export const getContext = () => _context;
 export const getAllocatedWidth = () => _context.mode.allocatedWidth;
 
 export const getReqirementLevel = async (fieldName: string) => {
-  // eslint-disable-next-line max-len
-  const request = `${_clientUrl}EntityDefinitions(LogicalName='${_targetEntityType}')/Attributes(LogicalName='${fieldName}')?$select=RequiredLevel`;
+  const request = `${_clientUrl}EntityDefinitions(LogicalName='${
+    _targetEntityType}')/Attributes(LogicalName='${fieldName}')?$select=RequiredLevel`;
   const results = await getFetchResponse(request);
 
   return results.RequiredLevel.Value;

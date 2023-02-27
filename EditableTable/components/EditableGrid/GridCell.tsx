@@ -47,8 +47,9 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
 
   const cell = row.columns.find((column: Column) => column.schemaName === currentColumn.key);
 
-  const isRequired = fieldsRequirementLevels.find(field => field.fieldName === currentColumn.key)
-    ?.isRequired || false;
+  const fieldRequirementLevel = fieldsRequirementLevels.find(requirementLevel =>
+    requirementLevel.fieldName === currentColumn.key);
+  const isRequired = fieldRequirementLevel?.isRequired || false;
 
   let parentEntityMetadata: ParentEntityMetadata | undefined;
   if (isNewRow(row)) {

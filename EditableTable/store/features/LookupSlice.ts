@@ -1,5 +1,6 @@
-import { IColumn, ITag } from '@fluentui/react';
+import { ITag } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { Field } from '../../hooks/useLoadStore';
 import {
   getLookupOptions,
   getRelationships,
@@ -36,11 +37,11 @@ type AsyncThunkConfig = {
   state: RootState
 };
 
-export const setRelationships = createAsyncThunk<Relationship[], string>(
+export const setRelationships = createAsyncThunk(
   'lookup/setRelationships', async () => await getRelationships(),
 );
 
-export const setLookups = createAsyncThunk<Lookup[], IColumn[], AsyncThunkConfig>(
+export const setLookups = createAsyncThunk<Lookup[], Field[], AsyncThunkConfig>(
   'lookup/setLookups',
   async (lookupColumns, thunkApi) =>
     await Promise.all(lookupColumns.map(async lookupColumn => {
