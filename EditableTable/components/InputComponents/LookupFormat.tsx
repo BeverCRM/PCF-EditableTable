@@ -1,29 +1,19 @@
 import { DefaultButton, FontIcon } from '@fluentui/react';
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
 import React, { memo } from 'react';
-import { openForm } from '../../services/DataverseService';
 import { useAppSelector } from '../../store/hooks';
 import {
   asteriskClassStyle,
   lookupFormatStyles,
   lookupSelectedOptionStyles,
 } from '../../styles/ComponentsStyles';
-import { ParentEntityMetadata } from '../EditableGrid/GridCell';
-
-export interface ILookupProps {
-  fieldName: string;
-  value: ITag | undefined;
-  parentEntityMetadata: ParentEntityMetadata | undefined;
-  _onChange: Function;
-  _onDoubleClick: Function;
-  isRequired: boolean;
-}
+import { ILookupProps } from '../../utils/types';
 
 const MAX_NUMBER_OF_OPTIONS = 100;
 const SINGLE_CLICK_CODE = 1;
 
 export const LookupFormat = memo(
-  ({ fieldName, value, parentEntityMetadata,
+  ({ _service, fieldName, value, parentEntityMetadata,
     isRequired, _onChange, _onDoubleClick }: ILookupProps) => {
     const picker = React.useRef(null);
 
@@ -83,7 +73,7 @@ export const LookupFormat = memo(
         onMenuClick={() => onChange(undefined)}
         onClick={(event: any) => {
           if (event.detail === SINGLE_CLICK_CODE) {
-            openForm(currentOption[0].key.toString(),
+            _service.openForm(currentOption[0].key.toString(),
               currentLookup?.reference?.entityNameRef);
           }
         }}

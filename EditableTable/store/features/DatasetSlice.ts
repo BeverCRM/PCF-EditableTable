@@ -1,20 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Row, isNewRow } from '../../mappers/dataSetMapper';
-import { getReqirementLevel } from '../../services/DataverseService';
-import { RootState } from '../store';
+import { AsyncThunkConfig, IDataverseService, RequirementLevel, Updates } from '../../utils/types';
 
-type Updates = {
-  rowKey: string;
-  columnName: string;
-  newValue: any;
-}
-
-export type RequirementLevel = {
-  fieldName: string;
-  isRequired: boolean;
-}
-
-interface IDatasetState {
+export interface IDatasetState {
   rows: Row[],
   newRows: Row[],
   requirementLevels: RequirementLevel[]
@@ -26,14 +14,15 @@ const initialState: IDatasetState = {
   requirementLevels: [],
 };
 
-type AsyncThunkConfig = {
-  state: RootState,
-};
+type DatasetPayload = {
+  columnKeys: string[],
+  _service: IDataverseService,
+}
 
-export const setRequirementLevels = createAsyncThunk<any[], string[], AsyncThunkConfig>(
+export const setRequirementLevels = createAsyncThunk<any[], DatasetPayload, AsyncThunkConfig>(
   'dataset/setRequirementLevels',
-  async columnKeys => await Promise.all(columnKeys.map(async columnKey => {
-    const isRequired = await getReqirementLevel(columnKey) !== 'None';
+  async payload => await Promise.all(payload.columnKeys.map(async columnKey => {
+    const isRequired = await payload._service.getReqirementLevel(columnKey) !== 'None';
     return { fieldName: columnKey, isRequired };
   })),
 );

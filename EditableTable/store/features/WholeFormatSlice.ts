@@ -1,14 +1,8 @@
 import { IComboBoxOption } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import {
-  getTimeZoneDefinitions,
-  getProvisionedLanguages,
-  openErrorDialog,
-} from '../../services/DataverseService';
-import store from '../store';
-import { setLoading } from './LoadingSlice';
+import { IDataverseService } from '../../utils/types';
 
-interface IWholeFormatState {
+export interface IWholeFormatState {
   timezones: IComboBoxOption[];
   languages: IComboBoxOption[]
 }
@@ -18,18 +12,18 @@ const initialState: IWholeFormatState = {
   languages: [],
 };
 
-export const getTimeZones = createAsyncThunk(
+export const getTimeZones = createAsyncThunk<IComboBoxOption[], IDataverseService>(
   'wholeFormat/getTimeZones',
-  async () => {
-    const timezones = await getTimeZoneDefinitions();
+  async _service => {
+    const timezones = await _service.getTimeZoneDefinitions();
     return timezones;
   },
 );
 
-export const getLanguages = createAsyncThunk(
+export const getLanguages = createAsyncThunk<IComboBoxOption[], IDataverseService>(
   'wholeFormat/getLanguages',
-  async () => {
-    const languages = await getProvisionedLanguages();
+  async _service => {
+    const languages = await _service.getProvisionedLanguages();
     return languages;
   },
 );
@@ -44,20 +38,8 @@ const WholeFormatSlice = createSlice({
       state.timezones = [...action.payload];
     });
 
-    builder.addCase(getTimeZones.rejected, (state, action) => {
-      openErrorDialog(action.error).then(() => {
-        store.dispatch(setLoading(false));
-      });
-    });
-
     builder.addCase(getLanguages.fulfilled, (state, action) => {
       state.languages = [...action.payload];
-    });
-
-    builder.addCase(getLanguages.rejected, (state, action) => {
-      openErrorDialog(action.error).then(() => {
-        store.dispatch(setLoading(false));
-      });
     });
   },
 });

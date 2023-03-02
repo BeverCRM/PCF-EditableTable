@@ -27,18 +27,10 @@ import {
 } from '../../utils/dateTimeUtils';
 import { formatDateShort, formatUserDateTimeToUTC } from '../../utils/formattingUtils';
 import { timesList } from './timeList';
+import { IDatePickerProps } from '../../utils/types';
 
-export interface IDatePickerProps {
-  fieldName: string,
-  dateOnly: boolean,
-  value: string | null,
-  _onChange: any,
-  _onDoubleClick: Function;
-  isRequired: boolean;
-}
-
-export const DateTimeFormat = memo((
-  { fieldName, dateOnly, value, isRequired, _onChange, _onDoubleClick }: IDatePickerProps) => {
+export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
+  isRequired, _onChange, _onDoubleClick, _service }: IDatePickerProps) => {
   let currentDate = value ? new Date(value) : undefined;
   let timeKey: string | number | undefined;
   const options = timesList;
@@ -71,12 +63,12 @@ export const DateTimeFormat = memo((
     if (currentDateTime !== undefined) {
       if (dateBehavior === 'TimeZoneIndependent') {
         _onChange(`${getDateFormatWithHyphen(currentDateTime)}T${key ?? '00:00'}:00Z`,
-          formatDateShort(currentDateTime, true));
+          formatDateShort(_service, currentDateTime, true));
       }
       else {
-        const dateInUTC = new Date(formatUserDateTimeToUTC(currentDateTime, 1));
+        const dateInUTC = new Date(formatUserDateTimeToUTC(_service, currentDateTime, 1));
         _onChange(`${getDateFormatWithHyphen(dateInUTC)}T${getTimeKeyFromDate(dateInUTC)}:00Z`,
-          formatDateShort(currentDateTime, true));
+          formatDateShort(_service, currentDateTime, true));
       }
     }
   };

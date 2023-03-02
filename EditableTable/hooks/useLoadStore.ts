@@ -11,6 +11,7 @@ import { useAppDispatch } from '../store/hooks';
 
 import { mapDataSetColumns, mapDataSetRows } from '../mappers/dataSetMapper';
 import { setRequirementLevels } from '../store/features/DatasetSlice';
+import { IDataverseService } from '../utils/types';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
@@ -20,11 +21,11 @@ export type Field = {
   data: string | undefined,
 }
 
-export const useLoadStore = (dataset: DataSet) => {
+export const useLoadStore = (dataset: DataSet, _service: IDataverseService) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const columns = mapDataSetColumns(dataset);
+    const columns = mapDataSetColumns(dataset, _service);
     const datasetRows = mapDataSetRows(dataset);
 
     const columnKeys = columns.map(column => column.key);
@@ -39,42 +40,55 @@ export const useLoadStore = (dataset: DataSet) => {
 
     const lookupColumns = getColumnsOfType(['Lookup.Simple']);
     if (lookupColumns.length > 0) {
-      dispatch(setRelationships()).unwrap()
+      dispatch(setRelationships(_service)).unwrap()
         .then(() => {
-          dispatch(setLookups(lookupColumns));
-        });
+          dispatch(setLookups({ lookupColumns, _service })).unwrap()
+            .catch(error =>
+              _service.openErrorDialog(error).then(() => {
+                dispatch(setLoading(false));
+              }));
+        })
+        .catch(error =>
+          _service.openErrorDialog(error).then(() => {
+            dispatch(setLoading(false));
+          }));
     }
 
-    const dropdownColumns = getColumnsOfType(['OptionSet', 'TwoOptions', 'MultiSelectPicklist']);
-    if (dropdownColumns.length > 0) {
-      dispatch(getDropdownsOptions(dropdownColumns));
+    const dropdownFields = getColumnsOfType(['OptionSet', 'TwoOptions', 'MultiSelectPicklist']);
+    if (dropdownFields.length > 0) {
+      dispatch(getDropdownsOptions({ dropdownFields, _service })).unwrap()
+        .catch(error =>
+          _service.openErrorDialog(error).then(() => {
+            dispatch(setLoading(false));
+          }));
     }
 
-    const numberColumns = getColumnsOfType(['Decimal', 'Currency', 'FP', 'Whole.None']);
-    if (numberColumns.length > 0) {
-      dispatch(getNumberFieldsMetadata(numberColumns));
+    const numberFields = getColumnsOfType(['Decimal', 'Currency', 'FP', 'Whole.None']);
+    if (numberFields.length > 0) {
+      dispatch(getNumberFieldsMetadata({ numberFields, _service }));
 
-      if (numberColumns.some(numberColumn => numberColumn.data === 'Currency')) {
-        dispatch(getCurrencySymbols(datasetRows.map(row => row.key)));
+      if (numberFields.some(numberColumn => numberColumn.data === 'Currency')) {
+        const recordIds = datasetRows.map(row => row.key);
+        dispatch(getCurrencySymbols({ recordIds, _service }));
       }
     }
 
     const timezoneColumns = getColumnsOfType(['Whole.TimeZone']);
     if (timezoneColumns.length > 0) {
-      dispatch(getTimeZones());
+      dispatch(getTimeZones(_service));
     }
 
     const languageColumns = getColumnsOfType(['Whole.Language']);
     if (languageColumns.length > 0) {
-      dispatch(getLanguages());
+      dispatch(getLanguages(_service));
     }
 
-    const dateColumns = getColumnsOfType(['DateAndTime.DateAndTime', 'DateAndTime.DateOnly']);
-    if (dateColumns.length > 0) {
-      dispatch(getDateBehavior(dateColumns));
+    const dateFields = getColumnsOfType(['DateAndTime.DateAndTime', 'DateAndTime.DateOnly']);
+    if (dateFields.length > 0) {
+      dispatch(getDateBehavior({ dateFields, _service }));
     }
 
-    dispatch(setRequirementLevels(columnKeys));
+    dispatch(setRequirementLevels({ columnKeys, _service }));
 
     dispatch(setLoading(false));
   }, [dataset]);

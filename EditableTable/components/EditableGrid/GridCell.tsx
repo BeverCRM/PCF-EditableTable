@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { IColumn, TextField } from '@fluentui/react';
+import { TextField } from '@fluentui/react';
 
 import { LookupFormat } from '../InputComponents/LookupFormat';
 import { NumberFormat } from '../InputComponents/NumberFormat';
@@ -7,17 +7,12 @@ import { OptionSetFormat } from '../InputComponents/OptionSetFormat';
 import { DateTimeFormat } from '../InputComponents/DateTimeFormat';
 import { WholeFormat } from '../InputComponents/WholeFormat';
 
-import { Column, Row, isNewRow } from '../../mappers/dataSetMapper';
+import { Column, isNewRow } from '../../mappers/dataSetMapper';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { updateRow } from '../../store/features/DatasetSlice';
 import { setChangedRecords } from '../../store/features/RecordSlice';
-import { getParentMetadata, openForm } from '../../services/DataverseService';
 import { textFieldStyles } from '../../styles/ComponentsStyles';
-
-interface IGridSetProps {
-  row: Row,
-  currentColumn: IColumn,
-}
+import { IGridSetProps } from '../../utils/types';
 
 export type ParentEntityMetadata = {
   entityId: string,
@@ -25,7 +20,7 @@ export type ParentEntityMetadata = {
   entityTypeName: string
 };
 
-export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
+export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
   const dispatch = useAppDispatch();
   const fieldsRequirementLevels = useAppSelector(state => state.dataset.requirementLevels);
 
@@ -53,13 +48,14 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
 
   let parentEntityMetadata: ParentEntityMetadata | undefined;
   if (isNewRow(row)) {
-    parentEntityMetadata = getParentMetadata();
+    parentEntityMetadata = _service.getParentMetadata();
   }
 
   const props = { fieldName: currentColumn?.fieldName ? currentColumn?.fieldName : '',
     isRequired,
     _onChange: _changedValue,
-    _onDoubleClick: useCallback(() => openForm(row.key), []),
+    _onDoubleClick: useCallback(() => _service.openForm(row.key), []),
+    _service,
   };
 
   if (currentColumn !== undefined && cell !== undefined) {
@@ -68,7 +64,7 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
         return <TextField value={cell.formattedValue}
           styles={textFieldStyles(isRequired)}
           required={isRequired}
-          onDoubleClick={() => openForm(row.key)}
+          onDoubleClick={() => _service.openForm(row.key)}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
             newValue?: string) => _changedValue(newValue || '')} />;
 
@@ -119,7 +115,7 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
           styles={textFieldStyles(isRequired)}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
             newValue?: string) => _changedValue(newValue || '')}
-          onDoubleClick={() => openForm(row.key)} />;
+          onDoubleClick={() => _service.openForm(row.key)} />;
 
       default:
         return <TextField value={cell.formattedValue}
@@ -127,7 +123,7 @@ export const GridCell = ({ row, currentColumn }: IGridSetProps) => {
           styles={textFieldStyles(isRequired)}
           onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
             newValue?: string) => _changedValue(newValue || '')}
-          onDoubleClick={() => openForm(row.key)}/>;
+          onDoubleClick={() => _service.openForm(row.key)}/>;
     }
   }
 

@@ -1,26 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Field } from '../../hooks/useLoadStore';
-import {
-  getNumberFieldMetadata,
-  getCurrencySymbol,
-  openErrorDialog,
-} from '../../services/DataverseService';
-import store from '../store';
-import { setLoading } from './LoadingSlice';
+import { CurrencySymbol, IDataverseService, NumberFieldMetadata } from '../../utils/types';
 
-export type NumberFieldMetadata = {
-  fieldName: string,
-  precision: number,
-  minValue: number,
-  maxValue: number,
-}
-
-export type CurrencySymbol = {
-  recordId: string,
-  symbol: string
-}
-
-interface INumberState {
+export interface INumberState {
   numberFieldsMetadata: NumberFieldMetadata[],
   currencySymbols: CurrencySymbol[]
 }
@@ -29,11 +11,17 @@ const initialState: INumberState = {
   numberFieldsMetadata: [],
   currencySymbols: [],
 };
+type NumberPayload = {
+  numberFields: Field[],
+  _service: IDataverseService,
+};
 
-export const getNumberFieldsMetadata = createAsyncThunk<NumberFieldMetadata[], Field[]>(
+type CurrencyPayload = { recordIds: string[], _service: IDataverseService };
+
+export const getNumberFieldsMetadata = createAsyncThunk<NumberFieldMetadata[], NumberPayload>(
   'number/getNumberFieldsMetadata',
-  async numberFields =>
-    await Promise.all(numberFields.map(async numberField => {
+  async payload =>
+    await Promise.all(payload.numberFields.map(async numberField => {
       let attributeType, selection: string;
 
       switch (numberField.data) {
@@ -57,7 +45,7 @@ export const getNumberFieldsMetadata = createAsyncThunk<NumberFieldMetadata[], F
           selection = 'MaxValue,MinValue';
       }
 
-      const currentNumber = await getNumberFieldMetadata(
+      const currentNumber = await payload._service.getNumberFieldMetadata(
         numberField.fieldName!,
         attributeType,
         selection);
@@ -65,11 +53,11 @@ export const getNumberFieldsMetadata = createAsyncThunk<NumberFieldMetadata[], F
     })),
 );
 
-export const getCurrencySymbols = createAsyncThunk<CurrencySymbol[], string[]>(
+export const getCurrencySymbols = createAsyncThunk<CurrencySymbol[], CurrencyPayload>(
   'number/getCurrencySymbols',
-  async recordIds =>
-    await Promise.all(recordIds.map(async recordId => {
-      const currencySymbol = await getCurrencySymbol(recordId);
+  async payload =>
+    await Promise.all(payload.recordIds.map(async recordId => {
+      const currencySymbol = await payload._service.getCurrencySymbol(recordId);
       return <CurrencySymbol>{
         recordId,
         symbol: currencySymbol,
@@ -86,11 +74,8 @@ const NumberSlice = createSlice({
       state.numberFieldsMetadata = [...action.payload];
     });
 
-    builder.addCase(getNumberFieldsMetadata.rejected, (state, action) => {
+    builder.addCase(getNumberFieldsMetadata.rejected, state => {
       state.numberFieldsMetadata = [];
-      openErrorDialog(action.error).then(() => {
-        store.dispatch(setLoading(false));
-      });
     });
 
     builder.addCase(getCurrencySymbols.fulfilled, (state, action) => {

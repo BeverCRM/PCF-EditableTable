@@ -1,29 +1,8 @@
-import { ITag } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Field } from '../../hooks/useLoadStore';
-import {
-  getLookupOptions,
-  getRelationships,
-  getEntityPluralName,
-  openErrorDialog,
-} from '../../services/DataverseService';
-import store, { RootState } from '../store';
-import { setLoading } from './LoadingSlice';
+import { AsyncThunkConfig, IDataverseService, Lookup, Relationship } from '../../utils/types';
 
-export type Relationship = {
-  fieldNameRef: string,
-  entityNameRef: string,
-  entityNavigation?: string
-}
-
-export type Lookup = {
-  logicalName: string | undefined,
-  reference: Relationship | undefined,
-  entityPluralName: string | undefined,
-  options: ITag[]
-}
-
-interface ILookupState {
+export interface ILookupState {
   relationships: Relationship[],
   lookups: Lookup[]
 }
@@ -33,18 +12,19 @@ const initialState: ILookupState = {
   lookups: [],
 };
 
-type AsyncThunkConfig = {
-  state: RootState
+type LookupPayload = {
+  lookupColumns: Field[],
+  _service: IDataverseService
 };
 
-export const setRelationships = createAsyncThunk(
-  'lookup/setRelationships', async () => await getRelationships(),
+export const setRelationships = createAsyncThunk<Relationship[], IDataverseService>(
+  'lookup/setRelationships', async _service => await _service.getRelationships(),
 );
 
-export const setLookups = createAsyncThunk<Lookup[], Field[], AsyncThunkConfig>(
+export const setLookups = createAsyncThunk<Lookup[], LookupPayload, AsyncThunkConfig>(
   'lookup/setLookups',
-  async (lookupColumns, thunkApi) =>
-    await Promise.all(lookupColumns.map(async lookupColumn => {
+  async (payload, thunkApi) =>
+    await Promise.all(payload.lookupColumns.map(async lookupColumn => {
       const { relationships } = thunkApi.getState().lookup;
       const { fieldName } = lookupColumn;
 
@@ -56,8 +36,8 @@ export const setLookups = createAsyncThunk<Lookup[], Field[], AsyncThunkConfig>(
         });
 
       const entityName = relationship?.entityNameRef ?? '';
-      const entityPluralName = await getEntityPluralName(entityName);
-      const options = await getLookupOptions(entityName);
+      const entityPluralName = await payload._service.getEntityPluralName(entityName);
+      const options = await payload._service.getLookupOptions(entityName);
 
       return <Lookup>{
         logicalName: fieldName,
@@ -77,21 +57,16 @@ export const lookupSlice = createSlice({
       state.relationships = [...action.payload];
     });
 
-    builder.addCase(setRelationships.rejected, (state, action) => {
+    builder.addCase(setRelationships.rejected, state => {
       state.relationships = [];
-      openErrorDialog(action.error).then(() => {
-        store.dispatch(setLoading(false));
-      });
     });
 
     builder.addCase(setLookups.fulfilled, (state, action) => {
       state.lookups = [...action.payload];
     });
 
-    builder.addCase(setLookups.rejected, (state, action) => {
-      openErrorDialog(action.error).then(() => {
-        store.dispatch(setLoading(false));
-      });
+    builder.addCase(setLookups.rejected, state => {
+      state.lookups = [];
     });
   },
 });

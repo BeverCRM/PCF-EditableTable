@@ -3,18 +3,10 @@ import React, { memo } from 'react';
 import { useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, numberFormatStyles } from '../../styles/ComponentsStyles';
 import { formatCurrency, formatDecimal, formatNumber } from '../../utils/formattingUtils';
-
-export interface INumberProps {
-  fieldName: string | undefined;
-  value: string;
-  rowId?: string;
-  _onChange: Function;
-  _onDoubleClick: Function;
-  isRequired: boolean;
-}
+import { INumberProps } from '../../utils/types';
 
 export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
-  _onChange, _onDoubleClick } : INumberProps) => {
+  _onChange, _onDoubleClick, _service } : INumberProps) => {
   const numbers = useAppSelector(state => state.number.numberFieldsMetadata);
   const currencySymbols = useAppSelector(state => state.number.currencySymbols);
 
@@ -26,8 +18,8 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
 
     const numberValue = formatNumber(value);
     return currentCurrency
-      ? formatCurrency(numberValue, currentNumber?.precision, currentCurrency?.symbol)
-      : formatDecimal(numberValue, currentNumber?.precision);
+      ? formatCurrency(_service, numberValue, currentNumber?.precision, currentCurrency?.symbol)
+      : formatDecimal(_service, numberValue, currentNumber?.precision);
   };
 
   const onNumberChange = (event: React.SyntheticEvent<HTMLElement>, newValue?: string) => {

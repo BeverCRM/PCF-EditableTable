@@ -1,15 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Field } from '../../hooks/useLoadStore';
-import { getDateMetadata, openErrorDialog } from '../../services/DataverseService';
-import store from '../store';
-import { setLoading } from './LoadingSlice';
+import { DateMetadata, IDataverseService } from '../../utils/types';
 
-type DateMetadata = {
-  fieldName: string,
-  dateBehavior: string
-}
-
-interface IDateState {
+export interface IDateState {
   dates: DateMetadata[]
 }
 
@@ -17,11 +10,16 @@ const initialState: IDateState = {
   dates: [],
 };
 
-export const getDateBehavior = createAsyncThunk<DateMetadata[], Field[]>(
+type DateBehaviorPayload = {
+  dateFields: Field[],
+  _service: IDataverseService
+};
+
+export const getDateBehavior = createAsyncThunk<DateMetadata[], DateBehaviorPayload>(
   'date/getDateBehavior',
-  async dateFields =>
-    await Promise.all(dateFields.map(async date => {
-      const behavior = await getDateMetadata(date.key);
+  async payload =>
+    await Promise.all(payload.dateFields.map(async date => {
+      const behavior = await payload._service.getDateMetadata(date.key);
 
       return {
         fieldName: date.key,
@@ -39,11 +37,8 @@ export const dateSlice = createSlice({
       state.dates = [...action.payload];
     });
 
-    builder.addCase(getDateBehavior.rejected, (state, action) => {
+    builder.addCase(getDateBehavior.rejected, state => {
       state.dates.push({ fieldName: '', dateBehavior: '' });
-      openErrorDialog(action.error).then(() => {
-        store.dispatch(setLoading(false));
-      });
     });
   },
 });

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface ILoadingState {
+export interface ILoadingState {
   isLoading: boolean
 }
 
