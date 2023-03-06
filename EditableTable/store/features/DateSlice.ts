@@ -1,6 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Field } from '../../hooks/useLoadStore';
-import { DateMetadata, IDataverseService } from '../../utils/types';
+import { IDataverseService } from '../../utils/types';
+
+export type DateMetadata = {
+  fieldName: string,
+  dateBehavior: string
+}
 
 export interface IDateState {
   dates: DateMetadata[]

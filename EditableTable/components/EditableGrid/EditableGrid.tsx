@@ -33,7 +33,7 @@ import { Row, Column, mapDataSetColumns,
 import { _onRenderDetailsHeader } from '../../styles/RenderStyles';
 import { buttonStyles } from '../../styles/ButtonStyles';
 import { containerStackStyles, gridStyles } from '../../styles/DetailsListStyles';
-import { IDataSetProps } from '../../utils/types';
+import { IDataSetProps } from '../AppWrapper';
 
 export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: IDataSetProps) => {
   const { selection, selectedRecordIds } = useSelection();

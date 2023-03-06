@@ -1,6 +1,18 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Row } from '../../mappers/dataSetMapper';
-import { AsyncThunkConfig, IDataverseService, Record, RequirementLevel } from '../../utils/types';
+import { AsyncThunkConfig, IDataverseService } from '../../utils/types';
+import { RequirementLevel } from './DatasetSlice';
+
+export type Record = {
+  id: string;
+  data: [
+    {
+      fieldName: string,
+      newValue: any,
+      fieldType: string
+    }
+  ]
+};
 
 export interface IRecordState {
   changedRecords: Record[],

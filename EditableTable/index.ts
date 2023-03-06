@@ -3,15 +3,7 @@ import * as React from 'react';
 import { DataverseService } from './services/DataverseService';
 import { Wrapper } from './components/AppWrapper';
 import { IDataverseService, Store } from './utils/types';
-import { configureStore } from '@reduxjs/toolkit';
-import lookupReducer from './store/features/LookupSlice';
-import loadingReducer from './store/features/LoadingSlice';
-import recordReducer from './store/features/RecordSlice';
-import dropdownReducer from './store/features/DropdownSlice';
-import numberReducer from './store/features/NumberSlice';
-import wholeFormatReducer from './store/features/WholeFormatSlice';
-import dateReducer from './store/features/DateSlice';
-import datasetReducer from './store/features/DatasetSlice';
+import { callConfigureStore } from './store/store';
 
 export class EditableTable implements ComponentFramework.ReactControl<IInputs, IOutputs> {
   private notifyOutputChanged: () => void;
@@ -27,18 +19,7 @@ export class EditableTable implements ComponentFramework.ReactControl<IInputs, I
     this.notifyOutputChanged = notifyOutputChanged;
     this._service = new DataverseService(context);
     context.mode.trackContainerResize(true);
-    this._store = configureStore({
-      reducer: {
-        dataset: datasetReducer,
-        lookup: lookupReducer,
-        number: numberReducer,
-        dropdown: dropdownReducer,
-        loading: loadingReducer,
-        record: recordReducer,
-        wholeFormat: wholeFormatReducer,
-        date: dateReducer,
-      },
-    });
+    this._store = callConfigureStore();
   }
 
   public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {

@@ -1,6 +1,12 @@
+import { IDropdownOption } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Field } from '../../hooks/useLoadStore';
-import { DropdownField, IDataverseService } from '../../utils/types';
+import { IDataverseService } from '../../utils/types';
+
+export type DropdownField = {
+  fieldName: string,
+  options: IDropdownOption[]
+}
 
 export interface IDropdownState {
   dropdownFields: DropdownField[]

@@ -7,10 +7,21 @@ import {
   lookupFormatStyles,
   lookupSelectedOptionStyles,
 } from '../../styles/ComponentsStyles';
-import { ILookupProps } from '../../utils/types';
+import { IDataverseService } from '../../utils/types';
+import { ParentEntityMetadata } from '../EditableGrid/GridCell';
 
 const MAX_NUMBER_OF_OPTIONS = 100;
 const SINGLE_CLICK_CODE = 1;
+
+export interface ILookupProps {
+  fieldName: string;
+  value: ITag | undefined;
+  parentEntityMetadata: ParentEntityMetadata | undefined;
+  isRequired: boolean;
+  _onChange: Function;
+  _onDoubleClick: Function;
+  _service: IDataverseService;
+}
 
 export const LookupFormat = memo(
   ({ _service, fieldName, value, parentEntityMetadata,

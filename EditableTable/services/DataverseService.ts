@@ -1,7 +1,15 @@
 import { IInputs } from '../generated/ManifestTypes';
 import { IComboBoxOption, IDropdownOption, ITag } from '@fluentui/react';
 import { getFetchResponse } from '../utils/fetchUtils';
-import { IDataverseService, ParentMetadata, Record, Relationship } from '../utils/types';
+import { IDataverseService } from '../utils/types';
+import { Relationship } from '../store/features/LookupSlice';
+import { Record } from '../store/features/RecordSlice';
+
+export type ParentMetadata = {
+  entityId: string,
+  entityRecordName: string,
+  entityTypeName: string,
+}
 
 export class DataverseService implements IDataverseService {
   private _context: ComponentFramework.Context<IInputs>;

@@ -1,6 +1,17 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Row, isNewRow } from '../../mappers/dataSetMapper';
-import { AsyncThunkConfig, IDataverseService, RequirementLevel, Updates } from '../../utils/types';
+import { AsyncThunkConfig, IDataverseService } from '../../utils/types';
+
+export type RequirementLevel = {
+  fieldName: string;
+  isRequired: boolean;
+}
+
+export type Updates = {
+  rowKey: string;
+  columnName: string;
+  newValue: any;
+}
 
 export interface IDatasetState {
   rows: Row[],

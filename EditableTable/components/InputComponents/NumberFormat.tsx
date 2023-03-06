@@ -3,7 +3,17 @@ import React, { memo } from 'react';
 import { useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, numberFormatStyles } from '../../styles/ComponentsStyles';
 import { formatCurrency, formatDecimal, formatNumber } from '../../utils/formattingUtils';
-import { INumberProps } from '../../utils/types';
+import { IDataverseService } from '../../utils/types';
+
+export interface INumberProps {
+  fieldName: string | undefined;
+  value: string;
+  rowId?: string;
+  isRequired: boolean;
+  _onChange: Function;
+  _onDoubleClick: Function;
+  _service: IDataverseService;
+}
 
 export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
   _onChange, _onDoubleClick, _service } : INumberProps) => {

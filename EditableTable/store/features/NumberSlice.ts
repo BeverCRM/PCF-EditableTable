@@ -1,6 +1,18 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Field } from '../../hooks/useLoadStore';
-import { CurrencySymbol, IDataverseService, NumberFieldMetadata } from '../../utils/types';
+import { IDataverseService } from '../../utils/types';
+
+export type NumberFieldMetadata = {
+  fieldName: string,
+  precision: number,
+  minValue: number,
+  maxValue: number,
+}
+
+export type CurrencySymbol = {
+  recordId: string,
+  symbol: string
+}
 
 export interface INumberState {
   numberFieldsMetadata: NumberFieldMetadata[],

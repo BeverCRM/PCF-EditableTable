@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { TextField } from '@fluentui/react';
+import { IColumn, TextField } from '@fluentui/react';
 
 import { LookupFormat } from '../InputComponents/LookupFormat';
 import { NumberFormat } from '../InputComponents/NumberFormat';
@@ -7,12 +7,18 @@ import { OptionSetFormat } from '../InputComponents/OptionSetFormat';
 import { DateTimeFormat } from '../InputComponents/DateTimeFormat';
 import { WholeFormat } from '../InputComponents/WholeFormat';
 
-import { Column, isNewRow } from '../../mappers/dataSetMapper';
+import { Column, isNewRow, Row } from '../../mappers/dataSetMapper';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { updateRow } from '../../store/features/DatasetSlice';
 import { setChangedRecords } from '../../store/features/RecordSlice';
 import { textFieldStyles } from '../../styles/ComponentsStyles';
-import { IGridSetProps } from '../../utils/types';
+import { IDataverseService } from '../../utils/types';
+
+export interface IGridSetProps {
+  row: Row,
+  currentColumn: IColumn,
+  _service: IDataverseService;
+}
 
 export type ParentEntityMetadata = {
   entityId: string,

@@ -1,6 +1,20 @@
+import { ITag } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Field } from '../../hooks/useLoadStore';
-import { AsyncThunkConfig, IDataverseService, Lookup, Relationship } from '../../utils/types';
+import { AsyncThunkConfig, IDataverseService } from '../../utils/types';
+
+export type Relationship = {
+  fieldNameRef: string,
+  entityNameRef: string,
+  entityNavigation?: string
+}
+
+export type Lookup = {
+  logicalName: string | undefined,
+  reference: Relationship | undefined,
+  entityPluralName: string | undefined,
+  options: ITag[]
+}
 
 export interface ILookupState {
   relationships: Relationship[],

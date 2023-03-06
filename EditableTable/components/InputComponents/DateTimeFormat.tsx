@@ -27,7 +27,17 @@ import {
 } from '../../utils/dateTimeUtils';
 import { formatDateShort, formatUserDateTimeToUTC } from '../../utils/formattingUtils';
 import { timesList } from './timeList';
-import { IDatePickerProps } from '../../utils/types';
+import { IDataverseService } from '../../utils/types';
+
+export interface IDatePickerProps {
+  fieldName: string,
+  dateOnly: boolean,
+  value: string | null,
+  isRequired: boolean;
+  _onChange: any,
+  _onDoubleClick: Function;
+  _service: IDataverseService;
+}
 
 export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
   isRequired, _onChange, _onDoubleClick, _service }: IDatePickerProps) => {
