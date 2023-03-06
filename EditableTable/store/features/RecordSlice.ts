@@ -45,7 +45,7 @@ export const saveRecords = createAsyncThunk<void, IDataverseService, AsyncThunkC
     if (isRequiredFieldEmpty(requirementLevels, rows)) {
       return thunkApi.rejectWithValue({ message: 'All required fields must be filled in.' });
     }
-
+    _service.setParentValue();
     await Promise.all(changedRecords.map(record => _service.saveRecord(record)));
   },
 );
