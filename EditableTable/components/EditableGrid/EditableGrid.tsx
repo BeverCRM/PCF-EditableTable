@@ -30,20 +30,12 @@ import {
 
 import { Row, Column, mapDataSetColumns,
   mapDataSetRows, getColumnsTotalWidth } from '../../mappers/dataSetMapper';
-import { _onRenderDetailsHeader, _onRenderRow } from '../../styles/RenderStyles';
+import { _onRenderDetailsHeader } from '../../styles/RenderStyles';
 import { buttonStyles } from '../../styles/ButtonStyles';
-import { openForm } from '../../services/DataverseService';
 import { containerStackStyles, gridStyles } from '../../styles/DetailsListStyles';
+import { IDataSetProps } from '../AppWrapper';
 
-type DataSet = ComponentFramework.PropertyTypes.DataSet;
-
-export interface IDataSetProps {
-  dataset: DataSet;
-  isControlDisabled: boolean;
-  width: number;
-}
-
-export const EditableGrid = ({ dataset, isControlDisabled, width }: IDataSetProps) => {
+export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: IDataSetProps) => {
   const { selection, selectedRecordIds } = useSelection();
 
   const rows: Row[] = useAppSelector(state => state.dataset.rows);
@@ -51,7 +43,7 @@ export const EditableGrid = ({ dataset, isControlDisabled, width }: IDataSetProp
 
   const dispatch = useAppDispatch();
 
-  const columns = mapDataSetColumns(dataset);
+  const columns = mapDataSetColumns(dataset, _service);
 
   const refreshButtonHandler = () => {
     dispatch(setLoading(true));
@@ -75,21 +67,28 @@ export const EditableGrid = ({ dataset, isControlDisabled, width }: IDataSetProp
 
   const deleteButtonHandler = () => {
     dispatch(setLoading(true));
-    dispatch(deleteRecords(selectedRecordIds)).unwrap()
+    dispatch(deleteRecords({ recordIds: selectedRecordIds, _service })).unwrap()
       .then(selectedNewRecordIds => {
         dataset.refresh();
         dispatch(readdNewRowsAfterDelete(selectedNewRecordIds));
       })
-      .catch(() => dispatch(setLoading(false)));
+      .catch(error =>
+        _service.openErrorDialog(error).then(() => {
+          dispatch(setLoading(false));
+        }));
   };
 
   const saveButtonHandler = () => {
     dispatch(setLoading(true));
-    dispatch(saveRecords()).unwrap()
+    dispatch(saveRecords(_service)).unwrap()
       .then(() => {
         dataset.refresh();
         dispatch(removeNewRows());
-      });
+      })
+      .catch(error =>
+        _service.openErrorDialog(error).then(() => {
+          dispatch(setLoading(false));
+        }));
   };
 
   useEffect(() => {
@@ -102,12 +101,12 @@ export const EditableGrid = ({ dataset, isControlDisabled, width }: IDataSetProp
     dispatch(clearChangedRecords());
   }, [dataset]);
 
-  useLoadStore(dataset);
+  useLoadStore(dataset, _service);
 
   const _renderItemColumn = (item: Row, index: number | undefined, column: IColumn | undefined) =>
-    <GridCell row={item} currentColumn={column!} />;
+    <GridCell row={item} currentColumn={column!} _service={_service} />;
 
-  const _onItemInvoked = (item: any) => openForm(item.key);
+  const _onItemInvoked = (item: any) => _service.openForm(item.key);
 
   return <div className='container'>
     <Stack style={containerStackStyles(width, rows.length)} >
@@ -128,7 +127,10 @@ export const EditableGrid = ({ dataset, isControlDisabled, width }: IDataSetProp
           columns={columns}
           onRenderItemColumn={_renderItemColumn}
           selection={selection}
-          onRenderRow={_onRenderRow}
+          onRenderRow={ (props, defaultRender) =>
+            <div onDoubleClick={() => _service.openForm(props?.item.key)}>
+              {defaultRender!(props)}
+            </div> }
           onRenderDetailsHeader={_onRenderDetailsHeader}
           layoutMode={DetailsListLayoutMode.fixedColumns}
           styles={gridStyles(rows.length)}

@@ -8,7 +8,7 @@ import wholeFormatReducer from './features/WholeFormatSlice';
 import dateReducer from './features/DateSlice';
 import datasetReducer from './features/DatasetSlice';
 
-const store = configureStore({
+export const callConfigureStore = () => configureStore({
   reducer: {
     dataset: datasetReducer,
     lookup: lookupReducer,
@@ -20,8 +20,3 @@ const store = configureStore({
     date: dateReducer,
   },
 });
-
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
-
-export default store;

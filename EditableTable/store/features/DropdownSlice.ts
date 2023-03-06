@@ -1,16 +1,14 @@
 import { IDropdownOption } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Field } from '../../hooks/useLoadStore';
-import { getDropdownOptions, openErrorDialog } from '../../services/DataverseService';
-import store from '../store';
-import { setLoading } from './LoadingSlice';
+import { IDataverseService } from '../../services/DataverseService';
 
 export type DropdownField = {
   fieldName: string,
   options: IDropdownOption[]
 }
 
-interface IDropdownState {
+export interface IDropdownState {
   dropdownFields: DropdownField[]
 }
 
@@ -18,10 +16,11 @@ const initialState: IDropdownState = {
   dropdownFields: [],
 };
 
-export const getDropdownsOptions = createAsyncThunk<DropdownField[], Field[]>(
+export const getDropdownsOptions =
+createAsyncThunk<DropdownField[], {dropdownFields: Field[], _service: IDataverseService}>(
   'dropdown/getDropdownsOptions',
-  async dropdownFields =>
-    await Promise.all(dropdownFields.map(async dropdownField => {
+  async payload =>
+    await Promise.all(payload.dropdownFields.map(async dropdownField => {
       let attributeType: string;
       let isTwoOptions: boolean;
 
@@ -53,7 +52,7 @@ export const getDropdownsOptions = createAsyncThunk<DropdownField[], Field[]>(
           break;
       }
 
-      const currentDropdown = await getDropdownOptions(
+      const currentDropdown = await payload._service.getDropdownOptions(
         dropdownField.fieldName!,
         attributeType,
         isTwoOptions);
@@ -70,11 +69,8 @@ const DropdownSlice = createSlice({
       state.dropdownFields = [...action.payload];
     });
 
-    builder.addCase(getDropdownsOptions.rejected, (state, action) => {
+    builder.addCase(getDropdownsOptions.rejected, state => {
       state.dropdownFields = [];
-      openErrorDialog(action.error).then(() => {
-        store.dispatch(setLoading(false));
-      });
     });
   },
 });

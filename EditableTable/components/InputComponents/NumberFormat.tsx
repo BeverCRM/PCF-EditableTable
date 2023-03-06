@@ -1,5 +1,6 @@
 import { FontIcon, SpinButton, Stack } from '@fluentui/react';
 import React, { memo } from 'react';
+import { IDataverseService } from '../../services/DataverseService';
 import { useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, numberFormatStyles } from '../../styles/ComponentsStyles';
 import { formatCurrency, formatDecimal, formatNumber } from '../../utils/formattingUtils';
@@ -8,13 +9,14 @@ export interface INumberProps {
   fieldName: string | undefined;
   value: string;
   rowId?: string;
+  isRequired: boolean;
   _onChange: Function;
   _onDoubleClick: Function;
-  isRequired: boolean;
+  _service: IDataverseService;
 }
 
 export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
-  _onChange, _onDoubleClick } : INumberProps) => {
+  _onChange, _onDoubleClick, _service } : INumberProps) => {
   const numbers = useAppSelector(state => state.number.numberFieldsMetadata);
   const currencySymbols = useAppSelector(state => state.number.currencySymbols);
 
@@ -26,8 +28,8 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
 
     const numberValue = formatNumber(value);
     return currentCurrency
-      ? formatCurrency(numberValue, currentNumber?.precision, currentCurrency?.symbol)
-      : formatDecimal(numberValue, currentNumber?.precision);
+      ? formatCurrency(_service, numberValue, currentNumber?.precision, currentCurrency?.symbol)
+      : formatDecimal(_service, numberValue, currentNumber?.precision);
   };
 
   const onNumberChange = (event: React.SyntheticEvent<HTMLElement>, newValue?: string) => {

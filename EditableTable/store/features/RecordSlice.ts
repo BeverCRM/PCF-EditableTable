@@ -1,14 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Row } from '../../mappers/dataSetMapper';
-import {
-  deleteRecord,
-  openRecordDeleteDialog,
-  saveRecord,
-  openErrorDialog,
-} from '../../services/DataverseService';
-import store, { RootState } from '../store';
+import { IDataverseService } from '../../services/DataverseService';
+import { AsyncThunkConfig } from '../../utils/types';
 import { RequirementLevel } from './DatasetSlice';
-import { setLoading } from './LoadingSlice';
 
 export type Record = {
   id: string;
@@ -19,15 +13,9 @@ export type Record = {
       fieldType: string
     }
   ]
-}
+};
 
-export type ParentMetadata = {
-  entityId: string,
-  entityRecordName: string,
-  entityTypeName: string,
-}
-
-interface IRecordState {
+export interface IRecordState {
   changedRecords: Record[],
   isPendingSave: boolean,
 }
@@ -37,8 +25,9 @@ const initialState: IRecordState = {
   isPendingSave: false,
 };
 
-type AsyncThunkConfig = {
-  state: RootState,
+type DeleteRecordPayload = {
+  recordIds: string[],
+  _service: IDataverseService,
 };
 
 const isRequiredFieldEmpty = (requirementLevels: RequirementLevel[], rows: Row[]) =>
@@ -47,9 +36,9 @@ const isRequiredFieldEmpty = (requirementLevels: RequirementLevel[], rows: Row[]
       requirementLevels.find(requirementLevel =>
         requirementLevel.fieldName === column.schemaName)?.isRequired && !column.rawValue));
 
-export const saveRecords = createAsyncThunk<void, undefined, AsyncThunkConfig>(
+export const saveRecords = createAsyncThunk<void, IDataverseService, AsyncThunkConfig>(
   'record/saveRecords',
-  async (a, thunkApi) => {
+  async (_service, thunkApi) => {
     const { changedRecords } = thunkApi.getState().record;
     const { requirementLevels, rows } = thunkApi.getState().dataset;
 
@@ -57,19 +46,19 @@ export const saveRecords = createAsyncThunk<void, undefined, AsyncThunkConfig>(
       return thunkApi.rejectWithValue({ message: 'All required fields must be filled in.' });
     }
 
-    await Promise.all(changedRecords.map(record => saveRecord(record)));
+    await Promise.all(changedRecords.map(record => _service.saveRecord(record)));
   },
 );
 
-export const deleteRecords = createAsyncThunk<string[], string[], AsyncThunkConfig>(
+export const deleteRecords = createAsyncThunk<string[], DeleteRecordPayload, AsyncThunkConfig>(
   'record/deleteRecords',
-  async (recordIds, thunkApi) => {
-    const newRecordIds = recordIds.filter(id => id.length < 15);
+  async (payload, thunkApi) => {
+    const newRecordIds = payload.recordIds.filter(id => id.length < 15);
 
-    const response = await openRecordDeleteDialog();
+    const response = await payload._service.openRecordDeleteDialog();
     if (response.confirmed) {
-      await Promise.all(recordIds.map(async id => {
-        if (id.length > 15) await deleteRecord(id);
+      await Promise.all(payload.recordIds.map(async id => {
+        if (id.length > 15) await payload._service.deleteRecord(id);
       }));
 
       return thunkApi.fulfillWithValue(newRecordIds);
@@ -129,24 +118,10 @@ const RecordSlice = createSlice({
       state.isPendingSave = false;
     });
 
-    builder.addCase(saveRecords.rejected, (state, action) => {
-      openErrorDialog(action.payload || action.error).then(() => {
-        store.dispatch(setLoading(false));
-      });
-    });
-
     builder.addCase(deleteRecords.fulfilled, (state, action) => {
       const recordsToRemove = new Set(action.payload);
       state.changedRecords = state.changedRecords.filter(record =>
         !recordsToRemove.has(record.id));
-    });
-
-    builder.addCase(deleteRecords.rejected, (state, action) => {
-      if (action.payload) {
-        openErrorDialog(action.error).then(() => {
-          store.dispatch(setLoading(false));
-        });
-      }
     });
   },
 });
