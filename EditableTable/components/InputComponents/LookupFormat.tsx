@@ -1,13 +1,13 @@
 import { DefaultButton, FontIcon } from '@fluentui/react';
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
 import React, { memo } from 'react';
+import { IDataverseService } from '../../services/DataverseService';
 import { useAppSelector } from '../../store/hooks';
 import {
   asteriskClassStyle,
   lookupFormatStyles,
   lookupSelectedOptionStyles,
 } from '../../styles/ComponentsStyles';
-import { IDataverseService } from '../../utils/types';
 import { ParentEntityMetadata } from '../EditableGrid/GridCell';
 
 const MAX_NUMBER_OF_OPTIONS = 100;

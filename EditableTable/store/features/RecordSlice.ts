@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Row } from '../../mappers/dataSetMapper';
-import { AsyncThunkConfig, IDataverseService } from '../../utils/types';
+import { IDataverseService } from '../../services/DataverseService';
+import { AsyncThunkConfig } from '../../utils/types';
 import { RequirementLevel } from './DatasetSlice';
 
 export type Record = {

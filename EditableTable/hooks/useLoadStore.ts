@@ -11,7 +11,7 @@ import { useAppDispatch } from '../store/hooks';
 
 import { mapDataSetColumns, mapDataSetRows } from '../mappers/dataSetMapper';
 import { setRequirementLevels } from '../store/features/DatasetSlice';
-import { IDataverseService } from '../utils/types';
+import { IDataverseService } from '../services/DataverseService';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 

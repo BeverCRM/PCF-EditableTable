@@ -1,5 +1,5 @@
 import { IColumn, ITag } from '@fluentui/react';
-import { IDataverseService } from '../utils/types';
+import { IDataverseService } from '../services/DataverseService';
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
 export type Row = {

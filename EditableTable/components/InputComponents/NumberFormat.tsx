@@ -1,9 +1,9 @@
 import { FontIcon, SpinButton, Stack } from '@fluentui/react';
 import React, { memo } from 'react';
+import { IDataverseService } from '../../services/DataverseService';
 import { useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, numberFormatStyles } from '../../styles/ComponentsStyles';
 import { formatCurrency, formatDecimal, formatNumber } from '../../utils/formattingUtils';
-import { IDataverseService } from '../../utils/types';
 
 export interface INumberProps {
   fieldName: string | undefined;

@@ -1,7 +1,8 @@
 import { ITag } from '@fluentui/react';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Field } from '../../hooks/useLoadStore';
-import { AsyncThunkConfig, IDataverseService } from '../../utils/types';
+import { IDataverseService } from '../../services/DataverseService';
+import { AsyncThunkConfig } from '../../utils/types';
 
 export type Relationship = {
   fieldNameRef: string,

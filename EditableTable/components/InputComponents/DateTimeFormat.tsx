@@ -27,7 +27,7 @@ import {
 } from '../../utils/dateTimeUtils';
 import { formatDateShort, formatUserDateTimeToUTC } from '../../utils/formattingUtils';
 import { timesList } from './timeList';
-import { IDataverseService } from '../../utils/types';
+import { IDataverseService } from '../../services/DataverseService';
 
 export interface IDatePickerProps {
   fieldName: string,

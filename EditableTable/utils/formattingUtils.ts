@@ -1,4 +1,4 @@
-import { IDataverseService } from './types';
+import { IDataverseService } from '../services/DataverseService';
 
 export const formatNumber = (value: string) => Number(value.replace(/[^0-9.-]+/g, ''));
 

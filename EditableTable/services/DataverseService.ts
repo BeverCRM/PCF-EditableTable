@@ -1,14 +1,45 @@
 import { IInputs } from '../generated/ManifestTypes';
 import { IComboBoxOption, IDropdownOption, ITag } from '@fluentui/react';
 import { getFetchResponse } from '../utils/fetchUtils';
-import { IDataverseService } from '../utils/types';
 import { Relationship } from '../store/features/LookupSlice';
 import { Record } from '../store/features/RecordSlice';
+import { DropdownField } from '../store/features/DropdownSlice';
+import { NumberFieldMetadata } from '../store/features/NumberSlice';
 
 export type ParentMetadata = {
   entityId: string,
   entityRecordName: string,
   entityTypeName: string,
+}
+export type Entity = ComponentFramework.WebApi.Entity;
+
+export interface IDataverseService {
+  getEntityPluralName(entityName: string): Promise<string>;
+  getParentMetadata(): ParentMetadata;
+  setParentValue(): Promise<void>;
+  openForm(id: string, entityName?: string): void;
+  createNewRecord(data: {}): Promise<void>;
+  retrieveAllRecords(entityName: string, options: string): Promise<Entity[]>;
+  deleteRecord(recordId: string): Promise<void>;
+  openRecordDeleteDialog(): Promise<ComponentFramework.NavigationApi.ConfirmDialogResponse>;
+  openErrorDialog(error: any): Promise<void>;
+  getFieldSchemaName(): Promise<string>;
+  parentFieldIsValid(record: Record, subgridParentFieldName: string | undefined): boolean;
+  saveRecord(record: Record): Promise<void>;
+  getRelationships(): Promise<Relationship[]>;
+  getLookupOptions(entityName: string): Promise<ITag[]>;
+  getDropdownOptions(fieldName: string, attributeType: string, isTwoOptions: boolean):
+    Promise<DropdownField>;
+  getNumberFieldMetadata(fieldName: string, attributeType: string, selection: string):
+    Promise<NumberFieldMetadata>;
+  getCurrencySymbol(recordId: string): Promise<string>;
+  getTimeZoneDefinitions(): Promise<IComboBoxOption[]>;
+  getProvisionedLanguages(): Promise<IComboBoxOption[]>;
+  getDateMetadata(fieldName: string): Promise<any>;
+  getTargetEntityType(): string;
+  getContext(): ComponentFramework.Context<IInputs>;
+  getAllocatedWidth(): number;
+  getReqirementLevel(fieldName: string): Promise<any>;
 }
 
 export class DataverseService implements IDataverseService {

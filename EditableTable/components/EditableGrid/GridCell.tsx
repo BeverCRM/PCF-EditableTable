@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { updateRow } from '../../store/features/DatasetSlice';
 import { setChangedRecords } from '../../store/features/RecordSlice';
 import { textFieldStyles } from '../../styles/ComponentsStyles';
-import { IDataverseService } from '../../utils/types';
+import { IDataverseService } from '../../services/DataverseService';
 
 export interface IGridSetProps {
   row: Row,

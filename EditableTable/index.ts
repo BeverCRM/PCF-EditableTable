@@ -1,8 +1,8 @@
 import { IInputs, IOutputs } from './generated/ManifestTypes';
 import * as React from 'react';
-import { DataverseService } from './services/DataverseService';
+import { DataverseService, IDataverseService } from './services/DataverseService';
 import { Wrapper } from './components/AppWrapper';
-import { IDataverseService, Store } from './utils/types';
+import { Store } from './utils/types';
 import { callConfigureStore } from './store/store';
 
 export class EditableTable implements ComponentFramework.ReactControl<IInputs, IOutputs> {
