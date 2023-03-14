@@ -34,7 +34,8 @@ const isRequiredFieldEmpty = (requirementLevels: RequirementLevel[], rows: Row[]
   rows.some(row =>
     row.columns.some(column =>
       requirementLevels.find(requirementLevel =>
-        requirementLevel.fieldName === column.schemaName)?.isRequired && !column.rawValue));
+        requirementLevel.fieldName === column.schemaName)?.isRequired && !column.rawValue &&
+        column.type !== 'Lookup.Customer'));
 
 export const saveRecords = createAsyncThunk<void, IDataverseService, AsyncThunkConfig>(
   'record/saveRecords',

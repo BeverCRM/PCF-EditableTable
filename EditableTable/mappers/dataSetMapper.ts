@@ -12,6 +12,7 @@ export type Column = {
   formattedValue: string,
   rawValue: string | null,
   lookup?: ITag,
+  type: string,
 };
 
 const SELECTION_WIDTH = 48;
@@ -69,6 +70,7 @@ export const mapDataSetRows = (dataset: DataSet): Row[] =>
           key: (record.getValue(column.name) as ComponentFramework.EntityReference)?.id?.guid,
         }
         : undefined,
+      type: column.dataType,
     }));
 
     return {

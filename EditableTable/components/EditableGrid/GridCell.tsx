@@ -84,6 +84,14 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
         return <LookupFormat value={cell.lookup} parentEntityMetadata={parentEntityMetadata}
           {...props} />;
 
+      case 'Lookup.Customer':
+        return <TextField value={cell.formattedValue}
+          required={isRequired} readOnly
+          styles={textFieldStyles(isRequired)}
+          onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
+            newValue?: string) => _changedValue(newValue || '')}
+          onDoubleClick={() => _service.openForm(row.key)}/>;
+
       case 'OptionSet':
         return <OptionSetFormat value={cell.rawValue} isMultiple={false} {... props} />;
 
