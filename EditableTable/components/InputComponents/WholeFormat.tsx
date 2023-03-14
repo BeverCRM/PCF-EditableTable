@@ -2,17 +2,19 @@ import { ComboBox, FontIcon, IComboBox, IComboBoxOption, Stack } from '@fluentui
 import React, { memo } from 'react';
 import { useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, wholeFormatStyles } from '../../styles/ComponentsStyles';
+import { getDurationOption } from '../../utils/durationUtils';
 import { durationList } from './durationList';
 
 export interface IWholeFormatProps {
   value: string | null | undefined;
+  formattedValue?: string;
   type: string;
   _onChange: Function;
   _onDoubleClick: Function;
   isRequired: boolean;
 }
 
-export const WholeFormat = memo(({ value, type, _onChange, isRequired,
+export const WholeFormat = memo(({ value, formattedValue, type, _onChange, isRequired,
   _onDoubleClick } : IWholeFormatProps) => {
   const wholeFormat = useAppSelector(state => state.wholeFormat);
 
@@ -28,11 +30,24 @@ export const WholeFormat = memo(({ value, type, _onChange, isRequired,
 
     case 'duration':
       options = durationList;
+      options.push({ key: value, text: formattedValue, hidden: true } as IComboBoxOption);
       break;
   }
 
-  const onChange = (event: React.FormEvent<IComboBox>, option?: IComboBoxOption): void => {
-    const key = option?.key;
+  const durationValidation = (value: string | undefined): string | undefined => {
+    if (type === 'duration' && value) {
+      const newOption = getDurationOption(value);
+      if (newOption) {
+        newOption.hidden = true;
+        options.push(newOption);
+        return newOption.key.toString();
+      }
+    }
+  };
+
+  const onChange = (event: React.FormEvent<IComboBox>, option?: IComboBoxOption,
+    index?: number | undefined, value?: string | undefined): void => {
+    const key = option?.key || durationValidation(value) || '';
     _onChange(key);
   };
 
@@ -44,6 +59,7 @@ export const WholeFormat = memo(({ value, type, _onChange, isRequired,
         selectedKey={value}
         styles={wholeFormatStyles(isRequired)}
         onDoubleClick={() => _onDoubleClick()}
+        allowFreeform={type === 'duration'}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
     </Stack>

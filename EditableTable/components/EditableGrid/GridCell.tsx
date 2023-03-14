@@ -107,7 +107,10 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
         return <NumberFormat value={cell.formattedValue ?? ''} {...props} />;
 
       case 'Whole.Duration':
-        return <WholeFormat value={cell.rawValue} type={'duration'} {...props} />;
+        return <WholeFormat
+          value={cell.rawValue}
+          formattedValue={cell.formattedValue}
+          type={'duration'} {...props} />;
 
       case 'Whole.Language':
         return <WholeFormat value={cell.rawValue} type={'language'} {...props} />;
