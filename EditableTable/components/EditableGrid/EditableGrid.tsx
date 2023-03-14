@@ -57,7 +57,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       schemaName: column.key,
       rawValue: '',
       formattedValue: '',
-      type: '',
+      type: column.data,
     }));
 
     dispatch(addNewRow({
