@@ -38,7 +38,6 @@ export const WholeFormat = memo(({ value, formattedValue, type, _onChange, isReq
     if (type === 'duration' && value) {
       const newOption = getDurationOption(value);
       if (newOption) {
-        newOption.hidden = true;
         options.push(newOption);
         return newOption.key.toString();
       }

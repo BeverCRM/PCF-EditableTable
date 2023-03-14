@@ -24,35 +24,6 @@ export const getDurationOption = (value: string) => {
       key = Math.round(number);
       optionText = key > 1 ? `${key} minutes` : `${key} minute`;
     }
-    return { text: optionText, key: key.toString() } as IComboBoxOption;
+    return { text: optionText, key: key.toString(), hidden: true } as IComboBoxOption;
   }
 };
-
-// export const getDurationOptionFromFormattedValue =
-// (value: string | null | undefined, formattedValue: string | undefined) =>
-// <IComboBoxOption>{ text: formattedValue, key: value, hidden: true };
-
-// {
-// let numberConverted: number | undefined;
-// let optionText: string;
-
-// const number = Number(value);
-
-// if (value) {
-//   if (number >= 1440) {
-//     numberConverted = number / 60 / 24;
-//     optionText = numberConverted > 1 ? `${numberConverted} days` : `${numberConverted} day`;
-//   }
-//   else if (number < 1440 && number >= 60) {
-//     numberConverted = number / 60;
-//     optionText = numberConverted > 1 ? `${numberConverted} hours` : `${numberConverted} hour`;
-//   }
-//   else {
-//     numberConverted = number;
-//     optionText = numberConverted > 1 ? `${numberConverted} minutes` : `${numberConverted} minute`;
-//   }
-//   return { text: optionText, key: value, hidden: true } as IComboBoxOption;
-// }
-
-// return { } as IComboBoxOption;
-// };
