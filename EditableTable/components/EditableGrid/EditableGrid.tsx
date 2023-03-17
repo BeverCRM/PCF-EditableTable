@@ -3,7 +3,6 @@ import {
   DetailsList,
   DetailsListLayoutMode,
   IColumn,
-  ScrollablePane,
   Stack,
 } from '@fluentui/react';
 
@@ -25,6 +24,7 @@ import {
   addNewRow,
   readdNewRowsAfterDelete,
   removeNewRows,
+  setColumns,
   setRows,
 } from '../../store/features/DatasetSlice';
 
@@ -32,7 +32,7 @@ import { Row, Column, mapDataSetColumns,
   mapDataSetRows, getColumnsTotalWidth } from '../../mappers/dataSetMapper';
 import { _onRenderDetailsHeader } from '../../styles/RenderStyles';
 import { buttonStyles } from '../../styles/ButtonStyles';
-import { containerStackStyles, gridStyles } from '../../styles/DetailsListStyles';
+import { gridStyles } from '../../styles/DetailsListStyles';
 import { IDataSetProps } from '../AppWrapper';
 
 export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: IDataSetProps) => {
@@ -40,10 +40,9 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
 
   const rows: Row[] = useAppSelector(state => state.dataset.rows);
   const newRows: Row[] = useAppSelector(state => state.dataset.newRows);
+  const columns: IColumn[] = useAppSelector(state => state.dataset.columns);
 
   const dispatch = useAppDispatch();
-
-  const columns = mapDataSetColumns(dataset, _service);
 
   const refreshButtonHandler = () => {
     dispatch(setLoading(true));
@@ -97,9 +96,10 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       ...newRows,
       ...mapDataSetRows(dataset),
     ];
-
+    const columns = mapDataSetColumns(dataset, _service);
     dispatch(setRows(datasetRows));
     dispatch(clearChangedRecords());
+    dispatch(setColumns(columns));
   }, [dataset]);
 
   useLoadStore(dataset, _service);
@@ -110,41 +110,37 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
   const _onItemInvoked = (item: any) => _service.openForm(item.key);
 
   return <div className='container'>
-    <Stack style={containerStackStyles(width, rows.length)} >
-      <ScrollablePane>
-        <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons} >
-          <CommandBar
-            refreshButtonHandler={refreshButtonHandler}
-            newButtonHandler={newButtonHandler}
-            deleteButtonHandler={deleteButtonHandler}
-            saveButtonHandler={saveButtonHandler}
-            isControlDisabled={isControlDisabled}
-            selectedCount={selectedRecordIds.length}
-          ></CommandBar>
-        </Stack>
-        <DetailsList
-          key={getColumnsTotalWidth(dataset) > width ? 0 : width}
-          items={rows}
-          columns={columns}
-          onRenderItemColumn={_renderItemColumn}
-          selection={selection}
-          onRenderRow={ (props, defaultRender) =>
-            <div onDoubleClick={() => _service.openForm(props?.item.key)}>
-              {defaultRender!(props)}
-            </div> }
-          onRenderDetailsHeader={_onRenderDetailsHeader}
-          layoutMode={DetailsListLayoutMode.fixedColumns}
-          styles={gridStyles(rows.length)}
-          onItemInvoked={_onItemInvoked}
-        >
-        </DetailsList>
-        {rows.length === 0 &&
-          <Stack horizontalAlign='center' className='noDataContainer'>
-            <div className='nodata'><span>No data available</span></div>
-          </Stack>
-        }
-        <GridFooter dataset={dataset} selectedCount={selectedRecordIds.length}></GridFooter>
-      </ScrollablePane>
+    <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons} >
+      <CommandBar
+        refreshButtonHandler={refreshButtonHandler}
+        newButtonHandler={newButtonHandler}
+        deleteButtonHandler={deleteButtonHandler}
+        saveButtonHandler={saveButtonHandler}
+        isControlDisabled={isControlDisabled}
+        selectedCount={selectedRecordIds.length}
+      ></CommandBar>
     </Stack>
+    <DetailsList
+      key={getColumnsTotalWidth(dataset) > width ? 0 : width}
+      items={rows}
+      columns={columns}
+      onRenderItemColumn={_renderItemColumn}
+      selection={selection}
+      onRenderRow={ (props, defaultRender) =>
+        <div onDoubleClick={() => _service.openForm(props?.item.key)}>
+          {defaultRender!(props)}
+        </div> }
+      onRenderDetailsHeader={_onRenderDetailsHeader}
+      layoutMode={DetailsListLayoutMode.fixedColumns}
+      styles={gridStyles(rows.length)}
+      onItemInvoked={_onItemInvoked}
+    >
+    </DetailsList>
+    {rows.length === 0 &&
+      <Stack horizontalAlign='center' className='noDataContainer'>
+        <div className='nodata'><span>No data available</span></div>
+      </Stack>
+    }
+    <GridFooter dataset={dataset} selectedCount={selectedRecordIds.length}></GridFooter>
   </div>;
 };

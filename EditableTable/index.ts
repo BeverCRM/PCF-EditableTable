@@ -23,13 +23,16 @@ export class EditableTable implements ComponentFramework.ReactControl<IInputs, I
   }
 
   public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
-    return React.createElement(Wrapper, {
-      dataset: context.parameters.dataset,
-      isControlDisabled: context.mode.isControlDisabled,
-      width: context.mode.allocatedWidth,
-      _service: this._service,
-      _store: this._store,
-    });
+    if (context.mode.allocatedWidth > 0) {
+      return React.createElement(Wrapper, {
+        dataset: context.parameters.dataset,
+        isControlDisabled: context.mode.isControlDisabled,
+        width: context.mode.allocatedWidth,
+        _service: this._service,
+        _store: this._store,
+      });
+    }
+    return React.createElement('div');
   }
 
   public getOutputs(): IOutputs { return {}; }

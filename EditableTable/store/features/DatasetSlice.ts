@@ -1,3 +1,4 @@
+import { IColumn } from '@fluentui/react';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Row, isNewRow } from '../../mappers/dataSetMapper';
 import { IDataverseService } from '../../services/DataverseService';
@@ -17,12 +18,14 @@ export type Updates = {
 export interface IDatasetState {
   rows: Row[],
   newRows: Row[],
+  columns: IColumn[],
   requirementLevels: RequirementLevel[]
 }
 
 const initialState: IDatasetState = {
   rows: [],
   newRows: [],
+  columns: [],
   requirementLevels: [],
 };
 
@@ -71,6 +74,15 @@ export const datasetSlice = createSlice({
       state.rows = state.rows.filter(row => isNewRow(row));
       state.newRows = [];
     },
+    setColumns: (state, action: PayloadAction<IColumn[]>) => {
+      state.columns = action.payload;
+    },
+    // resizeColumn: (state, action: PayloadAction<{column?: IColumn, newWidth?: number}>) => {
+    //   const currentColumn = state.columns.find(column =>
+    //     column.fieldName === action.payload.column?.fieldName);
+
+    //   currentColumn?.calculatedWidth = action.payload.newWidth;
+    // },
   },
   extraReducers: builder => {
     builder.addCase(setRequirementLevels.fulfilled, (state, action) => {
@@ -89,6 +101,8 @@ export const {
   addNewRow,
   readdNewRowsAfterDelete,
   removeNewRows,
+  setColumns,
+  // resizeColumn,
 } = datasetSlice.actions;
 
 export default datasetSlice.reducer;

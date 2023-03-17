@@ -29,25 +29,33 @@ export const WholeFormat = memo(({ value, formattedValue, type, _onChange, isReq
       break;
 
     case 'duration':
-      options = durationList;
-      options.push({ key: value, text: formattedValue, hidden: true } as IComboBoxOption);
+      options = [
+        { key: value, text: formattedValue, hidden: true } as IComboBoxOption,
+        ...durationList,
+      ];
       break;
   }
 
-  const durationValidation = (value: string | undefined): string | undefined => {
+  const durationValidation = (value: string | undefined): IComboBoxOption | undefined => {
     if (type === 'duration' && value) {
-      const newOption = getDurationOption(value);
+      const newOption = getDurationOption(value) as IComboBoxOption;
       if (newOption) {
         options.push(newOption);
-        return newOption.key.toString();
+        return newOption;
       }
     }
   };
 
   const onChange = (event: React.FormEvent<IComboBox>, option?: IComboBoxOption,
     index?: number | undefined, value?: string | undefined): void => {
-    const key = option?.key || durationValidation(value) || '';
-    _onChange(key);
+    if (option) {
+      const { key } = option;
+      _onChange(key);
+    }
+    else {
+      const newOption = durationValidation(value);
+      _onChange(newOption?.key, newOption?.text);
+    }
   };
 
   return (
