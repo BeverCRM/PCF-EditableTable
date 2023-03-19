@@ -43,6 +43,7 @@ export const mapDataSetColumns =
 
   return dataset.columns
     .sort((column1, column2) => column1.order - column2.order)
+    .filter(column => !column.isHidden)
     .map<IColumn>((column): IColumn => ({
       name: column.displayName,
       fieldName: column.name,

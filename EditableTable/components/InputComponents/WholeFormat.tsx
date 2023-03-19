@@ -50,7 +50,7 @@ export const WholeFormat = memo(({ value, formattedValue, type, _onChange, isReq
     index?: number | undefined, value?: string | undefined): void => {
     if (option) {
       const { key } = option;
-      _onChange(key);
+      _onChange(key, option.text);
     }
     else {
       const newOption = durationValidation(value);
