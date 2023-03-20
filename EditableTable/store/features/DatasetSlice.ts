@@ -1,8 +1,17 @@
-import { IColumn } from '@fluentui/react';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Row, isNewRow } from '../../mappers/dataSetMapper';
 import { IDataverseService } from '../../services/DataverseService';
 import { AsyncThunkConfig } from '../../utils/types';
+
+export type DatasetColumn = {
+  name: string;
+  fieldName: string;
+  minWidth: number;
+  key: string;
+  isResizable: boolean;
+  data: string;
+  calculatedWidth: number;
+}
 
 export type RequirementLevel = {
   fieldName: string;
@@ -18,7 +27,7 @@ export type Updates = {
 export interface IDatasetState {
   rows: Row[],
   newRows: Row[],
-  columns: IColumn[],
+  columns: DatasetColumn[],
   requirementLevels: RequirementLevel[]
 }
 
@@ -74,15 +83,9 @@ export const datasetSlice = createSlice({
       state.rows = state.rows.filter(row => isNewRow(row));
       state.newRows = [];
     },
-    setColumns: (state, action: PayloadAction<IColumn[]>) => {
+    setColumns: (state, action: PayloadAction<DatasetColumn[]>) => {
       state.columns = action.payload;
     },
-    // resizeColumn: (state, action: PayloadAction<{column?: IColumn, newWidth?: number}>) => {
-    //   const currentColumn = state.columns.find(column =>
-    //     column.fieldName === action.payload.column?.fieldName);
-
-    //   currentColumn?.calculatedWidth = action.payload.newWidth;
-    // },
   },
   extraReducers: builder => {
     builder.addCase(setRequirementLevels.fulfilled, (state, action) => {

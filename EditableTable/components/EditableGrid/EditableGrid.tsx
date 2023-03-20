@@ -22,6 +22,7 @@ import {
 import { setLoading } from '../../store/features/LoadingSlice';
 import {
   addNewRow,
+  DatasetColumn,
   readdNewRowsAfterDelete,
   removeNewRows,
   setColumns,
@@ -99,7 +100,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
     const columns = mapDataSetColumns(dataset, _service);
     dispatch(setRows(datasetRows));
     dispatch(clearChangedRecords());
-    dispatch(setColumns(columns));
+    dispatch(setColumns(columns as DatasetColumn[]));
   }, [dataset]);
 
   useLoadStore(dataset, _service);
