@@ -12,6 +12,7 @@ export type Column = {
   formattedValue: string,
   rawValue: string | null,
   lookup?: ITag,
+  type: string,
 };
 
 const SELECTION_WIDTH = 48;
@@ -42,6 +43,7 @@ export const mapDataSetColumns =
 
   return dataset.columns
     .sort((column1, column2) => column1.order - column2.order)
+    .filter(column => !column.isHidden)
     .map<IColumn>((column): IColumn => ({
       name: column.displayName,
       fieldName: column.name,
@@ -69,6 +71,7 @@ export const mapDataSetRows = (dataset: DataSet): Row[] =>
           key: (record.getValue(column.name) as ComponentFramework.EntityReference)?.id?.guid,
         }
         : undefined,
+      type: column.dataType,
     }));
 
     return {

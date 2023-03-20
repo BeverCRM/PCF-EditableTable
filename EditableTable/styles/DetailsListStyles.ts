@@ -37,7 +37,7 @@ export const containerStackStyles = (width: number, rowsLength: number) => {
   const height = rowsLength === 0
     ? 282
     : rowsLength < 10
-      ? (rowsLength * 50) + 155
+      ? (rowsLength * 50) + 160
       : window.innerHeight - 280;
 
   return { width, height };

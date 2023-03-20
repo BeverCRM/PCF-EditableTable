@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { IColumn, TextField } from '@fluentui/react';
+import { IColumn } from '@fluentui/react';
 
 import { LookupFormat } from '../InputComponents/LookupFormat';
 import { NumberFormat } from '../InputComponents/NumberFormat';
@@ -11,8 +11,8 @@ import { Column, isNewRow, Row } from '../../mappers/dataSetMapper';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { updateRow } from '../../store/features/DatasetSlice';
 import { setChangedRecords } from '../../store/features/RecordSlice';
-import { textFieldStyles } from '../../styles/ComponentsStyles';
 import { IDataverseService } from '../../services/DataverseService';
+import { TextFormat } from '../InputComponents/TextFormat';
 
 export interface IGridSetProps {
   row: Row,
@@ -66,14 +66,6 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
 
   if (currentColumn !== undefined && cell !== undefined) {
     switch (currentColumn.data) {
-      case 'SingleLine.Text':
-        return <TextField value={cell.formattedValue}
-          styles={textFieldStyles(isRequired)}
-          required={isRequired}
-          onDoubleClick={() => _service.openForm(row.key)}
-          onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-            newValue?: string) => _changedValue(newValue || '')} />;
-
       case 'DateAndTime.DateAndTime':
         return <DateTimeFormat dateOnly={false} value={cell.formattedValue} {...props} />;
 
@@ -83,6 +75,9 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
       case 'Lookup.Simple':
         return <LookupFormat value={cell.lookup} parentEntityMetadata={parentEntityMetadata}
           {...props} />;
+
+      case 'Lookup.Customer':
+        return <TextFormat value={cell.formattedValue} isReadOnly={true} {...props} />;
 
       case 'OptionSet':
         return <OptionSetFormat value={cell.rawValue} isMultiple={false} {... props} />;
@@ -107,7 +102,10 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
         return <NumberFormat value={cell.formattedValue ?? ''} {...props} />;
 
       case 'Whole.Duration':
-        return <WholeFormat value={cell.rawValue} type={'duration'} {...props} />;
+        return <WholeFormat
+          value={cell.rawValue}
+          formattedValue={cell.formattedValue}
+          type={'duration'} {...props} />;
 
       case 'Whole.Language':
         return <WholeFormat value={cell.rawValue} type={'language'} {...props} />;
@@ -115,21 +113,10 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
       case 'Whole.TimeZone':
         return <WholeFormat value={cell.rawValue} type={'timezone'} {...props} />;
 
+      case 'SingleLine.Text':
       case 'Multiple':
-        return <TextField value={cell.formattedValue}
-          required={isRequired}
-          styles={textFieldStyles(isRequired)}
-          onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-            newValue?: string) => _changedValue(newValue || '')}
-          onDoubleClick={() => _service.openForm(row.key)} />;
-
       default:
-        return <TextField value={cell.formattedValue}
-          required={isRequired}
-          styles={textFieldStyles(isRequired)}
-          onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-            newValue?: string) => _changedValue(newValue || '')}
-          onDoubleClick={() => _service.openForm(row.key)}/>;
+        return <TextFormat value={cell.formattedValue} {...props} />;
     }
   }
 
