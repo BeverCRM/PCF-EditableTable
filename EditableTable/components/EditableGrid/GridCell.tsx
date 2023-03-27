@@ -67,17 +67,17 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
   if (currentColumn !== undefined && cell !== undefined) {
     switch (currentColumn.data) {
       case 'DateAndTime.DateAndTime':
-        return <DateTimeFormat dateOnly={false} value={cell.formattedValue} {...props} />;
+        return <DateTimeFormat dateOnly={false} value={cell.rawValue} {...props} />;
 
       case 'DateAndTime.DateOnly':
-        return <DateTimeFormat dateOnly={true} value={cell.formattedValue} {...props} />;
+        return <DateTimeFormat dateOnly={true} value={cell.rawValue} {...props} />;
 
       case 'Lookup.Simple':
         return <LookupFormat value={cell.lookup} parentEntityMetadata={parentEntityMetadata}
           {...props} />;
 
       case 'Lookup.Customer':
-        return <TextFormat value={cell.formattedValue} isReadOnly={true} {...props} />;
+        return <TextFormat value={cell.formattedValue} isDisabled={true} {...props} />;
 
       case 'OptionSet':
         return <OptionSetFormat value={cell.rawValue} isMultiple={false} {... props} />;

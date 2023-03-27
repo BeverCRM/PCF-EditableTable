@@ -4,18 +4,18 @@ import { textFieldStyles } from '../../styles/ComponentsStyles';
 
 export interface ITextProps {
   value: string | undefined,
-  isReadOnly?: boolean,
+  isDisabled?: boolean,
   isRequired: boolean,
   _onChange: Function;
   _onDoubleClick: Function;
 }
 
 export const TextFormat =
-memo(({ value, isRequired, isReadOnly, _onChange, _onDoubleClick } : ITextProps) =>
+memo(({ value, isRequired, isDisabled, _onChange, _onDoubleClick } : ITextProps) =>
   <Stack>
     <TextField defaultValue={value}
       styles={textFieldStyles(isRequired)}
-      readOnly={isReadOnly}
+      disabled={isDisabled}
       required={isRequired}
       onDoubleClick={() => _onDoubleClick()}
       onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
