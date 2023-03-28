@@ -19,13 +19,16 @@ import { shallowEqual } from 'react-redux';
 import {
   getDateFormatWithHyphen,
   setTimeForDate,
-  getDateFormatWithSlash,
-  getDateFromString,
   getTimeKeyFromTime,
   getTimeKeyFromDate,
   formatTimeto12Hours,
 } from '../../utils/dateTimeUtils';
-import { formatDateShort, formatUserDateTimeToUTC } from '../../utils/formattingUtils';
+import {
+  formatUTCDateTimeToUserDate,
+  formatUserDateTimeToUTC,
+  formatDateShort,
+  parseDateFromString,
+} from '../../utils/formattingUtils';
 import { timesList } from './timeList';
 import { IDataverseService } from '../../services/DataverseService';
 
@@ -41,13 +44,18 @@ export interface IDatePickerProps {
 
 export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
   isRequired, _onChange, _onDoubleClick, _service }: IDatePickerProps) => {
-  let currentDate = value ? new Date(value) : undefined;
   let timeKey: string | number | undefined;
   const options = timesList;
 
   const dateFields = useAppSelector(state => state.date.dates, shallowEqual);
   const currentDateMetadata = dateFields.find(dateField => dateField.fieldName === fieldName);
   const dateBehavior = currentDateMetadata?.dateBehavior ?? '';
+
+  let currentDate: Date | undefined = value
+    ? dateBehavior === 'TimeZoneIndependent'
+      ? formatUserDateTimeToUTC(_service, new Date(value), 4)
+      : formatUTCDateTimeToUserDate(_service, value)
+    : undefined;
 
   if (currentDate !== undefined && !isNaN(currentDate.getTime())) {
     const newKey = getTimeKeyFromDate(currentDate);
@@ -64,7 +72,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
   }
 
   const onParseDateFromString = React.useCallback(
-    (newValue: string): Date => getDateFromString(newValue, currentDate),
+    (newValue: string): Date => parseDateFromString(_service, newValue),
     [currentDate],
   );
 
@@ -72,13 +80,11 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
     const currentDateTime = setTimeForDate(date, key?.toString());
     if (currentDateTime !== undefined) {
       if (dateBehavior === 'TimeZoneIndependent') {
-        _onChange(`${getDateFormatWithHyphen(currentDateTime)}T${key ?? '00:00'}:00Z`,
-          formatDateShort(_service, currentDateTime, true));
+        _onChange(`${getDateFormatWithHyphen(currentDateTime)}T${key ?? '00:00'}:00Z`);
       }
       else {
-        const dateInUTC = new Date(formatUserDateTimeToUTC(_service, currentDateTime, 1));
-        _onChange(`${getDateFormatWithHyphen(dateInUTC)}T${getTimeKeyFromDate(dateInUTC)}:00Z`,
-          formatDateShort(_service, currentDateTime, true));
+        const dateInUTC = formatUserDateTimeToUTC(_service, currentDateTime, 1);
+        _onChange(`${getDateFormatWithHyphen(dateInUTC)}T${getTimeKeyFromDate(dateInUTC)}:00Z`);
       }
     }
   };
@@ -113,7 +119,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
         allowTextInput
         value={currentDate}
         onSelectDate={onDateChange}
-        formatDate={getDateFormatWithSlash}
+        formatDate={(date?: Date) => date ? formatDateShort(_service, date) : ''}
         parseDateFromString={onParseDateFromString}
         strings={defaultDatePickerStrings}
         onDoubleClick={() => _onDoubleClick()}

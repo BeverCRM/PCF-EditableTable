@@ -23,18 +23,18 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
   const currentNumber = numbers.find(num => num.fieldName === fieldName);
   const currentCurrency = currencySymbols.find(currency => currency.recordId === rowId) ?? null;
 
-  const onValidate = (value: string): string | void => {
-    if (value === '') return '';
-
-    const numberValue = formatNumber(value);
-    return currentCurrency
-      ? formatCurrency(_service, numberValue, currentNumber?.precision, currentCurrency?.symbol)
-      : formatDecimal(_service, numberValue, currentNumber?.precision);
-  };
-
-  const onNumberChange = (event: React.SyntheticEvent<HTMLElement>, newValue?: string) => {
-    const numberValue = newValue === '' ? null : formatNumber(newValue!);
-    _onChange(numberValue, newValue);
+  const onNumberChange = (newValue?: string) => {
+    if (newValue === '') {
+      _onChange(null, '');
+    }
+    else {
+      const numberValue = formatNumber(newValue!);
+      const stringValue = currentCurrency
+        ? formatCurrency(_service, numberValue || 0,
+          currentNumber?.precision, currentCurrency?.symbol)
+        : formatDecimal(_service, numberValue || 0, currentNumber?.precision);
+      _onChange(numberValue, stringValue);
+    }
   };
 
   return (
@@ -44,10 +44,12 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
         max={currentNumber?.maxValue}
         precision={currentNumber?.precision ?? 0}
         styles={numberFormatStyles(isRequired)}
-        onChange={onNumberChange}
-        onValidate={onValidate}
         value={value}
         onDoubleClick={() => _onDoubleClick()}
+        onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+          const elem = event.target as HTMLInputElement;
+          onNumberChange(elem.value);
+        }}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
     </Stack>
