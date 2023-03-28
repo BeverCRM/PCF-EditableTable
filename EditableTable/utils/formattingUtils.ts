@@ -1,7 +1,8 @@
 import { IDataverseService } from '../services/DataverseService';
 
-export const formatNumber = (value: string) =>
-  Number(value.replace(',', '.').replace(/[^0-9.-]+/g, ''));
+export const formatNumber = (_service: IDataverseService, value: string) =>
+  // @ts-ignore
+  Number.parseLocale(value.replace(/[^0-9.,]+/g, ''), _service.getContext().client.locale);
 
 export const formatCurrency =
 (_service: IDataverseService, value: number, precision?: number, symbol?: string) =>

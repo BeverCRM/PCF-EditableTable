@@ -28,7 +28,7 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
       _onChange(null, '');
     }
     else {
-      const numberValue = formatNumber(newValue!);
+      const numberValue = formatNumber(_service, newValue!);
       const stringValue = currentCurrency
         ? formatCurrency(_service, numberValue || 0,
           currentNumber?.precision, currentCurrency?.symbol)
