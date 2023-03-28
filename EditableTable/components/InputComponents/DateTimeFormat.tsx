@@ -53,7 +53,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
 
   let currentDate: Date | undefined = value
     ? dateBehavior === 'TimeZoneIndependent'
-      ? new Date(formatUserDateTimeToUTC(_service, new Date(value), 4))
+      ? formatUserDateTimeToUTC(_service, new Date(value), 4)
       : formatUTCDateTimeToUserDate(_service, value)
     : undefined;
 
@@ -83,7 +83,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
         _onChange(`${getDateFormatWithHyphen(currentDateTime)}T${key ?? '00:00'}:00Z`);
       }
       else {
-        const dateInUTC = new Date(formatUserDateTimeToUTC(_service, currentDateTime, 1));
+        const dateInUTC = formatUserDateTimeToUTC(_service, currentDateTime, 1);
         _onChange(`${getDateFormatWithHyphen(dateInUTC)}T${getTimeKeyFromDate(dateInUTC)}:00Z`);
       }
     }
@@ -119,7 +119,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
         allowTextInput
         value={currentDate}
         onSelectDate={onDateChange}
-        formatDate={(date?: Date | undefined) => date ? formatDateShort(_service, date) : ''}
+        formatDate={(date?: Date) => date ? formatDateShort(_service, date) : ''}
         parseDateFromString={onParseDateFromString}
         strings={defaultDatePickerStrings}
         onDoubleClick={() => _onDoubleClick()}

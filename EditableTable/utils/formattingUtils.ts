@@ -18,9 +18,9 @@ export const formatDateShort =
   _service.getContext().formatting.formatDateShort(value, includeTime);
 
 export const formatUserDateTimeToUTC =
-(_service: IDataverseService, userDateTime: Date, behavior: 1 | 3 | 4): string =>
+(_service: IDataverseService, userDateTime: Date, behavior: 1 | 3 | 4): Date =>
   // @ts-ignore
-  _service.getContext().formatting.formatUserDateTimeToUTC(userDateTime, behavior);
+  new Date(_service.getContext().formatting.formatUserDateTimeToUTC(userDateTime, behavior));
 
 export const formatUTCDateTimeToUserDate =
 (_service: IDataverseService, value: string): Date =>

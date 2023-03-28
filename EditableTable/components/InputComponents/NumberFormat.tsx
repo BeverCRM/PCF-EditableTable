@@ -48,7 +48,6 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
         onDoubleClick={() => _onDoubleClick()}
         onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
           const elem = event.target as HTMLInputElement;
-          console.log(elem.value);
           onNumberChange(elem.value);
         }}
       />
