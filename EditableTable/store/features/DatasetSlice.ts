@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Row, isNewRow } from '../../mappers/dataSetMapper';
-import { IDataverseService } from '../../services/DataverseService';
-import { AsyncThunkConfig } from '../../utils/types';
+import { EntityPrivileges, IDataverseService } from '../../services/DataverseService';
 
 export type DatasetColumn = {
   name: string;
@@ -28,7 +27,8 @@ export interface IDatasetState {
   rows: Row[],
   newRows: Row[],
   columns: DatasetColumn[],
-  requirementLevels: RequirementLevel[]
+  requirementLevels: RequirementLevel[],
+  entityPrivileges: EntityPrivileges,
 }
 
 const initialState: IDatasetState = {
@@ -36,6 +36,7 @@ const initialState: IDatasetState = {
   newRows: [],
   columns: [],
   requirementLevels: [],
+  entityPrivileges: <EntityPrivileges>{},
 };
 
 type DatasetPayload = {
@@ -43,12 +44,17 @@ type DatasetPayload = {
   _service: IDataverseService,
 }
 
-export const setRequirementLevels = createAsyncThunk<any[], DatasetPayload, AsyncThunkConfig>(
+export const setRequirementLevels = createAsyncThunk<any[], DatasetPayload>(
   'dataset/setRequirementLevels',
   async payload => await Promise.all(payload.columnKeys.map(async columnKey => {
     const isRequired = await payload._service.getReqirementLevel(columnKey) !== 'None';
     return { fieldName: columnKey, isRequired };
   })),
+);
+
+export const setEntityPrivileges = createAsyncThunk<EntityPrivileges, IDataverseService>(
+  'dataset/setEntityPrivileges',
+  async _service => await _service.getSecurityPrivileges(),
 );
 
 export const datasetSlice = createSlice({
@@ -94,6 +100,14 @@ export const datasetSlice = createSlice({
 
     builder.addCase(setRequirementLevels.rejected, state => {
       state.requirementLevels = [];
+    });
+
+    builder.addCase(setEntityPrivileges.fulfilled, (state, action) => {
+      state.entityPrivileges = { ...action.payload };
+    });
+
+    builder.addCase(setEntityPrivileges.rejected, state => {
+      state.entityPrivileges = <EntityPrivileges>{};
     });
   },
 });

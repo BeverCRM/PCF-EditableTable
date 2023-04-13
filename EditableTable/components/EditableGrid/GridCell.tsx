@@ -18,6 +18,7 @@ export interface IGridSetProps {
   row: Row,
   currentColumn: IColumn,
   _service: IDataverseService;
+  index: number | undefined;
 }
 
 export type ParentEntityMetadata = {
@@ -26,9 +27,14 @@ export type ParentEntityMetadata = {
   entityTypeName: string
 };
 
-export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
+export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps) => {
   const dispatch = useAppDispatch();
+  const cell = row.columns.find((column: Column) => column.schemaName === currentColumn.key);
+
   const fieldsRequirementLevels = useAppSelector(state => state.dataset.requirementLevels);
+  const fieldRequirementLevel = fieldsRequirementLevels.find(requirementLevel =>
+    requirementLevel.fieldName === currentColumn.key);
+  const isRequired = fieldRequirementLevel?.isRequired || false;
 
   const _changedValue = useCallback(
     (newValue: any, rawValue?: any, lookupEntityNavigation?: string): void => {
@@ -46,12 +52,6 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
       }));
     }, []);
 
-  const cell = row.columns.find((column: Column) => column.schemaName === currentColumn.key);
-
-  const fieldRequirementLevel = fieldsRequirementLevels.find(requirementLevel =>
-    requirementLevel.fieldName === currentColumn.key);
-  const isRequired = fieldRequirementLevel?.isRequired || false;
-
   let parentEntityMetadata: ParentEntityMetadata | undefined;
   if (isNewRow(row)) {
     parentEntityMetadata = _service.getParentMetadata();
@@ -62,6 +62,7 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
     _onChange: _changedValue,
     _onDoubleClick: useCallback(() => _service.openForm(row.key), []),
     _service,
+    index,
   };
 
   if (currentColumn !== undefined && cell !== undefined) {

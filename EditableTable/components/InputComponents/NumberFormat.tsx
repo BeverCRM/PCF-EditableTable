@@ -1,8 +1,12 @@
 import { FontIcon, SpinButton, Stack } from '@fluentui/react';
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { IDataverseService } from '../../services/DataverseService';
 import { useAppSelector } from '../../store/hooks';
-import { asteriskClassStyle, numberFormatStyles } from '../../styles/ComponentsStyles';
+import {
+  asteriskClassStyle,
+  errorTooltip,
+  numberFormatStyles,
+} from '../../styles/ComponentsStyles';
 import { formatCurrency, formatDecimal, formatNumber } from '../../utils/formattingUtils';
 
 export interface INumberProps {
@@ -17,6 +21,8 @@ export interface INumberProps {
 
 export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
   _onChange, _onDoubleClick, _service } : INumberProps) => {
+  const [isInvalid, setInvalid] = useState<boolean>(false);
+  const errorText = 'Required fields must be filled in.';
   const numbers = useAppSelector(state => state.number.numberFieldsMetadata);
   const currencySymbols = useAppSelector(state => state.number.currencySymbols);
 
@@ -37,6 +43,12 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
     }
   };
 
+  const checkValidation = (newValue: string) => {
+    if (isRequired && !newValue) {
+      setInvalid(true);
+    }
+  };
+
   return (
     <Stack>
       <SpinButton
@@ -49,9 +61,12 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
         onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
           const elem = event.target as HTMLInputElement;
           onNumberChange(elem.value);
+          checkValidation(elem.value);
         }}
+        onFocus={() => setInvalid(false)}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
+      <FontIcon iconName={'StatusErrorFull'} className={errorTooltip(isInvalid, errorText)} />
     </Stack>
   );
 });

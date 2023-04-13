@@ -1,10 +1,11 @@
 import { DefaultButton, FontIcon } from '@fluentui/react';
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { IDataverseService } from '../../services/DataverseService';
 import { useAppSelector } from '../../store/hooks';
 import {
   asteriskClassStyle,
+  errorTooltip,
   lookupFormatStyles,
   lookupSelectedOptionStyles,
 } from '../../styles/ComponentsStyles';
@@ -27,11 +28,13 @@ export const LookupFormat = memo(
   ({ _service, fieldName, value, parentEntityMetadata,
     isRequired, _onChange, _onDoubleClick }: ILookupProps) => {
     const picker = React.useRef(null);
+    const [isInvalid, setInvalid] = useState<boolean>(false);
 
     const lookups = useAppSelector(state => state.lookup.lookups);
     const currentLookup = lookups.find(lookup => lookup.logicalName === fieldName);
     const options = currentLookup?.options ?? [];
     const currentOption = value ? [value] : [];
+    const errorText = 'Required fields must be filled in.';
 
     if (value === undefined && parentEntityMetadata !== undefined) {
       if (currentLookup?.reference?.entityNameRef === parentEntityMetadata.entityTypeName) {
@@ -107,13 +110,16 @@ export const LookupFormat = memo(
           if (picker.current) {
             // @ts-ignore
             picker.current.input.current._updateValue('');
+            setInvalid(isRequired);
           }
         }}
         inputProps={{
           onDoubleClick: () => _onDoubleClick(),
           disabled: false,
+          onFocus: () => setInvalid(false),
         }}
       />
-      <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
+      <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
+      <FontIcon iconName={'StatusErrorFull'} className={errorTooltip(isInvalid, errorText)} />
     </div>;
   });

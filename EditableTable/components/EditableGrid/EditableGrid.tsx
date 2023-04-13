@@ -36,12 +36,16 @@ import { buttonStyles } from '../../styles/ButtonStyles';
 import { gridStyles } from '../../styles/DetailsListStyles';
 import { IDataSetProps } from '../AppWrapper';
 
+const ASC_SORT = 0;
+const DESC_SORT = 1;
+
 export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: IDataSetProps) => {
   const { selection, selectedRecordIds } = useSelection();
 
   const rows: Row[] = useAppSelector(state => state.dataset.rows);
   const newRows: Row[] = useAppSelector(state => state.dataset.newRows);
   const columns: IColumn[] = useAppSelector(state => state.dataset.columns);
+  const entityPrivileges = useAppSelector(state => state.dataset.entityPrivileges);
 
   const dispatch = useAppDispatch();
 
@@ -106,9 +110,33 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
   useLoadStore(dataset, _service);
 
   const _renderItemColumn = (item: Row, index: number | undefined, column: IColumn | undefined) =>
-    <GridCell row={item} currentColumn={column!} _service={_service} />;
+    <GridCell row={item} currentColumn={column!} _service={_service} index={index}/>;
 
   const _onItemInvoked = (item: any) => _service.openForm(item.key);
+
+  const _onColumnClick =
+  (ev?: React.MouseEvent<HTMLElement, MouseEvent>, column?: IColumn) => {
+    console.log(ev, column);
+
+    if (column?.fieldName) {
+      const oldSorting = (dataset.sorting || []).find(sort => sort.name === column.fieldName);
+      const newSorting: ComponentFramework.PropertyHelper.DataSetApi.SortStatus = {
+        name: column.fieldName,
+        sortDirection: oldSorting !== null
+          ? oldSorting?.sortDirection === ASC_SORT
+            ? DESC_SORT : ASC_SORT
+          : ASC_SORT,
+      };
+
+      while (dataset.sorting.length > 0) {
+        dataset.sorting.pop();
+      }
+      dataset.sorting.push(newSorting);
+      // dataset.paging.loadExactPage(1);
+      dataset.paging.reset();
+      dataset.refresh();
+    }
+  };
 
   return <div className='container'>
     <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons} >
@@ -119,6 +147,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
         saveButtonHandler={saveButtonHandler}
         isControlDisabled={isControlDisabled}
         selectedCount={selectedRecordIds.length}
+        entityPrivileges={entityPrivileges}
       ></CommandBar>
     </Stack>
     <DetailsList
@@ -135,6 +164,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       layoutMode={DetailsListLayoutMode.fixedColumns}
       styles={gridStyles(rows.length)}
       onItemInvoked={_onItemInvoked}
+      onColumnHeaderClick={_onColumnClick}
     >
     </DetailsList>
     {rows.length === 0 &&

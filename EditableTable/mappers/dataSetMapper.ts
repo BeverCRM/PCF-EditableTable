@@ -40,6 +40,7 @@ export const mapDataSetColumns =
 (dataset: DataSet, _service: IDataverseService): IColumn[] => {
   const columnTotalWidth = getColumnsTotalWidth(dataset);
   const tableWidth = _service.getAllocatedWidth();
+  const sortingColumns = dataset.sorting;
 
   return dataset.columns
     .sort((column1, column2) => column1.order - column2.order)
@@ -53,6 +54,9 @@ export const mapDataSetColumns =
       data: column.dataType,
       calculatedWidth: column.visualSizeFactor +
         calculateAdditinalWidth(dataset, columnTotalWidth, tableWidth),
+      isSorted: sortingColumns.some(col => col.name === column.name),
+      isSortedDescending: sortingColumns.find(col => col.name === column.name)?.sortDirection === 1,
+      showSortIconWhenUnsorted: true,
     }));
 };
 

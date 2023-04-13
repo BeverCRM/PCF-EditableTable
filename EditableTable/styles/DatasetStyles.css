@@ -21,6 +21,7 @@
   padding: 0px;
   margin: 0px 4px;
   padding-top: 4px;
+  overflow: visible;
 }
 
 .ms-DetailsRow-check {
@@ -73,4 +74,16 @@
 
 .ms-DetailsHeader-cellName {
   font-size: 12px;
+}
+
+.errorDiv {
+  position: absolute;
+  right: 20px;
+  top: 11px;
+  width: 16px;
+  height: 16px;
+}
+
+.errorDiv[title] {
+  border-color: rgba(248, 58, 58, 0.326);
 }

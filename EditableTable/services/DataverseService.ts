@@ -13,6 +13,13 @@ export type ParentMetadata = {
 }
 export type Entity = ComponentFramework.WebApi.Entity;
 
+export type EntityPrivileges = {
+  create: boolean,
+  read: boolean,
+  write: boolean,
+  delete: boolean,
+};
+
 export interface IDataverseService {
   getEntityPluralName(entityName: string): Promise<string>;
   getParentMetadata(): ParentMetadata;
@@ -36,10 +43,12 @@ export interface IDataverseService {
   getTimeZoneDefinitions(): Promise<IComboBoxOption[]>;
   getProvisionedLanguages(): Promise<IComboBoxOption[]>;
   getDateMetadata(fieldName: string): Promise<any>;
+  getTextFieldMetadata(fieldName: string, type: string | undefined): Promise<number>;
   getTargetEntityType(): string;
   getContext(): ComponentFramework.Context<IInputs>;
   getAllocatedWidth(): number;
   getReqirementLevel(fieldName: string): Promise<any>;
+  getSecurityPrivileges(): Promise<EntityPrivileges>;
 }
 
 export class DataverseService implements IDataverseService {
@@ -291,6 +300,17 @@ export class DataverseService implements IDataverseService {
     return results.value[0].DateTimeBehavior.Value;
   }
 
+  public async getTextFieldMetadata(fieldName: string, type: string | undefined) {
+    const filter = `$filter=LogicalName eq '${fieldName}'`;
+    const attributeType = `${type === 'Multiple'
+      ? 'MemoAttributeMetadata' : 'StringAttributeMetadata'}`;
+    const request = `${this._clientUrl}EntityDefinitions(LogicalName='${this._targetEntityType
+    }')/Attributes/Microsoft.Dynamics.CRM.${attributeType}?${filter}`;
+    const results = await getFetchResponse(request);
+
+    return results.value[0]?.MaxLength;
+  }
+
   public getTargetEntityType() {
     return this._targetEntityType;
   }
@@ -309,6 +329,20 @@ export class DataverseService implements IDataverseService {
     const results = await getFetchResponse(request);
 
     return results.RequiredLevel.Value;
+  }
+
+  public async getSecurityPrivileges() {
+    const createPriv = this._context.utils.hasEntityPrivilege(this._targetEntityType, 1, 0);
+    const readPriv = this._context.utils.hasEntityPrivilege(this._targetEntityType, 2, 0);
+    const writePriv = this._context.utils.hasEntityPrivilege(this._targetEntityType, 3, 0);
+    const deletePriv = this._context.utils.hasEntityPrivilege(this._targetEntityType, 4, 0);
+    // doesnt look at the level (org vs user)
+    return <EntityPrivileges>{
+      create: createPriv,
+      read: readPriv,
+      write: writePriv,
+      delete: deletePriv,
+    };
   }
 
 }

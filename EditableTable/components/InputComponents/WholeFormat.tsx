@@ -1,7 +1,7 @@
 import { ComboBox, FontIcon, IComboBox, IComboBoxOption, Stack } from '@fluentui/react';
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { useAppSelector } from '../../store/hooks';
-import { asteriskClassStyle, wholeFormatStyles } from '../../styles/ComponentsStyles';
+import { asteriskClassStyle, errorTooltip, wholeFormatStyles } from '../../styles/ComponentsStyles';
 import { getDurationOption } from '../../utils/durationUtils';
 import { durationList } from './durationList';
 
@@ -16,6 +16,9 @@ export interface IWholeFormatProps {
 
 export const WholeFormat = memo(({ value, formattedValue, type, _onChange, isRequired,
   _onDoubleClick } : IWholeFormatProps) => {
+  const [isInvalid, setInvalid] = useState<boolean>(false);
+  const errorText = 'Required fields must be filled in.';
+
   const wholeFormat = useAppSelector(state => state.wholeFormat);
 
   let options: IComboBoxOption[] = [];
@@ -60,6 +63,12 @@ export const WholeFormat = memo(({ value, formattedValue, type, _onChange, isReq
     }
   };
 
+  const checkValidation = () => {
+    if (isRequired && (value === '' || value === null)) {
+      setInvalid(true);
+    }
+  };
+
   return (
     <Stack>
       <ComboBox
@@ -69,8 +78,11 @@ export const WholeFormat = memo(({ value, formattedValue, type, _onChange, isReq
         styles={wholeFormatStyles(isRequired)}
         onDoubleClick={() => _onDoubleClick()}
         allowFreeform={type === 'duration'}
+        onBlur={() => checkValidation()}
+        onFocus={() => setInvalid(false)}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
+      <FontIcon iconName={'StatusErrorFull'} className={errorTooltip(isInvalid, errorText)} />
     </Stack>
   );
 });

@@ -10,8 +10,9 @@ import { setLoading } from '../store/features/LoadingSlice';
 import { useAppDispatch } from '../store/hooks';
 
 import { mapDataSetColumns, mapDataSetRows } from '../mappers/dataSetMapper';
-import { setRequirementLevels } from '../store/features/DatasetSlice';
+import { setEntityPrivileges, setRequirementLevels } from '../store/features/DatasetSlice';
 import { IDataverseService } from '../services/DataverseService';
+import { getTextMetadata } from '../store/features/TextSlice';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
@@ -37,6 +38,15 @@ export const useLoadStore = (dataset: DataSet, _service: IDataverseService) => {
           fieldName: column.fieldName,
           data: column.data,
         }));
+
+    const textFields = getColumnsOfType(['SingleLine.Text', 'Multiple']);
+    if (textFields.length > 0) {
+      dispatch(getTextMetadata({ textFields, _service })).unwrap()
+        .catch(error =>
+          _service.openErrorDialog(error).then(() => {
+            dispatch(setLoading(false));
+          }));
+    }
 
     const lookupColumns = getColumnsOfType(['Lookup.Simple']);
     if (lookupColumns.length > 0) {
@@ -89,6 +99,7 @@ export const useLoadStore = (dataset: DataSet, _service: IDataverseService) => {
     }
 
     dispatch(setRequirementLevels({ columnKeys, _service }));
+    dispatch(setEntityPrivileges(_service));
 
     dispatch(setLoading(false));
   }, [dataset]);
