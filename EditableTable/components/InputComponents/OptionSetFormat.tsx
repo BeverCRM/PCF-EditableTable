@@ -23,6 +23,7 @@ export const OptionSetFormat =
     const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);
     const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
     const options = currentDropdown?.options ?? [];
+    const disabled = fieldName === 'statuscode' || fieldName === 'statecode';
 
     const onChange =
       (event: React.FormEvent<IComboBox>, option?: IComboBoxOption | undefined) => {
@@ -61,6 +62,7 @@ export const OptionSetFormat =
           styles={optionSetStyles(isRequired)}
           onMenuDismissed={() => checkValidation()}
           onMenuOpen={() => setInvalid(false)}
+          disabled={disabled}
         />
         <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
         <FontIcon iconName={'StatusErrorFull'} className={errorTooltip(isInvalid, errorText)} />

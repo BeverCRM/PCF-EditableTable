@@ -27,7 +27,6 @@ type ButtonProps = {
 
 export const CommandBar = (props: ICommandBarProps) => {
   const isLoading = useAppSelector(state => state.loading.isLoading);
-  const isInvalid = useAppSelector(state => state.error.isInvalid);
   const isPendingSave = useAppSelector(state => state.record.isPendingSave);
 
   const buttons: ButtonProps[] = [
@@ -49,7 +48,7 @@ export const CommandBar = (props: ICommandBarProps) => {
       order: 3,
       text: 'Delete',
       icon: deleteIcon,
-      disabled: isLoading || isInvalid || props.isControlDisabled || !props.entityPrivileges.delete,
+      disabled: isLoading || props.isControlDisabled || !props.entityPrivileges.delete,
       onClick: props.deleteButtonHandler,
       styles: {
         root: { display: props.selectedCount > 0 ? 'flex' : 'none' },
@@ -60,7 +59,7 @@ export const CommandBar = (props: ICommandBarProps) => {
       order: 4,
       text: 'Save',
       icon: saveIcon,
-      disabled: isLoading || isInvalid || props.isControlDisabled || !props.entityPrivileges.write,
+      disabled: isLoading || props.isControlDisabled || !props.entityPrivileges.write,
       onClick: props.saveButtonHandler,
       styles: {
         icon: { color: isPendingSave ? 'blue' : 'black' },
