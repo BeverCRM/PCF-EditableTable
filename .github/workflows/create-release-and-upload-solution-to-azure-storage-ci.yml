@@ -8,12 +8,11 @@ jobs:
   main:
     uses: BeverCRM/Workflow-Build-Release-Upload-CI/.github/workflows/build-release-upload-ci.yml@master
     secrets: inherit
-    # with:
-    #   control-title: Sample Custom Component # required
-    #   control-description: '' # default
+    with:
+      control-title: Editable Table
+      control-description: Editable Grid with create, delete, save and refresh functionalities. New records are created as a new line in the grid.
     #   control-thumbnail-url: '' # default
     #   control-primary-image-url: '' # default
     #   control-youtube-video-url: '' # default
-    #   control-img-extension: png # default
     #   control-tags: Bever-Controls, PCF, <control-title> # added by default
     #   create-new-release: true # default
