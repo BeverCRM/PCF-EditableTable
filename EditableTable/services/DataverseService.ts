@@ -273,7 +273,7 @@ export class DataverseService implements IDataverseService {
     const request = `${this._clientUrl}timezonedefinitions`;
     const results = await getFetchResponse(request);
 
-    return results.value.sort((a: any, b: any) => a.bias - b.bias)
+    return results.value.sort((a: any, b: any) => b.bias - a.bias)
       .map((timezone: any) => <IComboBoxOption>{
         key: timezone.timezonecode.toString(),
         text: timezone.userinterfacename,
