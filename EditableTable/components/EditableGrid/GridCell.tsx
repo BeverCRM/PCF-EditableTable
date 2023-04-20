@@ -53,15 +53,20 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
   const isRequired = fieldRequirementLevel?.isRequired || false;
 
   let parentEntityMetadata: ParentEntityMetadata | undefined;
+  let ownerEntityMetadata: string | undefined;
   if (isNewRow(row)) {
     parentEntityMetadata = _service.getParentMetadata();
+    ownerEntityMetadata = currentColumn.data === 'Lookup.Owner'
+      ? _service.getCurrentUserName() : undefined;
   }
 
   const props = { fieldName: currentColumn?.fieldName ? currentColumn?.fieldName : '',
+    rowId: row.key,
     isRequired,
     _onChange: _changedValue,
     _onDoubleClick: useCallback(() => _service.openForm(row.key), []),
     _service,
+    ownerValue: ownerEntityMetadata,
   };
 
   if (currentColumn !== undefined && cell !== undefined) {
@@ -77,6 +82,7 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
           {...props} />;
 
       case 'Lookup.Customer':
+      case 'Lookup.Owner':
         return <TextFormat value={cell.formattedValue} isDisabled={true} {...props} />;
 
       case 'OptionSet':
@@ -93,7 +99,7 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
         return <NumberFormat value={cell.formattedValue ?? ''} {...props} />;
 
       case 'Currency':
-        return <NumberFormat value={cell.formattedValue ?? ''} rowId={row.key} {...props} />;
+        return <NumberFormat value={cell.formattedValue ?? ''} {...props} />;
 
       case 'FP':
         return <NumberFormat value={cell.formattedValue ?? ''} {...props} />;

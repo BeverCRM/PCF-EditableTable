@@ -45,6 +45,7 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
         precision={currentNumber?.precision ?? 0}
         styles={numberFormatStyles(isRequired)}
         value={value}
+        disabled={currentNumber?.IsBaseCurrency}
         onDoubleClick={() => _onDoubleClick()}
         onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
           const elem = event.target as HTMLInputElement;

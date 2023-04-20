@@ -17,10 +17,16 @@ export interface IDropDownProps {
 export const OptionSetFormat =
   memo(({ fieldName, value, isMultiple, isRequired,
     isTwoOptions, _onChange, _onDoubleClick }: IDropDownProps) => {
-    const currentOptions: string[] = value ? value.split(',') : [];
+
     const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);
     const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
     const options = currentDropdown?.options ?? [];
+
+    if ((fieldName === 'statuscode' || fieldName === 'statecode') && !value) {
+      value = options.find(option =>
+        option.text.toLowerCase().includes('active'))?.key.toString() || '';
+    }
+    const currentOptions: string[] = value ? value.split(',') : [];
 
     const onChange =
       (event: React.FormEvent<IComboBox>, option?: IComboBoxOption | undefined) => {
@@ -48,6 +54,7 @@ export const OptionSetFormat =
           options={options}
           multiSelect={isMultiple}
           selectedKey={currentOptions}
+          disabled={fieldName === 'statuscode' || fieldName === 'statecode'}
           onChange={onChange}
           onDoubleClick={() => _onDoubleClick()}
           styles={optionSetStyles(isRequired)}

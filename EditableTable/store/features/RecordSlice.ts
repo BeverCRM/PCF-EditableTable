@@ -17,11 +17,13 @@ export type Record = {
 
 export interface IRecordState {
   changedRecords: Record[],
+  changedRecordsAfterDelete: Record[],
   isPendingSave: boolean,
 }
 
 const initialState: IRecordState = {
   changedRecords: [],
+  changedRecordsAfterDelete: [],
   isPendingSave: false,
 };
 
@@ -35,19 +37,27 @@ const isRequiredFieldEmpty = (requirementLevels: RequirementLevel[], rows: Row[]
     row.columns.some(column =>
       requirementLevels.find(requirementLevel =>
         requirementLevel.fieldName === column.schemaName)?.isRequired && !column.rawValue &&
-        column.type !== 'Lookup.Customer'));
+        column.type !== 'Lookup.Customer' && column.type !== 'Lookup.Owner' &&
+        column.schemaName !== 'statuscode' && column.schemaName !== 'statecode' &&
+        !(column.type === 'Currency' && column.schemaName.includes('base')),
+    ));
 
 export const saveRecords = createAsyncThunk<void, IDataverseService, AsyncThunkConfig>(
   'record/saveRecords',
   async (_service, thunkApi) => {
-    const { changedRecords } = thunkApi.getState().record;
+    const { changedRecords, changedRecordsAfterDelete } = thunkApi.getState().record;
     const { requirementLevels, rows } = thunkApi.getState().dataset;
 
     if (isRequiredFieldEmpty(requirementLevels, rows)) {
       return thunkApi.rejectWithValue({ message: 'All required fields must be filled in.' });
     }
     _service.setParentValue();
-    await Promise.all(changedRecords.map(record => _service.saveRecord(record)));
+    if (changedRecords.length > 0) {
+      await Promise.all(changedRecords.map(record => _service.saveRecord(record)));
+    }
+    else {
+      await Promise.all(changedRecordsAfterDelete.map(record => _service.saveRecord(record)));
+    }
   },
 );
 
@@ -65,7 +75,7 @@ export const deleteRecords = createAsyncThunk<string[], DeleteRecordPayload, Asy
       return thunkApi.fulfillWithValue(newRecordIds);
     }
 
-    return thunkApi.rejectWithValue(response.confirmed);
+    return thunkApi.fulfillWithValue([]);
   },
 );
 
@@ -116,12 +126,14 @@ const RecordSlice = createSlice({
   extraReducers(builder) {
     builder.addCase(saveRecords.fulfilled, state => {
       state.changedRecords = [];
+      state.changedRecordsAfterDelete = [];
       state.isPendingSave = false;
     });
 
     builder.addCase(deleteRecords.fulfilled, (state, action) => {
+      console.log(state, action);
       const recordsToRemove = new Set(action.payload);
-      state.changedRecords = state.changedRecords.filter(record =>
+      state.changedRecordsAfterDelete = [...state.changedRecords].filter(record =>
         !recordsToRemove.has(record.id));
     });
   },

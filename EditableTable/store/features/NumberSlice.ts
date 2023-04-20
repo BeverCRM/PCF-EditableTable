@@ -7,6 +7,7 @@ export type NumberFieldMetadata = {
   precision: number,
   minValue: number,
   maxValue: number,
+  IsBaseCurrency?: boolean,
 }
 
 export type CurrencySymbol = {
@@ -39,7 +40,7 @@ export const getNumberFieldsMetadata = createAsyncThunk<NumberFieldMetadata[], N
       switch (numberField.data) {
         case 'Currency':
           attributeType = 'MoneyAttributeMetadata';
-          selection = 'PrecisionSource,MaxValue,MinValue';
+          selection = 'PrecisionSource,MaxValue,MinValue,IsBaseCurrency';
           break;
 
         case 'Decimal':
