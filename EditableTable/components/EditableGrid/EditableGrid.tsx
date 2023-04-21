@@ -17,6 +17,7 @@ import { GridCell } from './GridCell';
 import {
   clearChangedRecords,
   deleteRecords,
+  readdChangedRecordsAfterDelete,
   saveRecords,
 } from '../../store/features/RecordSlice';
 import { setLoading } from '../../store/features/LoadingSlice';
@@ -67,14 +68,18 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
   const deleteButtonHandler = () => {
     dispatch(setLoading(true));
     dispatch(deleteRecords({ recordIds: selectedRecordIds, _service })).unwrap()
-      .then(selectedNewRecordIds => {
+      .then(recordsAfterDelete => {
         dataset.refresh();
-        dispatch(readdNewRowsAfterDelete(selectedNewRecordIds));
+        dispatch(readdNewRowsAfterDelete(recordsAfterDelete.newRows));
       })
-      .catch(error =>
-        _service.openErrorDialog(error).then(() => {
-          dispatch(setLoading(false));
-        }));
+      .catch(error => {
+        if (!error) {
+          _service.openErrorDialog(error).then(() => {
+            dispatch(setLoading(false));
+          });
+        }
+        dispatch(setLoading(false));
+      });
   };
 
   const saveButtonHandler = () => {
@@ -97,6 +102,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
     ];
     dispatch(setRows(datasetRows));
     dispatch(clearChangedRecords());
+    dispatch(readdChangedRecordsAfterDelete());
   }, [dataset]);
 
   useLoadStore(dataset, _service);

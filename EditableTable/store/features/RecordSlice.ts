@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Row } from '../../mappers/dataSetMapper';
+import { isNewRow, Row } from '../../mappers/dataSetMapper';
 import { IDataverseService } from '../../services/DataverseService';
 import { AsyncThunkConfig } from '../../utils/types';
 import { RequirementLevel } from './DatasetSlice';
@@ -13,6 +13,11 @@ export type Record = {
       fieldType: string
     }
   ]
+};
+
+export type RecordsAfterDelete = {
+  newRows: Row[],
+  changedRecordsAfterDelete: Record[]
 };
 
 export interface IRecordState {
@@ -45,26 +50,29 @@ const isRequiredFieldEmpty = (requirementLevels: RequirementLevel[], rows: Row[]
 export const saveRecords = createAsyncThunk<void, IDataverseService, AsyncThunkConfig>(
   'record/saveRecords',
   async (_service, thunkApi) => {
-    const { changedRecords, changedRecordsAfterDelete } = thunkApi.getState().record;
+    const { changedRecords } = thunkApi.getState().record;
     const { requirementLevels, rows } = thunkApi.getState().dataset;
 
     if (isRequiredFieldEmpty(requirementLevels, rows)) {
       return thunkApi.rejectWithValue({ message: 'All required fields must be filled in.' });
     }
     _service.setParentValue();
-    if (changedRecords.length > 0) {
-      await Promise.all(changedRecords.map(record => _service.saveRecord(record)));
-    }
-    else {
-      await Promise.all(changedRecordsAfterDelete.map(record => _service.saveRecord(record)));
-    }
+
+    await Promise.all(changedRecords.map(record => _service.saveRecord(record)));
   },
 );
 
-export const deleteRecords = createAsyncThunk<string[], DeleteRecordPayload, AsyncThunkConfig>(
+export const deleteRecords =
+createAsyncThunk<RecordsAfterDelete, DeleteRecordPayload, AsyncThunkConfig>(
   'record/deleteRecords',
   async (payload, thunkApi) => {
-    const newRecordIds = payload.recordIds.filter(id => id.length < 15);
+    const { changedRecords } = thunkApi.getState().record;
+    const { rows } = thunkApi.getState().dataset;
+    const recordsToRemove = new Set(payload.recordIds);
+    const newRows = rows.filter(row => isNewRow(row) && !recordsToRemove.has(row.key));
+
+    const changedRecordsAfterDelete = changedRecords.filter(record =>
+      !recordsToRemove.has(record.id) && record.id.length < 15);
 
     const response = await payload._service.openRecordDeleteDialog();
     if (response.confirmed) {
@@ -72,10 +80,10 @@ export const deleteRecords = createAsyncThunk<string[], DeleteRecordPayload, Asy
         if (id.length > 15) await payload._service.deleteRecord(id);
       }));
 
-      return thunkApi.fulfillWithValue(newRecordIds);
+      return thunkApi.fulfillWithValue({ newRows, changedRecordsAfterDelete });
     }
 
-    return thunkApi.fulfillWithValue([]);
+    return thunkApi.rejectWithValue(undefined);
   },
 );
 
@@ -118,6 +126,12 @@ const RecordSlice = createSlice({
       state.isPendingSave = true;
     },
 
+    readdChangedRecordsAfterDelete: state => {
+      state.changedRecords = [...state.changedRecordsAfterDelete];
+      state.isPendingSave = !!(state.changedRecordsAfterDelete.length > 0);
+      state.changedRecordsAfterDelete = [];
+    },
+
     clearChangedRecords: state => {
       state.changedRecords = [];
       state.isPendingSave = false;
@@ -131,14 +145,16 @@ const RecordSlice = createSlice({
     });
 
     builder.addCase(deleteRecords.fulfilled, (state, action) => {
-      console.log(state, action);
-      const recordsToRemove = new Set(action.payload);
-      state.changedRecordsAfterDelete = [...state.changedRecords].filter(record =>
-        !recordsToRemove.has(record.id));
+      state.changedRecords = action.payload.changedRecordsAfterDelete;
+      state.changedRecordsAfterDelete = action.payload.changedRecordsAfterDelete;
     });
   },
 });
 
-export const { setChangedRecords, clearChangedRecords } = RecordSlice.actions;
+export const {
+  setChangedRecords,
+  clearChangedRecords,
+  readdChangedRecordsAfterDelete,
+} = RecordSlice.actions;
 
 export default RecordSlice.reducer;

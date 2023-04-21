@@ -61,10 +61,8 @@ export const datasetSlice = createSlice({
       state.rows.unshift(action.payload);
     },
 
-    readdNewRowsAfterDelete: (state, action: PayloadAction<string[]>) => {
-      const newRowsToRemove = action.payload;
-      state.newRows = state.rows
-        .filter(row => isNewRow(row) && !newRowsToRemove.includes(row.key));
+    readdNewRowsAfterDelete: (state, action: PayloadAction<Row[]>) => {
+      state.newRows = action.payload;
     },
 
     removeNewRows: state => {

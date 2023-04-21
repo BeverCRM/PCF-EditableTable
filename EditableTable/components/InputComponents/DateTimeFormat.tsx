@@ -99,6 +99,9 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
         setChangedDateTime(date, timeKey);
       }
     }
+    else {
+      _onChange(null);
+    }
   };
 
   const onTimeChange = (event: React.FormEvent<IComboBox>, option?: IComboBoxOption,
