@@ -7,7 +7,7 @@ export type NumberFieldMetadata = {
   precision: number,
   minValue: number,
   maxValue: number,
-  IsBaseCurrency?: boolean,
+  isBaseCurrency?: boolean,
 }
 
 export type CurrencySymbol = {

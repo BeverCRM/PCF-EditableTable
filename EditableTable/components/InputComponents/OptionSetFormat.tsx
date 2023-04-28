@@ -3,6 +3,7 @@ import { Stack, ComboBox, IComboBox, IComboBoxOption, FontIcon } from '@fluentui
 
 import { useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, optionSetStyles } from '../../styles/ComponentsStyles';
+import { IDataverseService } from '../../services/DataverseService';
 
 export interface IDropDownProps {
   fieldName: string | undefined;
@@ -12,21 +13,22 @@ export interface IDropDownProps {
   _onChange: Function;
   _onDoubleClick: Function;
   isRequired: boolean;
+  _service: IDataverseService;
 }
 
 export const OptionSetFormat =
-  memo(({ fieldName, value, isMultiple, isRequired,
-    isTwoOptions, _onChange, _onDoubleClick }: IDropDownProps) => {
-
+  memo(({ fieldName, value, isMultiple, isRequired, isTwoOptions,
+    _onChange, _onDoubleClick, _service }: IDropDownProps) => {
+    let currentValue = value;
     const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);
     const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
     const options = currentDropdown?.options ?? [];
 
-    if ((fieldName === 'statuscode' || fieldName === 'statecode') && !value) {
-      value = options.find(option =>
+    if (_service.isStatusField(fieldName) && !currentValue) {
+      currentValue = options.find(option =>
         option.text.toLowerCase().includes('active'))?.key.toString() || '';
     }
-    const currentOptions: string[] = value ? value.split(',') : [];
+    const currentOptions: string[] = currentValue ? currentValue.split(',') : [];
 
     const onChange =
       (event: React.FormEvent<IComboBox>, option?: IComboBoxOption | undefined) => {

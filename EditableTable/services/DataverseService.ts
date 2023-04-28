@@ -42,6 +42,7 @@ export interface IDataverseService {
   getContext(): ComponentFramework.Context<IInputs>;
   getAllocatedWidth(): number;
   getReqirementLevel(fieldName: string): Promise<any>;
+  isStatusField(fieldName: string | undefined): boolean;
 }
 
 export class DataverseService implements IDataverseService {
@@ -254,7 +255,7 @@ export class DataverseService implements IDataverseService {
       precision: results.value[0]?.PrecisionSource ?? results.value[0]?.Precision ?? 0,
       minValue: results.value[0].MinValue,
       maxValue: results.value[0].MaxValue,
-      IsBaseCurrency: results.value[0].IsBaseCurrency,
+      isBaseCurrency: results.value[0].IsBaseCurrency,
     };
   }
 
@@ -317,6 +318,10 @@ export class DataverseService implements IDataverseService {
     const results = await getFetchResponse(request);
 
     return results.RequiredLevel.Value;
+  }
+
+  public isStatusField(fieldName: string | undefined) {
+    return !!(fieldName === 'statuscode' || fieldName === 'statecode');
   }
 
 }

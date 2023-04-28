@@ -13,14 +13,13 @@ export interface ITextProps {
 
 export const TextFormat = memo(({ value, ownerValue,
   isRequired, isDisabled, _onChange, _onDoubleClick } : ITextProps) => {
-  if (ownerValue !== undefined) {
-    value = ownerValue;
-  }
+  const currentValue = ownerValue !== undefined ? ownerValue : value;
+
   return (
     <Stack>
       <TextField
-        defaultValue={value}
-        key={value}
+        defaultValue={currentValue}
+        key={currentValue}
         styles={textFieldStyles(isRequired)}
         disabled={isDisabled}
         required={isRequired}

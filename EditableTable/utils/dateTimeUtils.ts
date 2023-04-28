@@ -67,4 +67,3 @@ export const getTimeKeyFromTime = (value: string) => {
   }
   return key;
 };
-// moment(value).format('hh:mm')

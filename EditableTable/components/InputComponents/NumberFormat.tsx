@@ -29,7 +29,7 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
     }
     else {
       const numberValue = formatNumber(_service, newValue!);
-      const stringValue = currentCurrency
+      const stringValue = currentCurrency && currentNumber?.isBaseCurrency !== undefined
         ? formatCurrency(_service, numberValue || 0,
           currentNumber?.precision, currentCurrency?.symbol)
         : formatDecimal(_service, numberValue || 0, currentNumber?.precision);
@@ -45,7 +45,7 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
         precision={currentNumber?.precision ?? 0}
         styles={numberFormatStyles(isRequired)}
         value={value}
-        disabled={currentNumber?.IsBaseCurrency}
+        disabled={currentNumber?.isBaseCurrency}
         onDoubleClick={() => _onDoubleClick()}
         onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
           const elem = event.target as HTMLInputElement;

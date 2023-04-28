@@ -17,48 +17,48 @@ const initialState: IDropdownState = {
 };
 
 export const getDropdownsOptions =
-createAsyncThunk<DropdownField[], {dropdownFields: Field[], _service: IDataverseService}>(
-  'dropdown/getDropdownsOptions',
-  async payload =>
-    await Promise.all(payload.dropdownFields.map(async dropdownField => {
-      let attributeType: string;
-      let isTwoOptions: boolean;
+  createAsyncThunk<DropdownField[], {dropdownFields: Field[], _service: IDataverseService}>(
+    'dropdown/getDropdownsOptions',
+    async payload =>
+      await Promise.all(payload.dropdownFields.map(async dropdownField => {
+        let attributeType: string;
+        let isTwoOptions: boolean;
 
-      switch (dropdownField.data) {
-        case 'TwoOptions':
-          attributeType = 'BooleanAttributeMetadata';
-          isTwoOptions = true;
-          break;
+        switch (dropdownField.data) {
+          case 'TwoOptions':
+            attributeType = 'BooleanAttributeMetadata';
+            isTwoOptions = true;
+            break;
 
-        case 'MultiSelectPicklist':
-          attributeType = 'MultiSelectPicklistAttributeMetadata';
-          isTwoOptions = false;
-          break;
+          case 'MultiSelectPicklist':
+            attributeType = 'MultiSelectPicklistAttributeMetadata';
+            isTwoOptions = false;
+            break;
 
-        default:
-          attributeType = 'PicklistAttributeMetadata';
-          isTwoOptions = false;
-      }
+          default:
+            attributeType = 'PicklistAttributeMetadata';
+            isTwoOptions = false;
+        }
 
-      switch (dropdownField.fieldName) {
-        case 'statuscode':
-          attributeType = 'StatusAttributeMetadata';
-          isTwoOptions = false;
-          break;
+        switch (dropdownField.fieldName) {
+          case 'statuscode':
+            attributeType = 'StatusAttributeMetadata';
+            isTwoOptions = false;
+            break;
 
-        case 'statecode':
-          attributeType = 'StateAttributeMetadata';
-          isTwoOptions = false;
-          break;
-      }
+          case 'statecode':
+            attributeType = 'StateAttributeMetadata';
+            isTwoOptions = false;
+            break;
+        }
 
-      const currentDropdown = await payload._service.getDropdownOptions(
-        dropdownField.fieldName!,
-        attributeType,
-        isTwoOptions);
-      return <DropdownField>currentDropdown;
-    })),
-);
+        const currentDropdown = await payload._service.getDropdownOptions(
+          dropdownField.fieldName!,
+          attributeType,
+          isTwoOptions);
+        return <DropdownField>currentDropdown;
+      })),
+  );
 
 const DropdownSlice = createSlice({
   name: 'dropdown',

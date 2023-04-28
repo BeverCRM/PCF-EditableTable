@@ -37,15 +37,16 @@ type DeleteRecordPayload = {
   _service: IDataverseService,
 };
 
-const isRequiredFieldEmpty = (requirementLevels: RequirementLevel[], rows: Row[]) =>
-  rows.some(row =>
-    row.columns.some(column =>
-      requirementLevels.find(requirementLevel =>
-        requirementLevel.fieldName === column.schemaName)?.isRequired && !column.rawValue &&
-        column.type !== 'Lookup.Customer' && column.type !== 'Lookup.Owner' &&
-        column.schemaName !== 'statuscode' && column.schemaName !== 'statecode' &&
-        !(column.type === 'Currency' && column.schemaName.includes('base')),
-    ));
+const isRequiredFieldEmpty =
+  (requirementLevels: RequirementLevel[], rows: Row[], _service: IDataverseService) =>
+    rows.some(row =>
+      row.columns.some(column =>
+        requirementLevels.find(requirementLevel =>
+          requirementLevel.fieldName === column.schemaName)?.isRequired && !column.rawValue &&
+          column.type !== 'Lookup.Customer' && column.type !== 'Lookup.Owner' &&
+          !_service.isStatusField(column.schemaName) &&
+          !(column.type === 'Currency' && column.schemaName.includes('base')),
+      ));
 
 export const saveRecords = createAsyncThunk<void, IDataverseService, AsyncThunkConfig>(
   'record/saveRecords',
@@ -53,7 +54,7 @@ export const saveRecords = createAsyncThunk<void, IDataverseService, AsyncThunkC
     const { changedRecords } = thunkApi.getState().record;
     const { requirementLevels, rows } = thunkApi.getState().dataset;
 
-    if (isRequiredFieldEmpty(requirementLevels, rows)) {
+    if (isRequiredFieldEmpty(requirementLevels, rows, _service)) {
       return thunkApi.rejectWithValue({ message: 'All required fields must be filled in.' });
     }
     _service.setParentValue();
@@ -63,29 +64,29 @@ export const saveRecords = createAsyncThunk<void, IDataverseService, AsyncThunkC
 );
 
 export const deleteRecords =
-createAsyncThunk<RecordsAfterDelete, DeleteRecordPayload, AsyncThunkConfig>(
-  'record/deleteRecords',
-  async (payload, thunkApi) => {
-    const { changedRecords } = thunkApi.getState().record;
-    const { rows } = thunkApi.getState().dataset;
-    const recordsToRemove = new Set(payload.recordIds);
-    const newRows = rows.filter(row => isNewRow(row) && !recordsToRemove.has(row.key));
+  createAsyncThunk<RecordsAfterDelete, DeleteRecordPayload, AsyncThunkConfig>(
+    'record/deleteRecords',
+    async (payload, thunkApi) => {
+      const { changedRecords } = thunkApi.getState().record;
+      const { rows } = thunkApi.getState().dataset;
+      const recordsToRemove = new Set(payload.recordIds);
+      const newRows = rows.filter(row => isNewRow(row) && !recordsToRemove.has(row.key));
 
-    const changedRecordsAfterDelete = changedRecords.filter(record =>
-      !recordsToRemove.has(record.id) && record.id.length < 15);
+      const changedRecordsAfterDelete = changedRecords.filter(record =>
+        !recordsToRemove.has(record.id) && record.id.length < 15);
 
-    const response = await payload._service.openRecordDeleteDialog();
-    if (response.confirmed) {
-      await Promise.all(payload.recordIds.map(async id => {
-        if (id.length > 15) await payload._service.deleteRecord(id);
-      }));
+      const response = await payload._service.openRecordDeleteDialog();
+      if (response.confirmed) {
+        await Promise.all(payload.recordIds.map(async id => {
+          if (id.length > 15) await payload._service.deleteRecord(id);
+        }));
 
-      return thunkApi.fulfillWithValue({ newRows, changedRecordsAfterDelete });
-    }
+        return thunkApi.fulfillWithValue({ newRows, changedRecordsAfterDelete });
+      }
 
-    return thunkApi.rejectWithValue(undefined);
-  },
-);
+      return thunkApi.rejectWithValue(undefined);
+    },
+  );
 
 const RecordSlice = createSlice({
   name: 'record',
