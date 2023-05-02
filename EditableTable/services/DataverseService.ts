@@ -321,7 +321,7 @@ export class DataverseService implements IDataverseService {
   }
 
   public isStatusField(fieldName: string | undefined) {
-    return !!(fieldName === 'statuscode' || fieldName === 'statecode');
+    return fieldName === 'statuscode' || fieldName === 'statecode';
   }
 
 }
