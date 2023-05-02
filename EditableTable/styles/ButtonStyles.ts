@@ -30,9 +30,6 @@ export const commandBarButtonStyles: Partial<IButtonStyles> = {
   icon: {
     color: 'black',
   },
-  iconHovered: {
-    color: 'red',
-  },
 };
 
 export const deleteIcon: IIconProps = { iconName: 'Delete' };

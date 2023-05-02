@@ -3,16 +3,6 @@ import { Row, isNewRow } from '../../mappers/dataSetMapper';
 import { IDataverseService } from '../../services/DataverseService';
 import { AsyncThunkConfig } from '../../utils/types';
 
-export type DatasetColumn = {
-  name: string;
-  fieldName: string;
-  minWidth: number;
-  key: string;
-  isResizable: boolean;
-  data: string;
-  calculatedWidth: number;
-}
-
 export type RequirementLevel = {
   fieldName: string;
   isRequired: boolean;
@@ -27,14 +17,12 @@ export type Updates = {
 export interface IDatasetState {
   rows: Row[],
   newRows: Row[],
-  columns: DatasetColumn[],
   requirementLevels: RequirementLevel[]
 }
 
 const initialState: IDatasetState = {
   rows: [],
   newRows: [],
-  columns: [],
   requirementLevels: [],
 };
 
@@ -73,18 +61,13 @@ export const datasetSlice = createSlice({
       state.rows.unshift(action.payload);
     },
 
-    readdNewRowsAfterDelete: (state, action: PayloadAction<string[]>) => {
-      const newRowsToRemove = action.payload;
-      state.newRows = state.rows
-        .filter(row => isNewRow(row) && !newRowsToRemove.includes(row.key));
+    readdNewRowsAfterDelete: (state, action: PayloadAction<Row[]>) => {
+      state.newRows = action.payload;
     },
 
     removeNewRows: state => {
       state.rows = state.rows.filter(row => isNewRow(row));
       state.newRows = [];
-    },
-    setColumns: (state, action: PayloadAction<DatasetColumn[]>) => {
-      state.columns = action.payload;
     },
   },
   extraReducers: builder => {
@@ -104,8 +87,6 @@ export const {
   addNewRow,
   readdNewRowsAfterDelete,
   removeNewRows,
-  setColumns,
-  // resizeColumn,
 } = datasetSlice.actions;
 
 export default datasetSlice.reducer;

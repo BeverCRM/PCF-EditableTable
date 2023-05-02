@@ -10,11 +10,13 @@ export type ParentMetadata = {
   entityId: string,
   entityRecordName: string,
   entityTypeName: string,
-}
+};
+
 export type Entity = ComponentFramework.WebApi.Entity;
 
 export interface IDataverseService {
   getEntityPluralName(entityName: string): Promise<string>;
+  getCurrentUserName(): string;
   getParentMetadata(): ParentMetadata;
   setParentValue(): Promise<void>;
   openForm(id: string, entityName?: string): void;
@@ -40,6 +42,7 @@ export interface IDataverseService {
   getContext(): ComponentFramework.Context<IInputs>;
   getAllocatedWidth(): number;
   getReqirementLevel(fieldName: string): Promise<any>;
+  isStatusField(fieldName: string | undefined): boolean;
 }
 
 export class DataverseService implements IDataverseService {
@@ -54,6 +57,10 @@ export class DataverseService implements IDataverseService {
     this._targetEntityType = context.parameters.dataset.getTargetEntityType();
     // @ts-ignore
     this._clientUrl = `${this._context.page.getClientUrl()}/api/data/v9.2/`;
+  }
+
+  public getCurrentUserName() {
+    return this._context.userSettings.userName;
   }
 
   public getParentMetadata() {
@@ -248,6 +255,7 @@ export class DataverseService implements IDataverseService {
       precision: results.value[0]?.PrecisionSource ?? results.value[0]?.Precision ?? 0,
       minValue: results.value[0].MinValue,
       maxValue: results.value[0].MaxValue,
+      isBaseCurrency: results.value[0].IsBaseCurrency,
     };
   }
 
@@ -266,10 +274,11 @@ export class DataverseService implements IDataverseService {
     const request = `${this._clientUrl}timezonedefinitions`;
     const results = await getFetchResponse(request);
 
-    return results.value.map((timezone: any) => <IComboBoxOption>{
-      key: timezone.timezonecode.toString(),
-      text: timezone.userinterfacename,
-    });
+    return results.value.sort((a: any, b: any) => b.bias - a.bias)
+      .map((timezone: any) => <IComboBoxOption>{
+        key: timezone.timezonecode.toString(),
+        text: timezone.userinterfacename,
+      });
   }
 
   public async getProvisionedLanguages() {
@@ -309,6 +318,10 @@ export class DataverseService implements IDataverseService {
     const results = await getFetchResponse(request);
 
     return results.RequiredLevel.Value;
+  }
+
+  public isStatusField(fieldName: string | undefined) {
+    return fieldName === 'statuscode' || fieldName === 'statecode';
   }
 
 }

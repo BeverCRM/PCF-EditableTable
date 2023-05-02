@@ -3,6 +3,7 @@ import { Stack, ComboBox, IComboBox, IComboBoxOption, FontIcon } from '@fluentui
 
 import { useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, optionSetStyles } from '../../styles/ComponentsStyles';
+import { IDataverseService } from '../../services/DataverseService';
 
 export interface IDropDownProps {
   fieldName: string | undefined;
@@ -12,15 +13,22 @@ export interface IDropDownProps {
   _onChange: Function;
   _onDoubleClick: Function;
   isRequired: boolean;
+  _service: IDataverseService;
 }
 
 export const OptionSetFormat =
-  memo(({ fieldName, value, isMultiple, isRequired,
-    isTwoOptions, _onChange, _onDoubleClick }: IDropDownProps) => {
-    const currentOptions: string[] = value ? value.split(',') : [];
+  memo(({ fieldName, value, isMultiple, isRequired, isTwoOptions,
+    _onChange, _onDoubleClick, _service }: IDropDownProps) => {
+    let currentValue = value;
     const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);
     const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
     const options = currentDropdown?.options ?? [];
+
+    if (_service.isStatusField(fieldName) && !currentValue) {
+      currentValue = options.find(option =>
+        option.text.toLowerCase().includes('active'))?.key.toString() || '';
+    }
+    const currentOptions: string[] = currentValue ? currentValue.split(',') : [];
 
     const onChange =
       (event: React.FormEvent<IComboBox>, option?: IComboBoxOption | undefined) => {
@@ -48,6 +56,7 @@ export const OptionSetFormat =
           options={options}
           multiSelect={isMultiple}
           selectedKey={currentOptions}
+          disabled={fieldName === 'statuscode' || fieldName === 'statecode'}
           onChange={onChange}
           onDoubleClick={() => _onDoubleClick()}
           styles={optionSetStyles(isRequired)}
