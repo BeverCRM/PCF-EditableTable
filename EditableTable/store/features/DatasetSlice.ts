@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Row, isNewRow } from '../../mappers/dataSetMapper';
+import { Row } from '../../mappers/dataSetMapper';
 import { IDataverseService } from '../../services/DataverseService';
 import { AsyncThunkConfig } from '../../utils/types';
 
@@ -66,7 +66,6 @@ export const datasetSlice = createSlice({
     },
 
     removeNewRows: state => {
-      state.rows = state.rows.filter(row => isNewRow(row));
       state.newRows = [];
     },
   },
