@@ -24,12 +24,14 @@ export interface IRecordState {
   changedRecords: Record[],
   changedRecordsAfterDelete: Record[],
   isPendingSave: boolean,
+  isPendingDelete: boolean,
 }
 
 const initialState: IRecordState = {
   changedRecords: [],
   changedRecordsAfterDelete: [],
   isPendingSave: false,
+  isPendingDelete: false,
 };
 
 type DeleteRecordPayload = {
@@ -145,9 +147,14 @@ const RecordSlice = createSlice({
       state.isPendingSave = false;
     });
 
+    builder.addCase(deleteRecords.pending, state => {
+      state.isPendingDelete = true;
+    });
+
     builder.addCase(deleteRecords.fulfilled, (state, action) => {
       state.changedRecords = action.payload.changedRecordsAfterDelete;
       state.changedRecordsAfterDelete = action.payload.changedRecordsAfterDelete;
+      state.isPendingDelete = false;
     });
   },
 });

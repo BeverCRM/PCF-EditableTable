@@ -41,6 +41,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
   const rows: Row[] = useAppSelector(state => state.dataset.rows);
   const newRows: Row[] = useAppSelector(state => state.dataset.newRows);
   const columns = mapDataSetColumns(dataset, _service);
+  const isPendingDelete = useAppSelector(state => state.record.isPendingDelete);
 
   const dispatch = useAppDispatch();
 
@@ -103,7 +104,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
     dispatch(setRows(datasetRows));
     dispatch(clearChangedRecords());
     dispatch(readdChangedRecordsAfterDelete());
-    dispatch(setLoading(false));
+    dispatch(setLoading(isPendingDelete));
   }, [dataset]);
 
   useLoadStore(dataset, _service);
