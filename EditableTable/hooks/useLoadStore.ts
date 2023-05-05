@@ -89,7 +89,5 @@ export const useLoadStore = (dataset: DataSet, _service: IDataverseService) => {
     }
 
     dispatch(setRequirementLevels({ columnKeys, _service }));
-
-    dispatch(setLoading(false));
   }, [dataset]);
 };

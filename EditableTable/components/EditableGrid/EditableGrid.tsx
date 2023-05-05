@@ -103,6 +103,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
     dispatch(setRows(datasetRows));
     dispatch(clearChangedRecords());
     dispatch(readdChangedRecordsAfterDelete());
+    dispatch(setLoading(false));
   }, [dataset]);
 
   useLoadStore(dataset, _service);
