@@ -1,6 +1,7 @@
 /* eslint-disable react/display-name */
 import { FontIcon, SpinButton, Stack } from '@fluentui/react';
-import React, { memo } from 'react';
+import * as React from 'react';
+import { memo } from 'react';
 import { IDataverseService } from '../../services/DataverseService';
 import { useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, numberFormatStyles } from '../../styles/ComponentsStyles';

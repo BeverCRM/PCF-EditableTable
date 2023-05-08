@@ -1,6 +1,7 @@
 /* eslint-disable react/display-name */
 import { Stack, TextField } from '@fluentui/react';
-import React, { memo } from 'react';
+import * as React from 'react';
+import { memo } from 'react';
 import { textFieldStyles } from '../../styles/ComponentsStyles';
 
 export interface ITextProps {
