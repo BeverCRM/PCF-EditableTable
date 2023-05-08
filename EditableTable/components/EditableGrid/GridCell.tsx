@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import * as React from 'react';
 import { IColumn } from '@fluentui/react';
 
 import { LookupFormat } from '../InputComponents/LookupFormat';
@@ -30,7 +30,7 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
   const dispatch = useAppDispatch();
   const fieldsRequirementLevels = useAppSelector(state => state.dataset.requirementLevels);
 
-  const _changedValue = useCallback(
+  const _changedValue = React.useCallback(
     (newValue: any, rawValue?: any, lookupEntityNavigation?: string): void => {
       dispatch(setChangedRecords({
         id: row.key,
@@ -64,7 +64,7 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
     rowId: row.key,
     isRequired,
     _onChange: _changedValue,
-    _onDoubleClick: useCallback(() => _service.openForm(row.key), []),
+    _onDoubleClick: React.useCallback(() => _service.openForm(row.key), []),
     _service,
     ownerValue: ownerEntityMetadata,
   };

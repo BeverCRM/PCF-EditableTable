@@ -1,5 +1,6 @@
+/* eslint-disable react/display-name */
 import { ComboBox, FontIcon, IComboBox, IComboBoxOption, Stack } from '@fluentui/react';
-import React, { memo } from 'react';
+import * as React from 'react';
 import { useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, wholeFormatStyles } from '../../styles/ComponentsStyles';
 import { getDurationOption } from '../../utils/durationUtils';
@@ -14,7 +15,7 @@ export interface IWholeFormatProps {
   isRequired: boolean;
 }
 
-export const WholeFormat = memo(({ value, formattedValue, type, _onChange, isRequired,
+export const WholeFormat = React.memo(({ value, formattedValue, type, _onChange, isRequired,
   _onDoubleClick } : IWholeFormatProps) => {
   const wholeFormat = useAppSelector(state => state.wholeFormat);
 

@@ -1,6 +1,7 @@
+/* eslint-disable react/display-name */
 import { DefaultButton, FontIcon } from '@fluentui/react';
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
-import React, { memo } from 'react';
+import * as React from 'react';
 import { IDataverseService } from '../../services/DataverseService';
 import { useAppSelector } from '../../store/hooks';
 import {
@@ -23,7 +24,7 @@ export interface ILookupProps {
   _service: IDataverseService;
 }
 
-export const LookupFormat = memo(
+export const LookupFormat = React.memo(
   ({ _service, fieldName, value, parentEntityMetadata,
     isRequired, _onChange, _onDoubleClick }: ILookupProps) => {
     const picker = React.useRef(null);
@@ -105,6 +106,7 @@ export const LookupFormat = memo(
         onRenderItem={_onRenderItem}
         onBlur={() => {
           if (picker.current) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             picker.current.input.current._updateValue('');
           }

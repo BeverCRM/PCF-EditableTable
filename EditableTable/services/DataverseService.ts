@@ -55,6 +55,7 @@ export class DataverseService implements IDataverseService {
   constructor(context: ComponentFramework.Context<IInputs>) {
     this._context = context;
     this._targetEntityType = context.parameters.dataset.getTargetEntityType();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     this._clientUrl = `${this._context.page.getClientUrl()}/api/data/v9.2/`;
   }
@@ -64,6 +65,7 @@ export class DataverseService implements IDataverseService {
   }
 
   public getParentMetadata() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return <ParentMetadata> this._context.mode.contextInfo;
   }
@@ -142,6 +144,7 @@ export class DataverseService implements IDataverseService {
   }
 
   public async getFieldSchemaName(): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const logicalName = this._context.page.entityTypeName;
     const endpoint = `EntityDefinitions(LogicalName='${logicalName}')/OneToManyRelationships`;
