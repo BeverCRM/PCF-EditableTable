@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import { DefaultButton, FontIcon } from '@fluentui/react';
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
 import React, { memo } from 'react';
@@ -105,6 +106,7 @@ export const LookupFormat = memo(
         onRenderItem={_onRenderItem}
         onBlur={() => {
           if (picker.current) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             picker.current.input.current._updateValue('');
           }

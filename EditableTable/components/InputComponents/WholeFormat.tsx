@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import { ComboBox, FontIcon, IComboBox, IComboBoxOption, Stack } from '@fluentui/react';
 import React, { memo } from 'react';
 import { useAppSelector } from '../../store/hooks';

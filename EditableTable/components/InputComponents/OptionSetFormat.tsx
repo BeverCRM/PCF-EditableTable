@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import React, { memo } from 'react';
 import { Stack, ComboBox, IComboBox, IComboBoxOption, FontIcon } from '@fluentui/react';
 

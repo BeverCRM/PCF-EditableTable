@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import { FontIcon, SpinButton, Stack } from '@fluentui/react';
 import React, { memo } from 'react';
 import { IDataverseService } from '../../services/DataverseService';
