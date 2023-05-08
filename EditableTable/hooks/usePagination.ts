@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import * as React from 'react';
 import { setLoading } from '../store/features/LoadingSlice';
 import { useAppDispatch } from '../store/hooks';
 
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
 export const usePagination = (dataset: DataSet) => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = React.useState(1);
 
   const dispatch = useAppDispatch();
 
@@ -29,7 +29,7 @@ export const usePagination = (dataset: DataSet) => {
       ? (currentPage - 1) * pageSize + pageSize
       : totalRecords;
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (currentPage !== dataset.paging.firstPageNumber) {
       setCurrentPage(dataset.paging.firstPageNumber);
     }

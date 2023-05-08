@@ -1,7 +1,6 @@
 /* eslint-disable react/display-name */
 import { FontIcon, SpinButton, Stack } from '@fluentui/react';
 import * as React from 'react';
-import { memo } from 'react';
 import { IDataverseService } from '../../services/DataverseService';
 import { useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, numberFormatStyles } from '../../styles/ComponentsStyles';
@@ -17,7 +16,7 @@ export interface INumberProps {
   _service: IDataverseService;
 }
 
-export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
+export const NumberFormat = React.memo(({ fieldName, value, rowId, isRequired,
   _onChange, _onDoubleClick, _service } : INumberProps) => {
   const numbers = useAppSelector(state => state.number.numberFieldsMetadata);
   const currencySymbols = useAppSelector(state => state.number.currencySymbols);

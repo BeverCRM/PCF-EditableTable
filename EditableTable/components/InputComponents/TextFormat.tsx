@@ -1,7 +1,6 @@
 /* eslint-disable react/display-name */
 import { Stack, TextField } from '@fluentui/react';
 import * as React from 'react';
-import { memo } from 'react';
 import { textFieldStyles } from '../../styles/ComponentsStyles';
 
 export interface ITextProps {
@@ -13,7 +12,7 @@ export interface ITextProps {
   _onDoubleClick: Function;
 }
 
-export const TextFormat = memo(({ value, ownerValue,
+export const TextFormat = React.memo(({ value, ownerValue,
   isRequired, isDisabled, _onChange, _onDoubleClick } : ITextProps) => {
   const currentValue = ownerValue !== undefined ? ownerValue : value;
 

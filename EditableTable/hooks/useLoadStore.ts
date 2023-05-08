@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import * as React from 'react';
 
 import { setRelationships, setLookups } from '../store/features/LookupSlice';
 import { getDropdownsOptions } from '../store/features/DropdownSlice';
@@ -24,7 +24,7 @@ export type Field = {
 export const useLoadStore = (dataset: DataSet, _service: IDataverseService) => {
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
+  React.useEffect(() => {
     const columns = mapDataSetColumns(dataset, _service);
     const datasetRows = mapDataSetRows(dataset);
 

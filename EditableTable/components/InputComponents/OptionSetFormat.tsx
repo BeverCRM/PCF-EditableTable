@@ -1,6 +1,5 @@
 /* eslint-disable react/display-name */
 import * as React from 'react';
-import { memo } from 'react';
 import { Stack, ComboBox, IComboBox, IComboBoxOption, FontIcon } from '@fluentui/react';
 
 import { useAppSelector } from '../../store/hooks';
@@ -19,7 +18,7 @@ export interface IDropDownProps {
 }
 
 export const OptionSetFormat =
-  memo(({ fieldName, value, isMultiple, isRequired, isTwoOptions,
+  React.memo(({ fieldName, value, isMultiple, isRequired, isTwoOptions,
     _onChange, _onDoubleClick, _service }: IDropDownProps) => {
     let currentValue = value;
     const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);

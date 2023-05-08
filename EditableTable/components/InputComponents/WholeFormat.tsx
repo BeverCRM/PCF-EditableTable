@@ -5,7 +5,6 @@ import { useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, wholeFormatStyles } from '../../styles/ComponentsStyles';
 import { getDurationOption } from '../../utils/durationUtils';
 import { durationList } from './durationList';
-import { memo } from 'react';
 
 export interface IWholeFormatProps {
   value: string | null | undefined;
@@ -16,7 +15,7 @@ export interface IWholeFormatProps {
   isRequired: boolean;
 }
 
-export const WholeFormat = memo(({ value, formattedValue, type, _onChange, isRequired,
+export const WholeFormat = React.memo(({ value, formattedValue, type, _onChange, isRequired,
   _onDoubleClick } : IWholeFormatProps) => {
   const wholeFormat = useAppSelector(state => state.wholeFormat);
 

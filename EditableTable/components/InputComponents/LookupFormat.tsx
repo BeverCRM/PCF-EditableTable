@@ -2,7 +2,6 @@
 import { DefaultButton, FontIcon } from '@fluentui/react';
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
 import * as React from 'react';
-import { memo } from 'react';
 import { IDataverseService } from '../../services/DataverseService';
 import { useAppSelector } from '../../store/hooks';
 import {
@@ -25,7 +24,7 @@ export interface ILookupProps {
   _service: IDataverseService;
 }
 
-export const LookupFormat = memo(
+export const LookupFormat = React.memo(
   ({ _service, fieldName, value, parentEntityMetadata,
     isRequired, _onChange, _onDoubleClick }: ILookupProps) => {
     const picker = React.useRef(null);

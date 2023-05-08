@@ -1,6 +1,5 @@
 /* eslint-disable react/display-name */
 import * as React from 'react';
-import { memo } from 'react';
 import {
   DatePicker,
   defaultDatePickerStrings,
@@ -44,7 +43,7 @@ export interface IDatePickerProps {
   _service: IDataverseService;
 }
 
-export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
+export const DateTimeFormat = React.memo(({ fieldName, dateOnly, value,
   isRequired, _onChange, _onDoubleClick, _service }: IDatePickerProps) => {
   let timeKey: string | number | undefined;
   const options = timesList;

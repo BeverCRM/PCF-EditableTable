@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useEffect } from 'react';
 import {
   DetailsList,
   DetailsListLayoutMode,
@@ -97,7 +96,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
         }));
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const datasetRows = [
       ...newRows,
       ...mapDataSetRows(dataset),
