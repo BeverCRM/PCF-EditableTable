@@ -1,7 +1,7 @@
 {
-  "name": "pcf-project",
+  "name": "pcf-editable-table",
   "version": "1.0.0",
-  "description": "Project containing your PowerApps Component Framework (PCF) control.",
+  "description": "Editable Grid with create, delete, save and refresh functionalities. New records are created as a new line in the grid.",
   "scripts": {
     "build": "pcf-scripts build",
     "clean": "pcf-scripts clean",
