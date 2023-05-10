@@ -5,6 +5,7 @@
   },
   "extends": [
     "bever",
+    "eslint:recommended",
     "plugin:react/recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended"
@@ -18,17 +19,25 @@
     "sourceType": "module"
   },
   "plugins": [
+    "@microsoft/power-apps",
     "@typescript-eslint"
   ],
   "rules": {
+    "no-unused-vars": "off",
+    "no-use-before-define": "off",
+    "default-param-last":"off",
+    "class-methods-use-this": "off",
     "@typescript-eslint/ban-types": "off",
     "@typescript-eslint/no-empty-function": "off",
-    "default-param-last":"off",
     "@typescript-eslint/no-empty-interface": "off",
-    "class-methods-use-this": "off",
-    "lines-between-class-members": ["error", "always", {
-      "exceptAfterSingleLine": true
-    }],
+    "@typescript-eslint/no-use-before-define": ["error"],
+    "lines-between-class-members": [
+      "error",
+      "always",
+      {
+        "exceptAfterSingleLine": true
+      }
+    ],
     "max-len": [
       "error",
       {
@@ -36,11 +45,12 @@
         "ignoreUrls": true,
         "ignoreComments": true
       }
-    ],
-    "no-use-before-define": "off",
-    "@typescript-eslint/no-use-before-define": ["error"]
+    ]
   },
   "settings": {
+    "react": {
+      "version": "detect"
+    },
     "import/resolver": {
       "node": {
         "extensions": [".tsx", ".d.ts", ".ts"]
