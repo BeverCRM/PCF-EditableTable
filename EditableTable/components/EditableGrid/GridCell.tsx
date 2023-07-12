@@ -36,7 +36,7 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
     requirementLevel.fieldName === currentColumn.key);
   const isRequired = fieldRequirementLevel?.isRequired || false;
 
-  const _changedValue = useCallback(
+  const _changedValue = React.useCallback(
     (newValue: any, rawValue?: any, lookupEntityNavigation?: string): void => {
       dispatch(setChangedRecords({
         id: row.key,
@@ -53,16 +53,21 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
     }, []);
 
   let parentEntityMetadata: ParentEntityMetadata | undefined;
+  let ownerEntityMetadata: string | undefined;
   if (isNewRow(row)) {
     parentEntityMetadata = _service.getParentMetadata();
+    ownerEntityMetadata = currentColumn.data === 'Lookup.Owner'
+      ? _service.getCurrentUserName() : undefined;
   }
 
   const props = { fieldName: currentColumn?.fieldName ? currentColumn?.fieldName : '',
+    rowId: row.key,
     isRequired,
     _onChange: _changedValue,
-    _onDoubleClick: useCallback(() => _service.openForm(row.key), []),
+    _onDoubleClick: React.useCallback(() => _service.openForm(row.key), []),
     _service,
     index,
+    ownerValue: ownerEntityMetadata,
   };
 
   if (currentColumn !== undefined && cell !== undefined) {
@@ -78,6 +83,7 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
           {...props} />;
 
       case 'Lookup.Customer':
+      case 'Lookup.Owner':
         return <TextFormat value={cell.formattedValue} isDisabled={true} {...props} />;
 
       case 'OptionSet':
@@ -94,7 +100,7 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
         return <NumberFormat value={cell.formattedValue ?? ''} {...props} />;
 
       case 'Currency':
-        return <NumberFormat value={cell.formattedValue ?? ''} rowId={row.key} {...props} />;
+        return <NumberFormat value={cell.formattedValue ?? ''} {...props} />;
 
       case 'FP':
         return <NumberFormat value={cell.formattedValue ?? ''} {...props} />;

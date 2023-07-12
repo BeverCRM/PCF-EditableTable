@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import { FontIcon, SpinButton, Stack } from '@fluentui/react';
 import React, { memo, useState } from 'react';
 import { IDataverseService } from '../../services/DataverseService';
@@ -19,7 +20,7 @@ export interface INumberProps {
   _service: IDataverseService;
 }
 
-export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
+export const NumberFormat = React.memo(({ fieldName, value, rowId, isRequired,
   _onChange, _onDoubleClick, _service } : INumberProps) => {
   const [isInvalid, setInvalid] = useState<boolean>(false);
   const errorText = 'Required fields must be filled in.';
@@ -35,7 +36,7 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
     }
     else {
       const numberValue = formatNumber(_service, newValue!);
-      const stringValue = currentCurrency
+      const stringValue = currentCurrency && currentNumber?.isBaseCurrency !== undefined
         ? formatCurrency(_service, numberValue || 0,
           currentNumber?.precision, currentCurrency?.symbol)
         : formatDecimal(_service, numberValue || 0, currentNumber?.precision);
@@ -57,6 +58,7 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
         precision={currentNumber?.precision ?? 0}
         styles={numberFormatStyles(isRequired)}
         value={value}
+        disabled={currentNumber?.isBaseCurrency}
         onDoubleClick={() => _onDoubleClick()}
         onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
           const elem = event.target as HTMLInputElement;

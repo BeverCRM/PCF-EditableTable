@@ -10,7 +10,8 @@ export type ParentMetadata = {
   entityId: string,
   entityRecordName: string,
   entityTypeName: string,
-}
+};
+
 export type Entity = ComponentFramework.WebApi.Entity;
 
 export type EntityPrivileges = {
@@ -22,6 +23,7 @@ export type EntityPrivileges = {
 
 export interface IDataverseService {
   getEntityPluralName(entityName: string): Promise<string>;
+  getCurrentUserName(): string;
   getParentMetadata(): ParentMetadata;
   setParentValue(): Promise<void>;
   openForm(id: string, entityName?: string): void;
@@ -49,6 +51,7 @@ export interface IDataverseService {
   getAllocatedWidth(): number;
   getReqirementLevel(fieldName: string): Promise<any>;
   getSecurityPrivileges(): Promise<EntityPrivileges>;
+  isStatusField(fieldName: string | undefined): boolean;
 }
 
 export class DataverseService implements IDataverseService {
@@ -61,11 +64,17 @@ export class DataverseService implements IDataverseService {
   constructor(context: ComponentFramework.Context<IInputs>) {
     this._context = context;
     this._targetEntityType = context.parameters.dataset.getTargetEntityType();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     this._clientUrl = `${this._context.page.getClientUrl()}/api/data/v9.2/`;
   }
 
+  public getCurrentUserName() {
+    return this._context.userSettings.userName;
+  }
+
   public getParentMetadata() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return <ParentMetadata> this._context.mode.contextInfo;
   }
@@ -144,6 +153,7 @@ export class DataverseService implements IDataverseService {
   }
 
   public async getFieldSchemaName(): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const logicalName = this._context.page.entityTypeName;
     const endpoint = `EntityDefinitions(LogicalName='${logicalName}')/OneToManyRelationships`;
@@ -257,6 +267,7 @@ export class DataverseService implements IDataverseService {
       precision: results.value[0]?.PrecisionSource ?? results.value[0]?.Precision ?? 0,
       minValue: results.value[0].MinValue,
       maxValue: results.value[0].MaxValue,
+      isBaseCurrency: results.value[0].IsBaseCurrency,
     };
   }
 
@@ -275,10 +286,11 @@ export class DataverseService implements IDataverseService {
     const request = `${this._clientUrl}timezonedefinitions`;
     const results = await getFetchResponse(request);
 
-    return results.value.map((timezone: any) => <IComboBoxOption>{
-      key: timezone.timezonecode.toString(),
-      text: timezone.userinterfacename,
-    });
+    return results.value.sort((a: any, b: any) => b.bias - a.bias)
+      .map((timezone: any) => <IComboBoxOption>{
+        key: timezone.timezonecode.toString(),
+        text: timezone.userinterfacename,
+      });
   }
 
   public async getProvisionedLanguages() {
@@ -343,6 +355,10 @@ export class DataverseService implements IDataverseService {
       write: writePriv,
       delete: deletePriv,
     };
+  }
+
+  public isStatusField(fieldName: string | undefined) {
+    return fieldName === 'statuscode' || fieldName === 'statecode';
   }
 
 }

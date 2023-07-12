@@ -1,38 +1,60 @@
 {
-    "env": {
-      "browser": true,
-      "es2021": true
-    },
-    "extends": [
-      "bever",
-      "plugin:react/recommended"
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "bever",
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "globals": {
+    "ComponentFramework": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": [
+    "@microsoft/power-apps",
+    "@typescript-eslint"
+  ],
+  "rules": {
+    "no-unused-vars": "off",
+    "no-use-before-define": "off",
+    "default-param-last":"off",
+    "class-methods-use-this": "off",
+    "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/no-use-before-define": ["error"],
+    "lines-between-class-members": [
+      "error",
+      "always",
+      {
+        "exceptAfterSingleLine": true
+      }
     ],
-    "globals": {
-      "ComponentFramework": true
+    "max-len": [
+      "error",
+      {
+        "code": 100,
+        "ignoreUrls": true,
+        "ignoreComments": true
+      }
+    ]
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
     },
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-      "ecmaVersion": 12,
-      "sourceType": "module"
-    },
-    "plugins": [
-      "@typescript-eslint"
-    ],
-    "rules": {
-      "no-use-before-define": "off",
-      "@typescript-eslint/no-use-before-define": ["error"],
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": ["error"],
-      "react/display-name": "off"
-    },
-    "settings": {
-      "import/resolver": {
-        "node": {
-          "extensions": [".tsx", ".d.ts", ".ts"]
-        }
-      },
-      "react": {
-        "version": "detect"
+    "import/resolver": {
+      "node": {
+        "extensions": [".tsx", ".d.ts", ".ts"]
       }
     }
+  }
 }

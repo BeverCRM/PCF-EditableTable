@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import { ComboBox, FontIcon, IComboBox, IComboBoxOption, Stack } from '@fluentui/react';
 import React, { memo, useState } from 'react';
 import { useAppSelector } from '../../store/hooks';
@@ -14,7 +15,7 @@ export interface IWholeFormatProps {
   isRequired: boolean;
 }
 
-export const WholeFormat = memo(({ value, formattedValue, type, _onChange, isRequired,
+export const WholeFormat = React.memo(({ value, formattedValue, type, _onChange, isRequired,
   _onDoubleClick } : IWholeFormatProps) => {
   const [isInvalid, setInvalid] = useState<boolean>(false);
   const errorText = 'Required fields must be filled in.';

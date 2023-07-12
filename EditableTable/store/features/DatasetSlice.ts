@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Row, isNewRow } from '../../mappers/dataSetMapper';
 import { EntityPrivileges, IDataverseService } from '../../services/DataverseService';
+import { AsyncThunkConfig } from '../../utils/types';
 
 export type DatasetColumn = {
   name: string;
@@ -79,18 +80,12 @@ export const datasetSlice = createSlice({
       state.rows.unshift(action.payload);
     },
 
-    readdNewRowsAfterDelete: (state, action: PayloadAction<string[]>) => {
-      const newRowsToRemove = action.payload;
-      state.newRows = state.rows
-        .filter(row => isNewRow(row) && !newRowsToRemove.includes(row.key));
+    readdNewRowsAfterDelete: (state, action: PayloadAction<Row[]>) => {
+      state.newRows = action.payload;
     },
 
     removeNewRows: state => {
-      state.rows = state.rows.filter(row => isNewRow(row));
       state.newRows = [];
-    },
-    setColumns: (state, action: PayloadAction<DatasetColumn[]>) => {
-      state.columns = action.payload;
     },
   },
   extraReducers: builder => {

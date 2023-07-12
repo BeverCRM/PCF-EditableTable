@@ -1,6 +1,7 @@
 import { IDataverseService } from '../services/DataverseService';
 
 export const formatNumber = (_service: IDataverseService, value: string) =>
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   Number.parseLocale(value.replace(/[^0-9.,]+/g, ''), _service.getContext().client.locale);
 
@@ -20,15 +21,18 @@ export const formatDateShort =
 
 export const formatUserDateTimeToUTC =
 (_service: IDataverseService, userDateTime: Date, behavior: 1 | 3 | 4): Date =>
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   new Date(_service.getContext().formatting.formatUserDateTimeToUTC(userDateTime, behavior));
 
 export const formatUTCDateTimeToUserDate =
 (_service: IDataverseService, value: string): Date =>
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   _service.getContext().formatting.formatUTCDateTimeToUserDate(value);
 
 export const parseDateFromString =
 (_service: IDataverseService, value: string): Date =>
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   _service.getContext().formatting.parseDateFromString(value);

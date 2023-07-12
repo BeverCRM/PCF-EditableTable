@@ -9,27 +9,6 @@ export const getDateFormatWithHyphen = (date: Date | undefined) => {
   return `${date.getFullYear()}-${month}-${day}`;
 };
 
-export const getDateFormatWithSlash = (date?: Date): string => !date ? ''
-  : `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-
-export const getDateFromString = (dateString: string, currentDate: Date | undefined) => {
-  const previousValue = currentDate || new Date();
-  const newValueParts = (dateString || '').trim().split('/');
-  const day =
-    newValueParts.length > 0
-      ? Math.max(1, Math.min(31, parseInt(newValueParts[1], 10))) : previousValue.getDate();
-  const month =
-    newValueParts.length > 1
-      ? Math.max(1, Math.min(12, parseInt(newValueParts[0], 10))) - 1
-      : previousValue.getMonth();
-  let year = newValueParts.length > 2
-    ? parseInt(newValueParts[2], 10) : previousValue.getFullYear();
-  if (year < 100) {
-    year += previousValue.getFullYear() - (previousValue.getFullYear() % 100);
-  }
-  return new Date(year, month, day);
-};
-
 export const setTimeForDate = (value: Date | undefined, time: string | undefined) => {
   if (time === undefined || value === undefined) return value;
 

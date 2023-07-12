@@ -1,0 +1,15 @@
+name: Publish on Bever Marketplace CI
+
+on:
+  push:
+    branches: release
+
+jobs:
+  main:
+    uses: BeverCRM/Workflow-Build-Release-Upload-Update/.github/workflows/build-release-upload-update-rw.yml@master
+    secrets: inherit
+    with:
+      control-title: Editable Table
+      control-description: Editable Grid with create, delete, save and refresh functionalities. New records are created as a new line in the grid.
+      control-tags: Dataset, Grid, Table, Editable
+      # control-youtube-video-url: ''

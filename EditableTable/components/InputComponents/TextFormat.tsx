@@ -3,6 +3,7 @@ import React, { memo, useState } from 'react';
 import { asteriskClassStyle, errorTooltip, textFieldStyles } from '../../styles/ComponentsStyles';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setInvalid } from '../../store/features/ErrorSlice';
+import { textFieldStyles } from '../../styles/ComponentsStyles';
 
 export type errorProp = {
   isInvalid: boolean,
@@ -13,14 +14,16 @@ export interface ITextProps {
   index: number | undefined,
   fieldName: string,
   value: string | undefined,
+  ownerValue: string | undefined,
   isDisabled?: boolean,
   isRequired: boolean,
-  _onChange: Function;
-  _onDoubleClick: Function;
+  _onChange: Function,
+  _onDoubleClick: Function,
 }
 
 export const TextFormat = memo(({ value, isRequired, isDisabled, fieldName, index,
   _onChange, _onDoubleClick } : ITextProps) => {
+  const currentValue = ownerValue !== undefined ? ownerValue : value;
   const errorProp = {
     isInvalid: !!(isRequired && value === ''),
     errorText: 'Required fields must be filled in.',
@@ -53,7 +56,8 @@ export const TextFormat = memo(({ value, isRequired, isDisabled, fieldName, inde
 
   return (
     <Stack>
-      <TextField defaultValue={value}
+      <TextField defaultValue={currentValue}
+        key={currentValue}
         styles={textFieldStyles(isRequired)}
         disabled={isDisabled}
         onDoubleClick={() => _onDoubleClick()}

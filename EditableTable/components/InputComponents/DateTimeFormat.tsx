@@ -43,7 +43,7 @@ export interface IDatePickerProps {
   _service: IDataverseService;
 }
 
-export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
+export const DateTimeFormat = React.memo(({ fieldName, dateOnly, value,
   isRequired, _onChange, _onDoubleClick, _service }: IDatePickerProps) => {
   const [isInvalid, setInvalid] = useState<boolean>(false);
   let timeKey: string | number | undefined;
@@ -106,6 +106,9 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
       else {
         setChangedDateTime(date, timeKey);
       }
+    }
+    else {
+      _onChange(null);
     }
   };
 
