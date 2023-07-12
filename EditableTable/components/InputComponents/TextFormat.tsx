@@ -3,7 +3,6 @@ import React, { memo, useState } from 'react';
 import { asteriskClassStyle, errorTooltip, textFieldStyles } from '../../styles/ComponentsStyles';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setInvalid } from '../../store/features/ErrorSlice';
-import { textFieldStyles } from '../../styles/ComponentsStyles';
 
 export type errorProp = {
   isInvalid: boolean,
@@ -21,7 +20,7 @@ export interface ITextProps {
   _onDoubleClick: Function,
 }
 
-export const TextFormat = memo(({ value, isRequired, isDisabled, fieldName, index,
+export const TextFormat = memo(({ value, isRequired, isDisabled, fieldName, index, ownerValue,
   _onChange, _onDoubleClick } : ITextProps) => {
   const currentValue = ownerValue !== undefined ? ownerValue : value;
   const errorProp = {
