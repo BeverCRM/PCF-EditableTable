@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import { FontIcon, Stack, TextField } from '@fluentui/react';
 import React, { memo, useState } from 'react';
 import { asteriskClassStyle, errorTooltip, textFieldStyles } from '../../styles/ComponentsStyles';
@@ -24,7 +25,7 @@ export const TextFormat = memo(({ value, isRequired, isDisabled, fieldName, inde
   _onChange, _onDoubleClick } : ITextProps) => {
   const currentValue = ownerValue !== undefined ? ownerValue : value;
   const errorProp = {
-    isInvalid: !!(isRequired && value === ''),
+    isInvalid: !!(isRequired && currentValue === ''),
     errorText: 'Required fields must be filled in.',
   };
 

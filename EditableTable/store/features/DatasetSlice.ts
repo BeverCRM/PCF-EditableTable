@@ -87,6 +87,10 @@ export const datasetSlice = createSlice({
     removeNewRows: state => {
       state.newRows = [];
     },
+
+    setColumns: (state, action: PayloadAction<DatasetColumn[]>) => {
+      state.columns = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setRequirementLevels.fulfilled, (state, action) => {

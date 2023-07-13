@@ -20,7 +20,7 @@ export interface INumberProps {
   _service: IDataverseService;
 }
 
-export const NumberFormat = React.memo(({ fieldName, value, rowId, isRequired,
+export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
   _onChange, _onDoubleClick, _service } : INumberProps) => {
   const [isInvalid, setInvalid] = useState<boolean>(false);
   const errorText = 'Required fields must be filled in.';

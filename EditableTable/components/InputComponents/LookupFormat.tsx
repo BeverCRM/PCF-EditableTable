@@ -25,7 +25,7 @@ export interface ILookupProps {
   _service: IDataverseService;
 }
 
-export const LookupFormat = React.memo(
+export const LookupFormat = memo(
   ({ _service, fieldName, value, parentEntityMetadata,
     isRequired, _onChange, _onDoubleClick }: ILookupProps) => {
     const picker = React.useRef(null);
@@ -37,7 +37,8 @@ export const LookupFormat = React.memo(
     const currentOption = value ? [value] : [];
     const errorText = 'Required fields must be filled in.';
 
-    if (value === undefined && parentEntityMetadata !== undefined) {
+    if (value === undefined &&
+      parentEntityMetadata !== undefined && parentEntityMetadata.entityId !== undefined) {
       if (currentLookup?.reference?.entityNameRef === parentEntityMetadata.entityTypeName) {
         currentOption.push({
           key: parentEntityMetadata.entityId,

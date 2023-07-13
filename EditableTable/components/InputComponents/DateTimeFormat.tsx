@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import React, { memo, useState } from 'react';
 import {
   DatePicker,
@@ -43,7 +44,7 @@ export interface IDatePickerProps {
   _service: IDataverseService;
 }
 
-export const DateTimeFormat = React.memo(({ fieldName, dateOnly, value,
+export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
   isRequired, _onChange, _onDoubleClick, _service }: IDatePickerProps) => {
   const [isInvalid, setInvalid] = useState<boolean>(false);
   let timeKey: string | number | undefined;

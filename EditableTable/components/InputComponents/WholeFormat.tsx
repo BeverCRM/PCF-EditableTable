@@ -15,7 +15,7 @@ export interface IWholeFormatProps {
   isRequired: boolean;
 }
 
-export const WholeFormat = React.memo(({ value, formattedValue, type, _onChange, isRequired,
+export const WholeFormat = memo(({ value, formattedValue, type, _onChange, isRequired,
   _onDoubleClick } : IWholeFormatProps) => {
   const [isInvalid, setInvalid] = useState<boolean>(false);
   const errorText = 'Required fields must be filled in.';

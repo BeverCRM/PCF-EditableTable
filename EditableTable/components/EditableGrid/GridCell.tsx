@@ -36,7 +36,7 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
     requirementLevel.fieldName === currentColumn.key);
   const isRequired = fieldRequirementLevel?.isRequired || false;
 
-  const _changedValue = React.useCallback(
+  const _changedValue = useCallback(
     (newValue: any, rawValue?: any, lookupEntityNavigation?: string): void => {
       dispatch(setChangedRecords({
         id: row.key,

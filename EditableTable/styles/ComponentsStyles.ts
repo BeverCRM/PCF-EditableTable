@@ -80,6 +80,9 @@ export const lookupSelectedOptionStyles: IButtonStyles = {
 };
 
 export const numberFormatStyles = (required: boolean): Partial<ISpinButtonStyles> => ({
+  root: {
+    minWidth: '40px',
+  },
   arrowButtonsContainer: {
     display: 'none',
   },
