@@ -58,7 +58,7 @@ export class DataverseService implements IDataverseService {
   private _context: ComponentFramework.Context<IInputs>;
   private _targetEntityType: string;
   private _clientUrl: string;
-  private _parentValue: string;
+  private _parentValue: string | undefined;
   private NEW_RECORD_ID_LENGTH_CHECK = 15;
 
   constructor(context: ComponentFramework.Context<IInputs>) {
@@ -84,10 +84,12 @@ export class DataverseService implements IDataverseService {
     return metadata.EntitySetName;
   }
 
-  public async getParentPluralName(): Promise<string> {
+  public async getParentPluralName(): Promise<string | undefined> {
     const parentMetadata = this.getParentMetadata();
     const parentEntityPluralName = await this.getEntityPluralName(parentMetadata.entityTypeName);
-    return `/${parentEntityPluralName}(${parentMetadata.entityId})`;
+    return parentMetadata.entityId
+      ? `/${parentEntityPluralName}(${parentMetadata.entityId})`
+      : undefined;
   }
 
   public async setParentValue() {
@@ -177,7 +179,7 @@ export class DataverseService implements IDataverseService {
           : { [recordData.fieldName]: recordData.newValue }), {});
 
     const subgridParentFieldName = await this.getFieldSchemaName();
-    if (this.parentFieldIsValid(record, subgridParentFieldName)) {
+    if (this.parentFieldIsValid(record, subgridParentFieldName) && this._parentValue) {
       Object.assign(data, { [`${subgridParentFieldName}@odata.bind`]: this._parentValue });
     }
 
