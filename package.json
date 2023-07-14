@@ -23,6 +23,7 @@
     "@types/react": "^16.8",
     "@typescript-eslint/eslint-plugin": "^5.46.0",
     "@typescript-eslint/parser": "^5.46.0",
+    "cypress": "^12.9.0",
     "eslint": "^7.32.0",
     "eslint-config-bever": "^1.0.3",
     "eslint-plugin-import": "^2.23.4",
