@@ -126,7 +126,7 @@ export class DataverseService implements IDataverseService {
       await this._context.webAPI.deleteRecord(this._targetEntityType, recordId);
     }
     catch (e) {
-      console.log(e);
+      this.openErrorDialog(e);
     }
   }
 

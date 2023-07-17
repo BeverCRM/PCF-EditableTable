@@ -29,7 +29,7 @@ export const LookupFormat = memo(
   ({ _service, fieldName, value, parentEntityMetadata,
     isRequired, _onChange, _onDoubleClick }: ILookupProps) => {
     const picker = React.useRef(null);
-    const [isInvalid, setInvalid] = useState<boolean>(false);
+    const [isInvalid, setInvalid] = useState(false);
 
     const lookups = useAppSelector(state => state.lookup.lookups);
     const currentLookup = lookups.find(lookup => lookup.logicalName === fieldName);

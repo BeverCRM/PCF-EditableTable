@@ -46,7 +46,7 @@ export interface IDatePickerProps {
 
 export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
   isRequired, _onChange, _onDoubleClick, _service }: IDatePickerProps) => {
-  const [isInvalid, setInvalid] = useState<boolean>(false);
+  const [isInvalid, setInvalid] = useState(false);
   let timeKey: string | number | undefined;
   const options = timesList;
 
@@ -79,11 +79,6 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
       setInvalid(true);
     }
   };
-
-  const onParseDateFromString = React.useCallback(
-    (newValue: string): Date => parseDateFromString(_service, newValue),
-    [],
-  );
 
   const setChangedDateTime = (date: Date | undefined, key: string | number | undefined) => {
     const currentDateTime = setTimeForDate(date, key?.toString());
@@ -132,7 +127,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
         value={currentDate}
         onSelectDate={onDateChange}
         formatDate={(date?: Date) => date ? formatDateShort(_service, date) : ''}
-        parseDateFromString={onParseDateFromString}
+        parseDateFromString={(newValue: string): Date => parseDateFromString(_service, newValue)}
         strings={defaultDatePickerStrings}
         onDoubleClick={() => _onDoubleClick()}
         styles={datePickerStyles(dateOnly ? isRequired : false)}

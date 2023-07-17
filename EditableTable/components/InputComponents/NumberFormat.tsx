@@ -22,7 +22,7 @@ export interface INumberProps {
 
 export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
   _onChange, _onDoubleClick, _service } : INumberProps) => {
-  const [isInvalid, setInvalid] = useState<boolean>(false);
+  const [isInvalid, setInvalid] = useState(false);
   const errorText = 'Required fields must be filled in.';
   const numbers = useAppSelector(state => state.number.numberFieldsMetadata);
   const currencySymbols = useAppSelector(state => state.number.currencySymbols);

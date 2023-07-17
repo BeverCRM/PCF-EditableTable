@@ -118,7 +118,6 @@ export const {
   readdNewRowsAfterDelete,
   removeNewRows,
   setColumns,
-  // resizeColumn,
 } = datasetSlice.actions;
 
 export default datasetSlice.reducer;

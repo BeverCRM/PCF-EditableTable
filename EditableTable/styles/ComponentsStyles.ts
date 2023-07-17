@@ -147,9 +147,7 @@ export const errorTooltip = (isInvalid: boolean, errorText: string, index?: numb
     position: 'absolute',
     bottom: '73%',
     marginLeft: '-13px',
-    borderWidth: '5px',
-    borderStyle: 'solid',
-    borderColor: '#c0172b transparent transparent transparent',
+    border: '5px solid #c0172b transparent transparent transparent',
   },
   ':hover::before': {
     display: 'block',

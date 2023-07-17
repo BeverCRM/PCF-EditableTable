@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from 'react';
 import {
   DetailsList,
@@ -49,7 +47,6 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
   const newRows: Row[] = useAppSelector(state => state.dataset.newRows);
   const columns = mapDataSetColumns(dataset, _service);
   const isPendingDelete = useAppSelector(state => state.record.isPendingDelete);
-  const entityPrivileges = useAppSelector(state => state.dataset.entityPrivileges);
 
   const dispatch = useAppDispatch();
 
@@ -126,8 +123,6 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
 
   const _onColumnClick =
   (ev?: React.MouseEvent<HTMLElement, MouseEvent>, column?: IColumn) => {
-    console.log(ev, column);
-
     if (column?.fieldName) {
       const oldSorting = (dataset.sorting || []).find(sort => sort.name === column.fieldName);
       const newSorting: ComponentFramework.PropertyHelper.DataSetApi.SortStatus = {
@@ -142,7 +137,6 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
         dataset.sorting.pop();
       }
       dataset.sorting.push(newSorting);
-      // dataset.paging.loadExactPage(1);
       dataset.paging.reset();
       dataset.refresh();
     }
@@ -157,7 +151,6 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
         saveButtonHandler={saveButtonHandler}
         isControlDisabled={isControlDisabled}
         selectedCount={selectedRecordIds.length}
-        entityPrivileges={entityPrivileges}
       ></CommandBar>
     </Stack>
     <DetailsList

@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-// import { AsyncThunkConfig } from '../../utils/types';
 
 export type InvalidField = {
   rowId: string;
@@ -18,16 +17,6 @@ const initialState: IErrorState = {
   errorMessage: '',
 };
 
-// export const checkFieldsValidity = createAsyncThunk<InvalidField[], void, AsyncThunkConfig>(
-//   'error/checkFieldsValidity',
-//   async (thunkApi) => {
-//     const { changedRecords } = thunkApi.getState().record;
-//     const { requirementLevels } = thunkApi.getState().dataset;
-
-//     return [];
-//   },
-// );
-
 export const ErrorSlice = createSlice({
   name: 'error',
   initialState,
@@ -39,11 +28,6 @@ export const ErrorSlice = createSlice({
       state.invalidFields = action.payload;
     },
   },
-  // extraReducers(builder) {
-  //   builder.addCase(checkFieldsValidity.fulfilled, (state, action) => {
-  //     state.invalidFields = action.payload;
-  //   });
-  // },
 });
 
 export const { setInvalid, setInvalidFields } = ErrorSlice.actions;

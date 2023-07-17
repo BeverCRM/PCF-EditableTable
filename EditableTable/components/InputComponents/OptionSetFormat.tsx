@@ -19,7 +19,7 @@ export interface IDropDownProps {
 
 export const OptionSetFormat = memo(({ fieldName, value, isMultiple, isRequired, isTwoOptions,
   _onChange, _onDoubleClick, _service }: IDropDownProps) => {
-  const [isInvalid, setInvalid] = useState<boolean>(false);
+  const [isInvalid, setInvalid] = useState(false);
   const errorText = 'Required fields must be filled in.';
   let currentValue = value;
   const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);

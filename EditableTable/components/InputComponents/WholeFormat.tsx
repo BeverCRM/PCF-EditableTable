@@ -17,7 +17,7 @@ export interface IWholeFormatProps {
 
 export const WholeFormat = memo(({ value, formattedValue, type, _onChange, isRequired,
   _onDoubleClick } : IWholeFormatProps) => {
-  const [isInvalid, setInvalid] = useState<boolean>(false);
+  const [isInvalid, setInvalid] = useState(false);
   const errorText = 'Required fields must be filled in.';
 
   const wholeFormat = useAppSelector(state => state.wholeFormat);

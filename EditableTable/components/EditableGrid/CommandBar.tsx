@@ -4,7 +4,6 @@ import { useAppSelector } from '../../store/hooks';
 import { commandBarButtonStyles } from '../../styles/ButtonStyles';
 import { addIcon, refreshIcon, deleteIcon, saveIcon } from '../../styles/ButtonStyles';
 import { IIconProps } from '@fluentui/react/lib/components/Icon/Icon.types';
-import { EntityPrivileges } from '../../services/DataverseService';
 
 export interface ICommandBarProps {
   refreshButtonHandler: () => void;
@@ -13,7 +12,6 @@ export interface ICommandBarProps {
   saveButtonHandler: () => void;
   isControlDisabled: boolean;
   selectedCount: number;
-  entityPrivileges: EntityPrivileges;
 }
 
 type ButtonProps = {
@@ -28,13 +26,14 @@ type ButtonProps = {
 export const CommandBar = (props: ICommandBarProps) => {
   const isLoading = useAppSelector(state => state.loading.isLoading);
   const isPendingSave = useAppSelector(state => state.record.isPendingSave);
+  const entityPrivileges = useAppSelector(state => state.dataset.entityPrivileges);
 
   const buttons: ButtonProps[] = [
     {
       order: 1,
       text: 'New',
       icon: addIcon,
-      disabled: isLoading || props.isControlDisabled || !props.entityPrivileges.create,
+      disabled: isLoading || props.isControlDisabled || !entityPrivileges.create,
       onClick: props.newButtonHandler,
     },
     {
@@ -48,7 +47,7 @@ export const CommandBar = (props: ICommandBarProps) => {
       order: 3,
       text: 'Delete',
       icon: deleteIcon,
-      disabled: isLoading || props.isControlDisabled || !props.entityPrivileges.delete,
+      disabled: isLoading || props.isControlDisabled || !entityPrivileges.delete,
       onClick: props.deleteButtonHandler,
       styles: {
         root: { display: props.selectedCount > 0 ? 'flex' : 'none' },
@@ -59,7 +58,7 @@ export const CommandBar = (props: ICommandBarProps) => {
       order: 4,
       text: 'Save',
       icon: saveIcon,
-      disabled: isLoading || props.isControlDisabled || !props.entityPrivileges.write,
+      disabled: isLoading || props.isControlDisabled || !entityPrivileges.write,
       onClick: props.saveButtonHandler,
       styles: {
         icon: { color: isPendingSave ? 'blue' : 'black' },
