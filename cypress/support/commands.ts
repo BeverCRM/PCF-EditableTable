@@ -8,7 +8,19 @@ declare namespace Cypress {
     createRecord(field1Value: string): Chainable<void>;
     deleteRecord(): Chainable<void>;
     refreshGrid(): Chainable<void>;
+    assertFieldValues(data: DateTimeData): Chainable<void>;
   }
+}
+
+interface Assertion {
+  selector: string;
+  index: number;
+  value: string;
+}
+
+interface DateTimeData {
+  value: string;
+  assertions: Assertion[];
 }
 
 Cypress.Commands.add('login', (username, password) => {
@@ -22,30 +34,18 @@ Cypress.Commands.add('login', (username, password) => {
         cy.get('[name="loginfmt"]').type(`${username}{enter}`);
         cy.get('[name="passwd"]').type(`${password}{enter}`);
         cy.get('[type="submit"]').click();
-      });
-  });
-  // cy.getAllCookies().then(cookies => {
-  //   console.log('COOKIES in LOGIN');
-  //   console.log(cookies);
-  //   const modifiedCookies = cookies.map(cookie => ({
-  //     ...cookie,
-  //     sameSite: 'no_restriction',
-  //     secure: true,
-  //   }));
 
-  //   modifiedCookies.forEach(cookie => {
-  //     cy.setCookie(cookie.name, cookie.value, {
-  //       ...cookie,
-  //       sameSite: 'no_restriction',
-  //       secure: true,
-  //     });
-  //   });
-  // });
+      });
+  }).then(() => {
+    cy.fixture('record').then(record => {
+      cy.visitD365Environment(record.appId, record.entityName, record.recordId);
+    });
+  },
+  );
 });
 
 Cypress.Commands.add('visitD365Environment', (appId, entityName, recordId) => {
   // cy.on('uncaught:exception', (err, runnable) => false);
-
   // cy.origin(`https://bevertest.crm4.dynamics.com`,
   // { args: { appId, entityName, recordId } },
   // ({ appId, entityName, recordId }) => {
@@ -55,25 +55,25 @@ Cypress.Commands.add('visitD365Environment', (appId, entityName, recordId) => {
           `&pagetype=entityrecord` +
           `&etn=${entityName}` +
           `&id=${recordId}`);
-  // });
-  // cy.getAllCookies().then(cookies => {
-  //   console.log('COOKIES');
-  //   console.log(cookies);
 
-  //   const modifiedCookies = cookies.map(cookie => ({
-  //     ...cookie,
-  //     sameSite: 'no_restriction',
-  //     secure: true,
-  //   }));
+  cy.get('body[data-loaded="1"]').should('exist');
 
-  //   modifiedCookies.forEach(cookie => {
-  //     cy.setCookie(cookie.name, cookie.value, {
-  //       ...cookie,
-  //       sameSite: 'no_restriction',
-  //       secure: true,
-  //     });
+  cy.get('button[aria-label="Sign In"]').as('btn').click();
+  cy.get('@btn').click();
+  // const interval = setInterval(() => {
+  //   cy.get('button[aria-label="Sign In"]').should('be.visible').click().then(() => {
+  //     count += 1;
+  //     if (count === 2) {
+  //       console.log('THE COUNT IS 2!');
+  //       clearInterval(interval);
+  //       cy.getCookies().then(cookies => {
+  //         cookies.forEach(cookie => {
+  //           cy.setCookie(cookie.name, cookie.value);
+  //         });
+  //       });
+  //     }
   //   });
-  // });
+  // }, 1000);
 });
 
 Cypress.Commands.add('removeSignInDialogWindow', () => {
@@ -88,19 +88,15 @@ Cypress.Commands.add('removeSignInDialogWindow', () => {
   }, 1000);
 });
 
-Cypress.Commands.add('createRecord', field1Value => {
-  cy.get('[data-icon-name="Add"]').should('be.visible').click();
-  cy.wait(1000);
-  cy.get('input.ms-TextField-field:not([role="combobox"])').eq(0).type(field1Value);
-  cy.get('[data-icon-name="Save"]').should('be.visible').click();
-  cy.wait(5000);
-});
-
-Cypress.Commands.add('deleteRecord', () => {
-  cy.get('delete-button-selector').click(); // CheckBox;
-  cy.get('[data-icon-name="Delete"]').should('be.visible').click();
-});
-
-Cypress.Commands.add('refreshGrid', () => {
-  cy.get('[data-icon-name="Refresh"]').should('be.visible').click();
+Cypress.Commands.add('assertFieldValues', data => {
+  cy.get(`div .ms-DetailsRow-fields input[value="${data.value}"]`)
+    .closest('.ms-DetailsRow-fields')
+    .then(row => {
+      data.assertions.forEach(assertion => {
+        cy.wrap(row)
+          .find(assertion.selector)
+          .eq(assertion.index)
+          .should('have.value', assertion.value);
+      });
+    });
 });
