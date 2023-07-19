@@ -14,6 +14,13 @@ export type ParentMetadata = {
 
 export type Entity = ComponentFramework.WebApi.Entity;
 
+export type EntityPrivileges = {
+  create: boolean,
+  read: boolean,
+  write: boolean,
+  delete: boolean,
+};
+
 export interface IDataverseService {
   getEntityPluralName(entityName: string): Promise<string>;
   getCurrentUserName(): string;
@@ -38,10 +45,12 @@ export interface IDataverseService {
   getTimeZoneDefinitions(): Promise<IComboBoxOption[]>;
   getProvisionedLanguages(): Promise<IComboBoxOption[]>;
   getDateMetadata(fieldName: string): Promise<any>;
+  getTextFieldMetadata(fieldName: string, type: string | undefined): Promise<number>;
   getTargetEntityType(): string;
   getContext(): ComponentFramework.Context<IInputs>;
   getAllocatedWidth(): number;
   getReqirementLevel(fieldName: string): Promise<any>;
+  getSecurityPrivileges(): Promise<EntityPrivileges>;
   isStatusField(fieldName: string | undefined): boolean;
 }
 
@@ -49,7 +58,7 @@ export class DataverseService implements IDataverseService {
   private _context: ComponentFramework.Context<IInputs>;
   private _targetEntityType: string;
   private _clientUrl: string;
-  private _parentValue: string;
+  private _parentValue: string | undefined;
   private NEW_RECORD_ID_LENGTH_CHECK = 15;
 
   constructor(context: ComponentFramework.Context<IInputs>) {
@@ -75,10 +84,12 @@ export class DataverseService implements IDataverseService {
     return metadata.EntitySetName;
   }
 
-  public async getParentPluralName(): Promise<string> {
+  public async getParentPluralName(): Promise<string | undefined> {
     const parentMetadata = this.getParentMetadata();
     const parentEntityPluralName = await this.getEntityPluralName(parentMetadata.entityTypeName);
-    return `/${parentEntityPluralName}(${parentMetadata.entityId})`;
+    return parentMetadata.entityId
+      ? `/${parentEntityPluralName}(${parentMetadata.entityId})`
+      : undefined;
   }
 
   public async setParentValue() {
@@ -115,7 +126,7 @@ export class DataverseService implements IDataverseService {
       await this._context.webAPI.deleteRecord(this._targetEntityType, recordId);
     }
     catch (e) {
-      console.log(e);
+      this.openErrorDialog(e);
     }
   }
 
@@ -168,7 +179,7 @@ export class DataverseService implements IDataverseService {
           : { [recordData.fieldName]: recordData.newValue }), {});
 
     const subgridParentFieldName = await this.getFieldSchemaName();
-    if (this.parentFieldIsValid(record, subgridParentFieldName)) {
+    if (this.parentFieldIsValid(record, subgridParentFieldName) && this._parentValue) {
       Object.assign(data, { [`${subgridParentFieldName}@odata.bind`]: this._parentValue });
     }
 
@@ -303,6 +314,17 @@ export class DataverseService implements IDataverseService {
     return results.value[0].DateTimeBehavior.Value;
   }
 
+  public async getTextFieldMetadata(fieldName: string, type: string | undefined) {
+    const filter = `$filter=LogicalName eq '${fieldName}'`;
+    const attributeType = `${type === 'Multiple'
+      ? 'MemoAttributeMetadata' : 'StringAttributeMetadata'}`;
+    const request = `${this._clientUrl}EntityDefinitions(LogicalName='${this._targetEntityType
+    }')/Attributes/Microsoft.Dynamics.CRM.${attributeType}?${filter}`;
+    const results = await getFetchResponse(request);
+
+    return results.value[0]?.MaxLength;
+  }
+
   public getTargetEntityType() {
     return this._targetEntityType;
   }
@@ -321,6 +343,20 @@ export class DataverseService implements IDataverseService {
     const results = await getFetchResponse(request);
 
     return results.RequiredLevel.Value;
+  }
+
+  public async getSecurityPrivileges() {
+    const createPriv = this._context.utils.hasEntityPrivilege(this._targetEntityType, 1, 0);
+    const readPriv = this._context.utils.hasEntityPrivilege(this._targetEntityType, 2, 0);
+    const writePriv = this._context.utils.hasEntityPrivilege(this._targetEntityType, 3, 0);
+    const deletePriv = this._context.utils.hasEntityPrivilege(this._targetEntityType, 4, 0);
+    // doesnt look at the level (org vs user)
+    return <EntityPrivileges>{
+      create: createPriv,
+      read: readPriv,
+      write: writePriv,
+      delete: deletePriv,
+    };
   }
 
   public isStatusField(fieldName: string | undefined) {

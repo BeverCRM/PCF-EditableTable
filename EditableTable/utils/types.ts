@@ -9,6 +9,8 @@ import { ILookupState } from '../store/features/LookupSlice';
 import { INumberState } from '../store/features/NumberSlice';
 import { IRecordState } from '../store/features/RecordSlice';
 import { IWholeFormatState } from '../store/features/WholeFormatSlice';
+import { IErrorState } from '../store/features/ErrorSlice';
+import { ITextState } from '../store/features/TextSlice';
 
 export interface StoreState {
   dataset: IDatasetState;
@@ -19,6 +21,8 @@ export interface StoreState {
   record: IRecordState;
   wholeFormat: IWholeFormatState;
   date: IDateState;
+  text: ITextState;
+  error: IErrorState;
 }
 
 export type Store = EnhancedStore<

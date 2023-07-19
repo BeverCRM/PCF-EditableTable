@@ -63,7 +63,7 @@ export const setLookups = createAsyncThunk<Lookup[], LookupPayload, AsyncThunkCo
     })),
 );
 
-export const lookupSlice = createSlice({
+export const LookupSlice = createSlice({
   name: 'lookup',
   initialState,
   reducers: {},
@@ -86,4 +86,4 @@ export const lookupSlice = createSlice({
   },
 });
 
-export default lookupSlice.reducer;
+export default LookupSlice.reducer;
