@@ -40,12 +40,11 @@ export interface IDatePickerProps {
   value: string | null,
   isRequired: boolean;
   _onChange: any,
-  _onDoubleClick: Function;
   _service: IDataverseService;
 }
 
 export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
-  isRequired, _onChange, _onDoubleClick, _service }: IDatePickerProps) => {
+  isRequired, _onChange, _service }: IDatePickerProps) => {
   const [isInvalid, setInvalid] = useState(false);
   let timeKey: string | number | undefined;
   const options = timesList;
@@ -129,7 +128,6 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
         formatDate={(date?: Date) => date ? formatDateShort(_service, date) : ''}
         parseDateFromString={(newValue: string): Date => parseDateFromString(_service, newValue)}
         strings={defaultDatePickerStrings}
-        onDoubleClick={() => _onDoubleClick()}
         styles={datePickerStyles(dateOnly ? isRequired : false)}
         onAfterMenuDismiss={() => checkValidation()}
         onClick={() => setInvalid(false)}
@@ -141,7 +139,6 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
           onChange={onTimeChange}
           styles={timePickerStyles(isRequired)}
           selectedKey={timeKey}
-          onDoubleClick={() => _onDoubleClick()}
           onBlur={() => checkValidation()}
         />
       }
