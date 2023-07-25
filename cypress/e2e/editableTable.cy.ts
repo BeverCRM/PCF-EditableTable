@@ -1,3 +1,5 @@
+import 'cypress-real-events';
+
 describe('Editable Table', () => {
   beforeEach(() => {
     cy.fixture('user').then(user => {
@@ -10,12 +12,9 @@ describe('Editable Table', () => {
 
     cy.get('body[data-loaded="1"]').should('exist');
     cy.get('[data-id="tablist-tab_2"]').should('be.visible').click();
+    cy.get('body[data-loaded="1"]').should('exist');
+
   });
-
-  // cy.get('body[data-loaded="1"]').should('exist');
-
-  // cy.get('button[aria-label="Sign In"]').as('btn').click();
-  // cy.get('@btn').click();
 
   it(`Should click on New Button -> click on Refresh button ->
   refresh the grid -> check for columns sizes`, () => {
@@ -153,10 +152,9 @@ describe('Editable Table', () => {
       });
   });
 
-  it(`Should click on Bool, Duration, DateTime type fields -> 
+  it.only(`Should click on Bool, Duration, DateTime type fields -> 
     select values -> unselect values`, () => {
     cy.get('[data-icon-name="Add"]').click();
-
     // select Bool
     cy.get('.ms-List-cell [data-icon-name="ChevronDown"]').eq(0).click();
     cy.get('.ms-ComboBox-optionText').eq(0).click();
@@ -174,16 +172,12 @@ describe('Editable Table', () => {
       .find('input').should('have.value', '12:00 AM');
 
     // choose Date
-    cy.get('.ms-List-cell [data-icon-name="Calendar"]').eq(0).click();
-    cy.get('td[role="presentation"] button').contains('14').closest('button').click();
+    cy.get('.ms-List-cell [data-icon-name="Calendar"]').eq(0).realClick();
+    cy.get('td[role="presentation"] button').contains('14').click();
     cy.wait(2000);
-    cy.get('.ms-List-cell [data-icon-name="Calendar"]').eq(0).closest('div')
-      .find('input').should('have.value', '07/14/2023');
-
-    // remove Date
-    cy.get('.ms-List-cell [data-icon-name="Calendar"]').eq(0).closest('div')
-      .find('input').as('dateTimeInput').type('{selectall}{backspace}');
-    cy.get('@dateTimeInput').should('have.value', '');
+    cy.get('.ms-List-cell input[id^=DatePicker]').eq(0).should('have.value', '07/14/2023');
+    cy.get('.ms-List-cell input[id^=DatePicker]').eq(0).type('{selectall}{backspace}');
+    cy.get('.ms-List-cell input[id^=DatePicker]').eq(0).should('have.value', '');
 
   });
 
@@ -267,11 +261,11 @@ describe('Editable Table', () => {
     // create test record
     cy.get('[data-icon-name="Add"]').should('exist').click();
     cy.get('div[data-automation-key="bvr_name"] input').eq(0).type('CypressDurationTest');
+    cy.get('div[data-automation-key="bvr_duration"] input').eq(0).type('1500');
+
     cy.get('[data-icon-name="Save"]').should('exist').click();
     cy.get('div[class^="ms-Stack loading"]').should('have.css', 'display', 'none');
 
-    cy.get('div[data-automation-key="bvr_duration"] input').eq(0).type('1500');
-    cy.get('[data-icon-name="Save"]').should('exist').click();
     cy.get('div[data-automation-key="bvr_duration"] input').eq(0).should('have.value', '1.04 days');
 
     // delete test record
@@ -381,11 +375,16 @@ describe('Editable Table', () => {
     cy.get('div[data-automation-key="bvr_turtest"] input').eq(0)
       .invoke('val').should('contain', '₽');
 
-    // delete created test record
-    cy.get('.ms-Check').eq(1).click();
-    cy.get('.ms-Check').eq(1).should('have.class', 'is-checked');
+    // delete test record
+    cy.get('.ms-List-cell')
+      .filter(':has(input[value="CypressDurationTest"])')
+      .find('.ms-Check').as('checkbox').click();
+
+    cy.get('@checkbox').should('have.class', 'is-checked');
+
     cy.get('[data-icon-name="Delete"]').click();
     cy.get('[aria-label="OK"]').click();
+    cy.get('div[class^="ms-Stack loading"]').should('have.css', 'display', 'none');
   });
 
   it(`Should click on New button (without parent lookup in the view) -> Save record -> 
@@ -403,68 +402,6 @@ describe('Editable Table', () => {
     cy.get('.ms-DetailsRow-fields').eq(0).should('exist').dblclick({ force: true });
     cy.get('div[title="E2E Test Editable Table"]').should('exist');
   });
-
-  // it.only('test create record', () => {
-  //   // cy.get('[data-id="tablist-tab_3"]').should('exist').click();
-  //   cy.get('[data-icon-name="Add"]').should('be.visible').click();
-
-  //   cy.get('div[data-automation-key="bvr_name"] input').eq(0).type('CypressDeleteTest');
-
-  //   cy.get('[data-icon-name="Save"]').should('be.visible').click();
-  //   cy.wait(7000);
-  // });
-
-  // it(`Should resize a column and check if its width is correct`, () => {
-
-  //   cy.get('.ms-DetailsHeader-cellSizer').eq(0)
-  //     .then(el => {
-  //       const rect = el[0].getBoundingClientRect();
-  //       const pageYDragAmount = 200;
-
-  //       cy.window().then(window => {
-  //         const pageY = rect.top + window.scrollY;
-
-  //         cy.wrap(el)
-  //           .trigger('mouseover', {
-  //             force: true,
-  //           })
-  //           .trigger('mousedown', {
-  //             which: 1,
-  //             pageX: rect.left,
-  //             pageY,
-  //             force: true,
-  //           })
-  //           .trigger('mousemove', {
-  //             pageX: rect.left,
-  //             pageY: pageY + pageYDragAmount,
-  //             force: true,
-  //             position: 'center',
-  //           })
-  //           .trigger('mousemove')
-  //           .trigger('mouseup', {
-  //             which: 1,
-  //             force: true,
-  //           });
-  //       });
-  //     });
-  //   // cy.get('[data-item-key="bvr_booltest"]').then($div => {
-  //   //   const initialWidth = Cypress.$($div).width();
-  //   //   const resizeValue = 200;
-  //   //   cy.get('.ms-DetailsHeader-cellSizer').eq(0)
-  //   //     .trigger('mousedown')
-  //   //     .wait(1500)
-  //   //     .trigger('mousemove', {
-  //   //       clientX: 700,
-
-  //   //     })
-  //   //     .trigger('mouseup', { force: true });
-  //   //   cy.get('[data-item-key="bvr_booltest"]').should($divAfterResize => {
-  //   //     const finalWidth = Cypress.$($divAfterResize).width();
-
-  //   //     expect(finalWidth).to.equal(initialWidth + resizeValue);
-  //   //   });
-  //   // });
-  // });
 
   it('Should click on New button (records count=6) -> check for Scrollable Pane visibility', () => {
     cy.get('[data-icon-name="Add"]').should('exist').click();

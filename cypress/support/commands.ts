@@ -36,7 +36,6 @@ Cypress.Commands.add('login', (username, password) => {
 
 Cypress.Commands.add('visitD365Environment', (appId, entityName, recordId) => {
   Cypress.on('uncaught:exception', () => false);
-
   cy.visit(`main.aspx?` +
           `appid=${appId}` +
           `&pagetype=entityrecord` +
