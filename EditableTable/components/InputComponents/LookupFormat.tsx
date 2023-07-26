@@ -21,13 +21,12 @@ export interface ILookupProps {
   parentEntityMetadata: ParentEntityMetadata | undefined;
   isRequired: boolean;
   _onChange: Function;
-  _onDoubleClick: Function;
   _service: IDataverseService;
 }
 
 export const LookupFormat = memo(
   ({ _service, fieldName, value, parentEntityMetadata,
-    isRequired, _onChange, _onDoubleClick }: ILookupProps) => {
+    isRequired, _onChange }: ILookupProps) => {
     const picker = React.useRef(null);
     const [isInvalid, setInvalid] = useState(false);
 
@@ -87,7 +86,7 @@ export const LookupFormat = memo(
           iconName: 'Cancel',
         }}
         onMenuClick={() => onChange(undefined)}
-        onClick={(event: any) => {
+        onClick={event => {
           if (event.detail === SINGLE_CLICK_CODE) {
             _service.openForm(currentOption[0].key.toString(),
               currentLookup?.reference?.entityNameRef);
@@ -117,7 +116,6 @@ export const LookupFormat = memo(
           }
         }}
         inputProps={{
-          onDoubleClick: () => _onDoubleClick(),
           disabled: false,
           onFocus: () => setInvalid(false),
         }}

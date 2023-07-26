@@ -119,8 +119,6 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
   const _renderItemColumn = (item: Row, index: number | undefined, column: IColumn | undefined) =>
     <GridCell row={item} currentColumn={column!} _service={_service} index={index}/>;
 
-  const _onItemInvoked = (item: any) => _service.openForm(item.key);
-
   const _onColumnClick =
   (ev?: React.MouseEvent<HTMLElement, MouseEvent>, column?: IColumn) => {
     if (column?.fieldName) {
@@ -160,13 +158,17 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       onRenderItemColumn={_renderItemColumn}
       selection={selection}
       onRenderRow={ (props, defaultRender) =>
-        <div onDoubleClick={() => _service.openForm(props?.item.key)}>
+        <div onDoubleClick={event => {
+          const target = event.target as HTMLInputElement;
+          if (!target.className.includes('Button')) {
+            _service.openForm(props?.item.key);
+          }
+        }}>
           {defaultRender!(props)}
         </div> }
       onRenderDetailsHeader={_onRenderDetailsHeader}
       layoutMode={DetailsListLayoutMode.fixedColumns}
       styles={gridStyles(rows.length)}
-      onItemInvoked={_onItemInvoked}
       onColumnHeaderClick={_onColumnClick}
     >
     </DetailsList>
