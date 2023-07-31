@@ -31,8 +31,6 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
   const changedTransactionId = changedRecord?.data.find(data =>
     data.fieldName === 'transactioncurrencyid');
 
-  // const currentLookup = lookups.find(lookup => lookup.);
-  // const options = currentLookup?.options ?? [];
   let currentCurrency: CurrencySymbol | null = null;
   const currentNumber = numbers.find(num => num.fieldName === fieldName);
   if (changedTransactionId?.newValue) {
