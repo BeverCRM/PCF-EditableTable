@@ -45,7 +45,22 @@ export const getTimeKeyFromDate = (date: Date) => {
 
 export const getTimeKeyFromTime = (value: string) => {
   let key = '';
-  if (value.toLowerCase().toString().includes('m')) {
+  const timeRegex = /^(0?[1-9]|1[0-2]):[0-5]\d\s(?:AM|PM)$/i;
+  if (timeRegex.test(value.toLowerCase().toString())) {
+    const splitKey = value.match(/[a-zA-Z]+|[0-9]+/g);
+    if (splitKey !== null) {
+      if (splitKey[2].toLowerCase() === 'pm') {
+        key = `${parseFloat(splitKey[0]) + 12}:${splitKey[1]}`;
+      }
+      else if (parseFloat(splitKey[0]) < 10) {
+        key = `0${splitKey[0]}:${splitKey[1]}`;
+      }
+      else {
+        key = `${splitKey[0]}:${splitKey[1]}`;
+      }
+    }
+  }
+  /* if (value.toLowerCase().toString().includes('m')) {
     const splitKey = value.match(/[a-zA-Z]+|[0-9]+/g);
     if (splitKey !== null) {
       if (splitKey[2].toLowerCase() === 'pm') {
@@ -64,6 +79,6 @@ export const getTimeKeyFromTime = (value: string) => {
   }
   else {
     key = '00:00';
-  }
+  } */
   return key;
 };

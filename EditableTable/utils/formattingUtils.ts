@@ -6,8 +6,8 @@ export const formatNumber = (_service: IDataverseService, value: string) =>
   Number.parseLocale(value.replace(/[^0-9.,]+/g, ''), _service.getContext().client.locale);
 
 export const formatCurrency =
-(_service: IDataverseService, value: number, precision?: number, symbol?: string) =>
-  _service.getContext().formatting.formatCurrency(value, precision, symbol);
+(_service: IDataverseService, value: number, precisionSource?: number, symbol?: string) =>
+  _service.getContext().formatting.formatCurrency(value, precisionSource, symbol);
 
 export const formatDecimal =
 (_service: IDataverseService, value: number, precision?: number | undefined) => {

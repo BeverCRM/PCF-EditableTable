@@ -21,6 +21,11 @@ export type EntityPrivileges = {
   delete: boolean,
 };
 
+export type CurrencyData = {
+  symbol: string,
+  precision: number,
+}
+
 export interface IDataverseService {
   getEntityPluralName(entityName: string): Promise<string>;
   getCurrentUserName(): string;
@@ -41,7 +46,8 @@ export interface IDataverseService {
     Promise<DropdownField>;
   getNumberFieldMetadata(fieldName: string, attributeType: string, selection: string):
     Promise<NumberFieldMetadata>;
-  getCurrencySymbol(recordId: string): Promise<string>;
+  getCurrency(recordId: string): Promise<CurrencyData>;
+  getCurrencyById(recordId: string): Promise<CurrencyData>;
   getTimeZoneDefinitions(): Promise<IComboBoxOption[]>;
   getProvisionedLanguages(): Promise<IComboBoxOption[]>;
   getDateMetadata(fieldName: string): Promise<any>;
@@ -52,6 +58,7 @@ export interface IDataverseService {
   getReqirementLevel(fieldName: string): Promise<any>;
   getSecurityPrivileges(): Promise<EntityPrivileges>;
   isStatusField(fieldName: string | undefined): boolean;
+  getGlobbalPrecision(): Promise<number>;
 }
 
 export class DataverseService implements IDataverseService {
@@ -270,18 +277,50 @@ export class DataverseService implements IDataverseService {
       minValue: results.value[0].MinValue,
       maxValue: results.value[0].MaxValue,
       isBaseCurrency: results.value[0].IsBaseCurrency,
+      precisionNumber: results.value[0]?.Precision,
     };
   }
 
-  public async getCurrencySymbol(recordId: string): Promise<string> {
+  public async getGlobbalPrecision() : Promise<number> {
+    const request = await fetch(`${this._clientUrl}organizations?$select=pricingdecimalprecision`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
+        'OData-MaxVersion': '4.0',
+        'OData-Version': '4.0',
+      },
+    });
+    const response = await request.json();
+    return response?.value[0].pricingdecimalprecision;
+  }
+
+  public async getCurrency(recordId: string): Promise<CurrencyData> {
     const fetchedCurrency = await this._context.webAPI.retrieveRecord(
       this._targetEntityType,
       recordId,
-      '?$select=_transactioncurrencyid_value&$expand=transactioncurrencyid($select=currencysymbol)',
+      // eslint-disable-next-line max-len
+      '?$select=_transactioncurrencyid_value&$expand=transactioncurrencyid($select=currencysymbol,currencyprecision)',
+    );
+    return {
+      symbol: fetchedCurrency.transactioncurrencyid?.currencysymbol ??
+      this._context.userSettings.numberFormattingInfo.currencySymbol,
+      precision: fetchedCurrency.transactioncurrencyid?.currencyprecision ??
+      this._context.userSettings.numberFormattingInfo.currencyDecimalDigits };
+  }
+
+  public async getCurrencyById(recordId: string): Promise<CurrencyData> {
+    const fetchedCurrency = await this._context.webAPI.retrieveRecord(
+      'transactioncurrency',
+      recordId,
+      '?$select=currencysymbol,currencyprecision',
     );
 
-    return fetchedCurrency.transactioncurrencyid?.currencysymbol ||
-      this._context.userSettings.numberFormattingInfo.currencySymbol;
+    return {
+      symbol: fetchedCurrency?.currencysymbol ??
+      this._context.userSettings.numberFormattingInfo.currencySymbol,
+      precision: fetchedCurrency?.currencyprecision ??
+      this._context.userSettings.numberFormattingInfo.currencyDecimalDigits };
   }
 
   public async getTimeZoneDefinitions() {
