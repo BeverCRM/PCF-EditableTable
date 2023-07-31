@@ -12,13 +12,12 @@ export interface IDropDownProps {
   isMultiple: boolean;
   isTwoOptions?: boolean;
   _onChange: Function;
-  _onDoubleClick: Function;
   isRequired: boolean;
   _service: IDataverseService;
 }
 
 export const OptionSetFormat = memo(({ fieldName, value, isMultiple, isRequired, isTwoOptions,
-  _onChange, _onDoubleClick, _service }: IDropDownProps) => {
+  _onChange, _service }: IDropDownProps) => {
   const [isInvalid, setInvalid] = useState(false);
   const errorText = 'Required fields must be filled in.';
   let currentValue = value;
@@ -66,7 +65,6 @@ export const OptionSetFormat = memo(({ fieldName, value, isMultiple, isRequired,
         multiSelect={isMultiple}
         selectedKey={currentOptions}
         onChange={onChange}
-        onDoubleClick={() => _onDoubleClick()}
         styles={optionSetStyles(isRequired)}
         onMenuDismissed={() => checkValidation()}
         onMenuOpen={() => setInvalid(false)}

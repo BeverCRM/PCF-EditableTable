@@ -64,7 +64,6 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
     rowId: row.key,
     isRequired,
     _onChange: _changedValue,
-    _onDoubleClick: React.useCallback(() => _service.openForm(row.key), []),
     _service,
     index,
     ownerValue: ownerEntityMetadata,

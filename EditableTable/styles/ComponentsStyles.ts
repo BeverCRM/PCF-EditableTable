@@ -19,6 +19,9 @@ export const textFieldStyles = (required: boolean): Partial<ITextFieldStyles> =>
 });
 
 export const datePickerStyles = (required: boolean): Partial<IDatePickerStyles> => ({
+  root: {
+    width: '-webkit-fill-available',
+  },
   wrapper: {
     marginRight: required ? '10px' : '0px',
   },
@@ -31,7 +34,6 @@ export const timePickerStyles = (required: boolean): Partial<IComboBoxStyles> =>
   },
   optionsContainer: { maxHeight: 260 },
   container: {
-    flexShrink: '2 !important',
     marginLeft: '-1px',
     maxWidth: 150,
     marginRight: required ? '10px' : '0px',
