@@ -282,16 +282,8 @@ export class DataverseService implements IDataverseService {
   }
 
   public async getGlobbalPrecision() : Promise<number> {
-    const request = await fetch(`${this._clientUrl}organizations?$select=pricingdecimalprecision`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=utf-8',
-        'OData-MaxVersion': '4.0',
-        'OData-Version': '4.0',
-      },
-    });
-    const response = await request.json();
+    const request = `${this._clientUrl}organizations?$select=pricingdecimalprecision`;
+    const response = await getFetchResponse(request);
     return response?.value[0].pricingdecimalprecision;
   }
 

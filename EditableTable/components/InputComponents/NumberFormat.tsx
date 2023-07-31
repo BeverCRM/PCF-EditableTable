@@ -81,7 +81,6 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
           changeNumberFormat(currentCurrency, currentNumber, currentNumber.precision, newValue);
         }
       }
-      // changeNumberFormat(currentCurrency, currentNumber, currentNumber?.precision, newValue);
     }
   };
 
