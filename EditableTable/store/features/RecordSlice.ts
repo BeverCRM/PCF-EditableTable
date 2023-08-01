@@ -3,6 +3,8 @@ import { isNewRow, Row } from '../../mappers/dataSetMapper';
 import { IDataverseService } from '../../services/DataverseService';
 import { AsyncThunkConfig } from '../../utils/types';
 import { RequirementLevel } from './DatasetSlice';
+import { ErrorDetails } from '../../services/DataverseService';
+import { getConsolidatedError, isError } from '../../utils/errorUtils';
 
 export type Record = {
   id: string;
@@ -64,7 +66,21 @@ export const saveRecords = createAsyncThunk<void, IDataverseService, AsyncThunkC
     }
     _service.setParentValue();
 
-    await Promise.all(changedRecords.map(record => _service.saveRecord(record)));
+    const errors: ErrorDetails[] = [];
+    await Promise.all(changedRecords.map(async record => {
+      const response = await _service.saveRecord(record);
+      if (isError(response)) errors.push(response);
+    }));
+
+    if (errors.length > 0) {
+      if (changedRecords.length === 1) {
+        _service.openErrorDialog(errors[0]);
+      }
+      else {
+        const consolidatedError = getConsolidatedError(errors, 'saving');
+        _service.openErrorDialog(consolidatedError);
+      }
+    }
   },
 );
 
@@ -82,10 +98,23 @@ export const deleteRecords =
 
       const response = await payload._service.openRecordDeleteDialog();
       if (response.confirmed) {
+        const errors: ErrorDetails[] = [];
         await Promise.all(payload.recordIds.map(async id => {
-          if (id.length > 15) await payload._service.deleteRecord(id);
+          if (id.length > 15) {
+            const response = await payload._service.deleteRecord(id);
+            if (isError(response)) errors.push(response);
+          }
         }));
 
+        if (errors.length > 0) {
+          if (payload.recordIds.length === 1) {
+            payload._service.openErrorDialog(errors[0]);
+          }
+          else {
+            const consolidatedError = getConsolidatedError(errors, 'deleting');
+            payload._service.openErrorDialog(consolidatedError);
+          }
+        }
         return thunkApi.fulfillWithValue({ newRows, changedRecordsAfterDelete });
       }
 

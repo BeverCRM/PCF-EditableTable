@@ -21,20 +21,29 @@ export type EntityPrivileges = {
   delete: boolean,
 };
 
+export interface ErrorDetails {
+  code: number,
+  errorCode: number,
+  message: string,
+  raw: string,
+  title: string
+  recordId?: string,
+}
+
 export interface IDataverseService {
   getEntityPluralName(entityName: string): Promise<string>;
   getCurrentUserName(): string;
   getParentMetadata(): ParentMetadata;
   setParentValue(): Promise<void>;
   openForm(id: string, entityName?: string): void;
-  createNewRecord(data: {}): Promise<void>;
+  createNewRecord(data: {}): Promise<ComponentFramework.LookupValue | ErrorDetails>;
   retrieveAllRecords(entityName: string, options: string): Promise<Entity[]>;
-  deleteRecord(recordId: string): Promise<void>;
+  deleteRecord(recordId: string): Promise<ComponentFramework.LookupValue | ErrorDetails>;
   openRecordDeleteDialog(): Promise<ComponentFramework.NavigationApi.ConfirmDialogResponse>;
   openErrorDialog(error: any): Promise<void>;
   getFieldSchemaName(): Promise<string>;
   parentFieldIsValid(record: Record, subgridParentFieldName: string | undefined): boolean;
-  saveRecord(record: Record): Promise<void>;
+  saveRecord(record: Record): Promise<ComponentFramework.LookupValue | ErrorDetails>;
   getRelationships(): Promise<Relationship[]>;
   getLookupOptions(entityName: string): Promise<ITag[]>;
   getDropdownOptions(fieldName: string, attributeType: string, isTwoOptions: boolean):
@@ -105,8 +114,8 @@ export class DataverseService implements IDataverseService {
     this._context.navigation.openForm(options);
   }
 
-  public async createNewRecord(data: {}): Promise<void> {
-    await this._context.webAPI.createRecord(this._targetEntityType, data);
+  public async createNewRecord(data: {}): Promise<ComponentFramework.LookupValue | ErrorDetails> {
+    return await this._context.webAPI.createRecord(this._targetEntityType, data);
   }
 
   public async retrieveAllRecords(entityName: string, options: string) {
@@ -121,12 +130,13 @@ export class DataverseService implements IDataverseService {
     return entities;
   }
 
-  public async deleteRecord(recordId: string): Promise<void> {
+  public async deleteRecord(recordId: string):
+  Promise<ComponentFramework.LookupValue | ErrorDetails> {
     try {
-      await this._context.webAPI.deleteRecord(this._targetEntityType, recordId);
+      return await this._context.webAPI.deleteRecord(this._targetEntityType, recordId);
     }
-    catch (e) {
-      this.openErrorDialog(e);
+    catch (error: any) {
+      return { ...error, recordId } as ErrorDetails;
     }
   }
 
@@ -168,10 +178,12 @@ export class DataverseService implements IDataverseService {
 
   public parentFieldIsValid(record: Record, subgridParentFieldName: string | undefined) {
     return subgridParentFieldName !== undefined &&
+    record.id.length < this.NEW_RECORD_ID_LENGTH_CHECK &&
     !record.data.some(recordData => recordData.fieldName === subgridParentFieldName);
   }
 
-  public async saveRecord(record: Record): Promise<void> {
+  public async saveRecord(record: Record):
+  Promise<ComponentFramework.LookupValue | ErrorDetails> {
     const data = record.data.reduce((obj, recordData) =>
       Object.assign(obj,
         recordData.fieldType === 'Lookup.Simple'
@@ -184,10 +196,20 @@ export class DataverseService implements IDataverseService {
     }
 
     if (record.id.length < this.NEW_RECORD_ID_LENGTH_CHECK) {
-      await this.createNewRecord(data);
+      try {
+        return await this.createNewRecord(data);
+      }
+      catch (error: any) {
+        return error as ErrorDetails;
+      }
     }
     else {
-      await this._context.webAPI.updateRecord(this._targetEntityType, record.id, data);
+      try {
+        return await this._context.webAPI.updateRecord(this._targetEntityType, record.id, data);
+      }
+      catch (error: any) {
+        return { ...error, recordId: record.id } as ErrorDetails;
+      }
     }
   }
 
