@@ -47,7 +47,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
   isRequired, _onChange, _service }: IDatePickerProps) => {
   const [isInvalid, setInvalid] = useState(false);
   let timeKey: string | number | undefined;
-  const options = timesList;
+  const options = [...timesList];
 
   const dateFields = useAppSelector(state => state.date.dates, shallowEqual);
   const currentDateMetadata = dateFields.find(dateField => dateField.fieldName === fieldName);
@@ -112,11 +112,14 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
     let key = option?.key;
     if (!option && value) {
       key = getTimeKeyFromTime(value);
-      options.push({ key: key!, text: value.toUpperCase() });
+      if (key !== '') {
+        options.push({ key: key!, text: value.toUpperCase() });
+      }
     }
     timeKey = key;
-
-    setChangedDateTime(currentDate, key);
+    if (key) {
+      setChangedDateTime(currentDate, key);
+    }
   };
 
   return (

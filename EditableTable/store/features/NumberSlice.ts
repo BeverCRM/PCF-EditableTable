@@ -8,11 +8,13 @@ export type NumberFieldMetadata = {
   minValue: number,
   maxValue: number,
   isBaseCurrency?: boolean,
+  precisionNumber: number,
 }
 
 export type CurrencySymbol = {
   recordId: string,
-  symbol: string
+  symbol: string,
+  precision: number,
 }
 
 export interface INumberState {
@@ -40,7 +42,7 @@ export const getNumberFieldsMetadata = createAsyncThunk<NumberFieldMetadata[], N
       switch (numberField.data) {
         case 'Currency':
           attributeType = 'MoneyAttributeMetadata';
-          selection = 'PrecisionSource,MaxValue,MinValue,IsBaseCurrency';
+          selection = 'PrecisionSource,MaxValue,MinValue,IsBaseCurrency,Precision';
           break;
 
         case 'Decimal':
@@ -70,10 +72,11 @@ export const getCurrencySymbols = createAsyncThunk<CurrencySymbol[], CurrencyPay
   'number/getCurrencySymbols',
   async payload =>
     await Promise.all(payload.recordIds.map(async recordId => {
-      const currencySymbol = await payload._service.getCurrencySymbol(recordId);
+      const currencySymbol = await payload._service.getCurrency(recordId);
       return <CurrencySymbol>{
         recordId,
-        symbol: currencySymbol,
+        symbol: currencySymbol.symbol,
+        precision: currencySymbol.precision,
       };
     })),
 );

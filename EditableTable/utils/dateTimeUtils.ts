@@ -19,7 +19,6 @@ export const setTimeForDate = (value: Date | undefined, time: string | undefined
   return newValue;
 };
 
-// 09:00 PM
 export const formatTimeto12Hours = (date: Date | undefined): string => {
   if (date === undefined) return '';
 
@@ -44,8 +43,9 @@ export const getTimeKeyFromDate = (date: Date) => {
 };
 
 export const getTimeKeyFromTime = (value: string) => {
-  let key = '';
-  if (value.toLowerCase().toString().includes('m')) {
+  let key = undefined;
+  const timeRegex = /^(0?[1-9]|1[0-2]):[0-5]\d\s(?:AM|PM)$/i;
+  if (timeRegex.test(value.toLowerCase().toString())) {
     const splitKey = value.match(/[a-zA-Z]+|[0-9]+/g);
     if (splitKey !== null) {
       if (splitKey[2].toLowerCase() === 'pm') {
@@ -58,12 +58,6 @@ export const getTimeKeyFromTime = (value: string) => {
         key = `${splitKey[0]}:${splitKey[1]}`;
       }
     }
-  }
-  else if (value.toLowerCase().toString().includes(':')) {
-    key = `${value.toString()}`;
-  }
-  else {
-    key = '00:00';
   }
   return key;
 };
