@@ -5,6 +5,7 @@ import { Relationship } from '../store/features/LookupSlice';
 import { Record } from '../store/features/RecordSlice';
 import { DropdownField } from '../store/features/DropdownSlice';
 import { NumberFieldMetadata } from '../store/features/NumberSlice';
+import { NEW_RECORD_ID_LENGTH_CHECK } from '../utils/commonUtils';
 
 export type ParentMetadata = {
   entityId: string,
@@ -26,20 +27,29 @@ export type CurrencyData = {
   precision: number,
 }
 
+export interface ErrorDetails {
+  code: number,
+  errorCode: number,
+  message: string,
+  raw: string,
+  title: string
+  recordId?: string,
+}
+
 export interface IDataverseService {
   getEntityPluralName(entityName: string): Promise<string>;
   getCurrentUserName(): string;
   getParentMetadata(): ParentMetadata;
   setParentValue(): Promise<void>;
   openForm(id: string, entityName?: string): void;
-  createNewRecord(data: {}): Promise<void>;
+  createNewRecord(data: {}): Promise<ComponentFramework.LookupValue | ErrorDetails>;
   retrieveAllRecords(entityName: string, options: string): Promise<Entity[]>;
-  deleteRecord(recordId: string): Promise<void>;
+  deleteRecord(recordId: string): Promise<ComponentFramework.LookupValue | ErrorDetails>;
   openRecordDeleteDialog(): Promise<ComponentFramework.NavigationApi.ConfirmDialogResponse>;
   openErrorDialog(error: any): Promise<void>;
   getFieldSchemaName(): Promise<string>;
   parentFieldIsValid(record: Record, subgridParentFieldName: string | undefined): boolean;
-  saveRecord(record: Record): Promise<void>;
+  saveRecord(record: Record): Promise<ComponentFramework.LookupValue | ErrorDetails>;
   getRelationships(): Promise<Relationship[]>;
   getLookupOptions(entityName: string): Promise<ITag[]>;
   getDropdownOptions(fieldName: string, attributeType: string, isTwoOptions: boolean):
@@ -66,7 +76,6 @@ export class DataverseService implements IDataverseService {
   private _targetEntityType: string;
   private _clientUrl: string;
   private _parentValue: string | undefined;
-  private NEW_RECORD_ID_LENGTH_CHECK = 15;
 
   constructor(context: ComponentFramework.Context<IInputs>) {
     this._context = context;
@@ -112,8 +121,8 @@ export class DataverseService implements IDataverseService {
     this._context.navigation.openForm(options);
   }
 
-  public async createNewRecord(data: {}): Promise<void> {
-    await this._context.webAPI.createRecord(this._targetEntityType, data);
+  public async createNewRecord(data: {}): Promise<ComponentFramework.LookupValue | ErrorDetails> {
+    return await this._context.webAPI.createRecord(this._targetEntityType, data);
   }
 
   public async retrieveAllRecords(entityName: string, options: string) {
@@ -128,12 +137,13 @@ export class DataverseService implements IDataverseService {
     return entities;
   }
 
-  public async deleteRecord(recordId: string): Promise<void> {
+  public async deleteRecord(recordId: string):
+  Promise<ComponentFramework.LookupValue | ErrorDetails> {
     try {
-      await this._context.webAPI.deleteRecord(this._targetEntityType, recordId);
+      return await this._context.webAPI.deleteRecord(this._targetEntityType, recordId);
     }
-    catch (e) {
-      this.openErrorDialog(e);
+    catch (error: any) {
+      return <ErrorDetails>{ ...error, recordId };
     }
   }
 
@@ -175,10 +185,12 @@ export class DataverseService implements IDataverseService {
 
   public parentFieldIsValid(record: Record, subgridParentFieldName: string | undefined) {
     return subgridParentFieldName !== undefined &&
+    record.id.length < NEW_RECORD_ID_LENGTH_CHECK &&
     !record.data.some(recordData => recordData.fieldName === subgridParentFieldName);
   }
 
-  public async saveRecord(record: Record): Promise<void> {
+  public async saveRecord(record: Record):
+  Promise<ComponentFramework.LookupValue | ErrorDetails> {
     const data = record.data.reduce((obj, recordData) =>
       Object.assign(obj,
         recordData.fieldType === 'Lookup.Simple'
@@ -190,11 +202,21 @@ export class DataverseService implements IDataverseService {
       Object.assign(data, { [`${subgridParentFieldName}@odata.bind`]: this._parentValue });
     }
 
-    if (record.id.length < this.NEW_RECORD_ID_LENGTH_CHECK) {
-      await this.createNewRecord(data);
+    if (record.id.length < NEW_RECORD_ID_LENGTH_CHECK) {
+      try {
+        return await this.createNewRecord(data);
+      }
+      catch (error: any) {
+        return <ErrorDetails>error;
+      }
     }
     else {
-      await this._context.webAPI.updateRecord(this._targetEntityType, record.id, data);
+      try {
+        return await this._context.webAPI.updateRecord(this._targetEntityType, record.id, data);
+      }
+      catch (error: any) {
+        return <ErrorDetails>{ ...error, recordId: record.id };
+      }
     }
   }
 
