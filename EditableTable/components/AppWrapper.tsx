@@ -19,7 +19,7 @@ export interface IDataSetProps {
 
 export const Wrapper = (props: IDataSetProps) =>
   <Provider store={props._store} >
-    <div className='appWrapper'>
+    <div className='appWrapper' tabIndex={0}>
       <Loading />
       <Stack style={containerStackStyles(props.width, props.dataset.sortedRecordIds.length)} >
         <ScrollablePane>

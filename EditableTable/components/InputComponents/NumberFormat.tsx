@@ -103,6 +103,7 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
           checkValidation(elem.value);
         }}
         onFocus={() => setInvalid(false)}
+        tabIndex={-1}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
       <FontIcon iconName={'StatusErrorFull'} className={errorTooltip(isInvalid, errorText)} />
