@@ -5,6 +5,7 @@ import { AsyncThunkConfig } from '../../utils/types';
 import { RequirementLevel } from './DatasetSlice';
 import { ErrorDetails } from '../../services/DataverseService';
 import { getConsolidatedError, isError } from '../../utils/errorUtils';
+import { NEW_RECORD_ID_LENGTH_CHECK } from '../../utils/commonUtils';
 
 export type Record = {
   id: string;
@@ -94,13 +95,13 @@ export const deleteRecords =
       const newRows = rows.filter(row => isNewRow(row) && !recordsToRemove.has(row.key));
 
       const changedRecordsAfterDelete = changedRecords.filter(record =>
-        !recordsToRemove.has(record.id) && record.id.length < 15);
+        !recordsToRemove.has(record.id) && record.id.length < NEW_RECORD_ID_LENGTH_CHECK);
 
       const response = await payload._service.openRecordDeleteDialog();
       if (response.confirmed) {
         const errors: ErrorDetails[] = [];
         await Promise.all(payload.recordIds.map(async id => {
-          if (id.length > 15) {
+          if (id.length > NEW_RECORD_ID_LENGTH_CHECK) {
             const response = await payload._service.deleteRecord(id);
             if (isError(response)) errors.push(response);
           }

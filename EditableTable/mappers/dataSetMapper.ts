@@ -1,5 +1,6 @@
 import { IColumn, ITag } from '@fluentui/react';
 import { IDataverseService } from '../services/DataverseService';
+import { NEW_RECORD_ID_LENGTH_CHECK } from '../utils/commonUtils';
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
 export type Row = {
@@ -19,7 +20,7 @@ const SELECTION_WIDTH = 48;
 const PADDING_WIDTH = 16;
 const EXCESS_WIDTH = 20;
 
-export const isNewRow = (row: Row) => row.key.length < 15;
+export const isNewRow = (row: Row) => row.key.length < NEW_RECORD_ID_LENGTH_CHECK;
 
 export const getColumnsTotalWidth = (dataset: DataSet) =>
   dataset.columns.reduce((result, column) => result + column.visualSizeFactor, 0);

@@ -1,7 +1,7 @@
 import { ErrorDetails } from '../services/DataverseService';
 
 export const isError = (value: any):
-  value is ErrorDetails => value !== undefined && <ErrorDetails>value.code !== undefined;
+  value is ErrorDetails => value !== undefined && value.code !== undefined;
 
 export const consolidateErrorMessages = (errors: ErrorDetails[]) => {
   let errorMsg = '';

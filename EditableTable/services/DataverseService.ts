@@ -5,6 +5,7 @@ import { Relationship } from '../store/features/LookupSlice';
 import { Record } from '../store/features/RecordSlice';
 import { DropdownField } from '../store/features/DropdownSlice';
 import { NumberFieldMetadata } from '../store/features/NumberSlice';
+import { NEW_RECORD_ID_LENGTH_CHECK } from '../utils/commonUtils';
 
 export type ParentMetadata = {
   entityId: string,
@@ -75,7 +76,6 @@ export class DataverseService implements IDataverseService {
   private _targetEntityType: string;
   private _clientUrl: string;
   private _parentValue: string | undefined;
-  private NEW_RECORD_ID_LENGTH_CHECK = 15;
 
   constructor(context: ComponentFramework.Context<IInputs>) {
     this._context = context;
@@ -143,7 +143,7 @@ export class DataverseService implements IDataverseService {
       return await this._context.webAPI.deleteRecord(this._targetEntityType, recordId);
     }
     catch (error: any) {
-      return { ...error, recordId } as ErrorDetails;
+      return <ErrorDetails>{ ...error, recordId };
     }
   }
 
@@ -185,7 +185,7 @@ export class DataverseService implements IDataverseService {
 
   public parentFieldIsValid(record: Record, subgridParentFieldName: string | undefined) {
     return subgridParentFieldName !== undefined &&
-    record.id.length < this.NEW_RECORD_ID_LENGTH_CHECK &&
+    record.id.length < NEW_RECORD_ID_LENGTH_CHECK &&
     !record.data.some(recordData => recordData.fieldName === subgridParentFieldName);
   }
 
@@ -202,12 +202,12 @@ export class DataverseService implements IDataverseService {
       Object.assign(data, { [`${subgridParentFieldName}@odata.bind`]: this._parentValue });
     }
 
-    if (record.id.length < this.NEW_RECORD_ID_LENGTH_CHECK) {
+    if (record.id.length < NEW_RECORD_ID_LENGTH_CHECK) {
       try {
         return await this.createNewRecord(data);
       }
       catch (error: any) {
-        return error as ErrorDetails;
+        return <ErrorDetails>error;
       }
     }
     else {
@@ -215,7 +215,7 @@ export class DataverseService implements IDataverseService {
         return await this._context.webAPI.updateRecord(this._targetEntityType, record.id, data);
       }
       catch (error: any) {
-        return { ...error, recordId: record.id } as ErrorDetails;
+        return <ErrorDetails>{ ...error, recordId: record.id };
       }
     }
   }
