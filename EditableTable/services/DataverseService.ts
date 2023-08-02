@@ -69,6 +69,10 @@ export interface IDataverseService {
   getSecurityPrivileges(): Promise<EntityPrivileges>;
   isStatusField(fieldName: string | undefined): boolean;
   getGlobbalPrecision(): Promise<number>;
+  getFirstDayOfWeek(): number;
+  getWeekDayNamesShort(): string[];
+  getMonthNamesShort(): string[];
+  getMonthNamesLong(): string[];
 }
 
 export class DataverseService implements IDataverseService {
@@ -416,4 +420,19 @@ export class DataverseService implements IDataverseService {
     return fieldName === 'statuscode' || fieldName === 'statecode';
   }
 
+  public getFirstDayOfWeek() {
+    return this._context.userSettings.dateFormattingInfo.firstDayOfWeek;
+  }
+
+  public getWeekDayNamesShort() {
+    return this._context.userSettings.dateFormattingInfo.shortestDayNames;
+  }
+
+  public getMonthNamesShort() {
+    return this._context.userSettings.dateFormattingInfo.abbreviatedMonthNames;
+  }
+
+  public getMonthNamesLong() {
+    return this._context.userSettings.dateFormattingInfo.monthNames;
+  }
 }
