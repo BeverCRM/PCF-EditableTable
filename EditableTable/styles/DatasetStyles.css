@@ -1,5 +1,6 @@
 .appWrapper {
   position: relative;
+  z-index: 0;
 }
 
 .container {
@@ -86,8 +87,4 @@
 
 .errorDiv[title] {
   border-color: rgba(248, 58, 58, 0.326);
-}
-
-div[id^="DialogContainer__"][id$='_popupContainer_innerPopup'] {
-  z-index: 10;
 }

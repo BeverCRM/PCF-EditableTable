@@ -154,8 +154,10 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
         />
       }
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
-      <FontIcon iconName={'StatusErrorFull'}
-        className={errorTooltip(isInvalid, 'Required fields must be filled in.')} />
+      <FontIcon
+        iconName={'StatusErrorFull'}
+        className={errorTooltip(isInvalid, 'Required fields must be filled in.', isRequired)}
+      />
     </Stack>
   );
 });

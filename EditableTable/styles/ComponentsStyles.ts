@@ -117,10 +117,11 @@ export const asteriskClassStyle = (required: boolean) => mergeStyles({
   display: required ? 'flex' : 'none',
 });
 
-export const errorTooltip = (isInvalid: boolean, errorText: string, index?: number) => mergeStyles({
+export const errorTooltip =
+(isInvalid: boolean, errorText: string, required: boolean, index?: number) => mergeStyles({
   display: isInvalid ? 'inline-block' : 'none',
   position: 'absolute',
-  right: '18px',
+  right: `${required ? '18px' : '8px'}`,
   top: '12px',
   fontSize: '16px',
   color: '#c0172b',

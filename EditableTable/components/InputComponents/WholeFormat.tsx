@@ -81,7 +81,10 @@ export const WholeFormat = memo(({ value, formattedValue, type,
         onFocus={() => setInvalid(false)}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
-      <FontIcon iconName={'StatusErrorFull'} className={errorTooltip(isInvalid, errorText)} />
+      <FontIcon
+        iconName={'StatusErrorFull'}
+        className={errorTooltip(isInvalid, errorText, isRequired)}
+      />
     </Stack>
   );
 });
