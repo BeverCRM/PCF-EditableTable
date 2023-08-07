@@ -55,11 +55,17 @@ export const stackComboBox : IStackStyles = {
 
 export const lookupFormatStyles = (required: boolean):
 IStyleFunctionOrObject<IBasePickerStyleProps, IBasePickerStyles> => ({
-  text: { minWidth: 30, overflow: 'hidden' },
+  text: {
+    minWidth: 30,
+    overflow: 'hidden',
+    outline: 'none',
+    border: '1px solid black !important',
+  },
   root: {
     minWidth: 30,
     overflow: 'hidden',
     marginRight: required ? '10px' : '0px',
+    backgroundColor: 'white',
   },
   input: { overflow: 'hidden' },
 });
