@@ -5,6 +5,7 @@ import { Relationship } from '../store/features/LookupSlice';
 import { Record } from '../store/features/RecordSlice';
 import { DropdownField } from '../store/features/DropdownSlice';
 import { NumberFieldMetadata } from '../store/features/NumberSlice';
+import { NEW_RECORD_ID_LENGTH_CHECK } from '../utils/commonUtils';
 
 export type ParentMetadata = {
   entityId: string,
@@ -14,43 +15,67 @@ export type ParentMetadata = {
 
 export type Entity = ComponentFramework.WebApi.Entity;
 
+export type EntityPrivileges = {
+  create: boolean,
+  read: boolean,
+  write: boolean,
+  delete: boolean,
+};
+
+export type CurrencyData = {
+  symbol: string,
+  precision: number,
+}
+
+export interface ErrorDetails {
+  code: number,
+  errorCode: number,
+  message: string,
+  raw: string,
+  title: string
+  recordId?: string,
+}
+
 export interface IDataverseService {
   getEntityPluralName(entityName: string): Promise<string>;
   getCurrentUserName(): string;
   getParentMetadata(): ParentMetadata;
   setParentValue(): Promise<void>;
   openForm(id: string, entityName?: string): void;
-  createNewRecord(data: {}): Promise<void>;
+  createNewRecord(data: {}): Promise<ComponentFramework.LookupValue | ErrorDetails>;
   retrieveAllRecords(entityName: string, options: string): Promise<Entity[]>;
-  deleteRecord(recordId: string): Promise<void>;
+  deleteRecord(recordId: string): Promise<ComponentFramework.LookupValue | ErrorDetails>;
   openRecordDeleteDialog(): Promise<ComponentFramework.NavigationApi.ConfirmDialogResponse>;
   openErrorDialog(error: any): Promise<void>;
   getFieldSchemaName(): Promise<string>;
   parentFieldIsValid(record: Record, subgridParentFieldName: string | undefined): boolean;
-  saveRecord(record: Record): Promise<void>;
+  saveRecord(record: Record): Promise<ComponentFramework.LookupValue | ErrorDetails>;
   getRelationships(): Promise<Relationship[]>;
   getLookupOptions(entityName: string): Promise<ITag[]>;
   getDropdownOptions(fieldName: string, attributeType: string, isTwoOptions: boolean):
     Promise<DropdownField>;
   getNumberFieldMetadata(fieldName: string, attributeType: string, selection: string):
     Promise<NumberFieldMetadata>;
-  getCurrencySymbol(recordId: string): Promise<string>;
+  getCurrency(recordId: string): Promise<CurrencyData>;
+  getCurrencyById(recordId: string): Promise<CurrencyData>;
   getTimeZoneDefinitions(): Promise<IComboBoxOption[]>;
   getProvisionedLanguages(): Promise<IComboBoxOption[]>;
   getDateMetadata(fieldName: string): Promise<any>;
+  getTextFieldMetadata(fieldName: string, type: string | undefined): Promise<number>;
   getTargetEntityType(): string;
   getContext(): ComponentFramework.Context<IInputs>;
   getAllocatedWidth(): number;
   getReqirementLevel(fieldName: string): Promise<any>;
+  getSecurityPrivileges(): Promise<EntityPrivileges>;
   isStatusField(fieldName: string | undefined): boolean;
+  getGlobbalPrecision(): Promise<number>;
 }
 
 export class DataverseService implements IDataverseService {
   private _context: ComponentFramework.Context<IInputs>;
   private _targetEntityType: string;
   private _clientUrl: string;
-  private _parentValue: string;
-  private NEW_RECORD_ID_LENGTH_CHECK = 15;
+  private _parentValue: string | undefined;
 
   constructor(context: ComponentFramework.Context<IInputs>) {
     this._context = context;
@@ -75,10 +100,12 @@ export class DataverseService implements IDataverseService {
     return metadata.EntitySetName;
   }
 
-  public async getParentPluralName(): Promise<string> {
+  public async getParentPluralName(): Promise<string | undefined> {
     const parentMetadata = this.getParentMetadata();
     const parentEntityPluralName = await this.getEntityPluralName(parentMetadata.entityTypeName);
-    return `/${parentEntityPluralName}(${parentMetadata.entityId})`;
+    return parentMetadata.entityId
+      ? `/${parentEntityPluralName}(${parentMetadata.entityId})`
+      : undefined;
   }
 
   public async setParentValue() {
@@ -94,8 +121,8 @@ export class DataverseService implements IDataverseService {
     this._context.navigation.openForm(options);
   }
 
-  public async createNewRecord(data: {}): Promise<void> {
-    await this._context.webAPI.createRecord(this._targetEntityType, data);
+  public async createNewRecord(data: {}): Promise<ComponentFramework.LookupValue | ErrorDetails> {
+    return await this._context.webAPI.createRecord(this._targetEntityType, data);
   }
 
   public async retrieveAllRecords(entityName: string, options: string) {
@@ -110,12 +137,13 @@ export class DataverseService implements IDataverseService {
     return entities;
   }
 
-  public async deleteRecord(recordId: string): Promise<void> {
+  public async deleteRecord(recordId: string):
+  Promise<ComponentFramework.LookupValue | ErrorDetails> {
     try {
-      await this._context.webAPI.deleteRecord(this._targetEntityType, recordId);
+      return await this._context.webAPI.deleteRecord(this._targetEntityType, recordId);
     }
-    catch (e) {
-      console.log(e);
+    catch (error: any) {
+      return <ErrorDetails>{ ...error, recordId };
     }
   }
 
@@ -157,10 +185,12 @@ export class DataverseService implements IDataverseService {
 
   public parentFieldIsValid(record: Record, subgridParentFieldName: string | undefined) {
     return subgridParentFieldName !== undefined &&
+    record.id.length < NEW_RECORD_ID_LENGTH_CHECK &&
     !record.data.some(recordData => recordData.fieldName === subgridParentFieldName);
   }
 
-  public async saveRecord(record: Record): Promise<void> {
+  public async saveRecord(record: Record):
+  Promise<ComponentFramework.LookupValue | ErrorDetails> {
     const data = record.data.reduce((obj, recordData) =>
       Object.assign(obj,
         recordData.fieldType === 'Lookup.Simple'
@@ -168,15 +198,25 @@ export class DataverseService implements IDataverseService {
           : { [recordData.fieldName]: recordData.newValue }), {});
 
     const subgridParentFieldName = await this.getFieldSchemaName();
-    if (this.parentFieldIsValid(record, subgridParentFieldName)) {
+    if (this.parentFieldIsValid(record, subgridParentFieldName) && this._parentValue) {
       Object.assign(data, { [`${subgridParentFieldName}@odata.bind`]: this._parentValue });
     }
 
-    if (record.id.length < this.NEW_RECORD_ID_LENGTH_CHECK) {
-      await this.createNewRecord(data);
+    if (record.id.length < NEW_RECORD_ID_LENGTH_CHECK) {
+      try {
+        return await this.createNewRecord(data);
+      }
+      catch (error: any) {
+        return <ErrorDetails>error;
+      }
     }
     else {
-      await this._context.webAPI.updateRecord(this._targetEntityType, record.id, data);
+      try {
+        return await this._context.webAPI.updateRecord(this._targetEntityType, record.id, data);
+      }
+      catch (error: any) {
+        return <ErrorDetails>{ ...error, recordId: record.id };
+      }
     }
   }
 
@@ -259,18 +299,42 @@ export class DataverseService implements IDataverseService {
       minValue: results.value[0].MinValue,
       maxValue: results.value[0].MaxValue,
       isBaseCurrency: results.value[0].IsBaseCurrency,
+      precisionNumber: results.value[0]?.Precision,
     };
   }
 
-  public async getCurrencySymbol(recordId: string): Promise<string> {
+  public async getGlobbalPrecision() : Promise<number> {
+    const request = `${this._clientUrl}organizations?$select=pricingdecimalprecision`;
+    const response = await getFetchResponse(request);
+    return response?.value[0].pricingdecimalprecision;
+  }
+
+  public async getCurrency(recordId: string): Promise<CurrencyData> {
     const fetchedCurrency = await this._context.webAPI.retrieveRecord(
       this._targetEntityType,
       recordId,
-      '?$select=_transactioncurrencyid_value&$expand=transactioncurrencyid($select=currencysymbol)',
+      // eslint-disable-next-line max-len
+      '?$select=_transactioncurrencyid_value&$expand=transactioncurrencyid($select=currencysymbol,currencyprecision)',
+    );
+    return {
+      symbol: fetchedCurrency.transactioncurrencyid?.currencysymbol ??
+      this._context.userSettings.numberFormattingInfo.currencySymbol,
+      precision: fetchedCurrency.transactioncurrencyid?.currencyprecision ??
+      this._context.userSettings.numberFormattingInfo.currencyDecimalDigits };
+  }
+
+  public async getCurrencyById(recordId: string): Promise<CurrencyData> {
+    const fetchedCurrency = await this._context.webAPI.retrieveRecord(
+      'transactioncurrency',
+      recordId,
+      '?$select=currencysymbol,currencyprecision',
     );
 
-    return fetchedCurrency.transactioncurrencyid?.currencysymbol ||
-      this._context.userSettings.numberFormattingInfo.currencySymbol;
+    return {
+      symbol: fetchedCurrency?.currencysymbol ??
+      this._context.userSettings.numberFormattingInfo.currencySymbol,
+      precision: fetchedCurrency?.currencyprecision ??
+      this._context.userSettings.numberFormattingInfo.currencyDecimalDigits };
   }
 
   public async getTimeZoneDefinitions() {
@@ -303,6 +367,17 @@ export class DataverseService implements IDataverseService {
     return results.value[0].DateTimeBehavior.Value;
   }
 
+  public async getTextFieldMetadata(fieldName: string, type: string | undefined) {
+    const filter = `$filter=LogicalName eq '${fieldName}'`;
+    const attributeType = `${type === 'Multiple'
+      ? 'MemoAttributeMetadata' : 'StringAttributeMetadata'}`;
+    const request = `${this._clientUrl}EntityDefinitions(LogicalName='${this._targetEntityType
+    }')/Attributes/Microsoft.Dynamics.CRM.${attributeType}?${filter}`;
+    const results = await getFetchResponse(request);
+
+    return results.value[0]?.MaxLength;
+  }
+
   public getTargetEntityType() {
     return this._targetEntityType;
   }
@@ -321,6 +396,20 @@ export class DataverseService implements IDataverseService {
     const results = await getFetchResponse(request);
 
     return results.RequiredLevel.Value;
+  }
+
+  public async getSecurityPrivileges() {
+    const createPriv = this._context.utils.hasEntityPrivilege(this._targetEntityType, 1, 0);
+    const readPriv = this._context.utils.hasEntityPrivilege(this._targetEntityType, 2, 0);
+    const writePriv = this._context.utils.hasEntityPrivilege(this._targetEntityType, 3, 0);
+    const deletePriv = this._context.utils.hasEntityPrivilege(this._targetEntityType, 4, 0);
+    // doesnt look at the level (org vs user)
+    return <EntityPrivileges>{
+      create: createPriv,
+      read: readPriv,
+      write: writePriv,
+      delete: deletePriv,
+    };
   }
 
   public isStatusField(fieldName: string | undefined) {

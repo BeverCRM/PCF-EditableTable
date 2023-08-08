@@ -3,6 +3,9 @@ import { isNewRow, Row } from '../../mappers/dataSetMapper';
 import { IDataverseService } from '../../services/DataverseService';
 import { AsyncThunkConfig } from '../../utils/types';
 import { RequirementLevel } from './DatasetSlice';
+import { ErrorDetails } from '../../services/DataverseService';
+import { getConsolidatedError, isError } from '../../utils/errorUtils';
+import { NEW_RECORD_ID_LENGTH_CHECK } from '../../utils/commonUtils';
 
 export type Record = {
   id: string;
@@ -56,12 +59,29 @@ export const saveRecords = createAsyncThunk<void, IDataverseService, AsyncThunkC
     const { changedRecords } = thunkApi.getState().record;
     const { requirementLevels, rows } = thunkApi.getState().dataset;
 
-    if (isRequiredFieldEmpty(requirementLevels, rows, _service)) {
+    const changedRows = rows.filter(
+      (row: Row) => changedRecords.some(changedRecord => changedRecord.id === row.key));
+
+    if (isRequiredFieldEmpty(requirementLevels, changedRows, _service)) {
       return thunkApi.rejectWithValue({ message: 'All required fields must be filled in.' });
     }
     _service.setParentValue();
 
-    await Promise.all(changedRecords.map(record => _service.saveRecord(record)));
+    const errors: ErrorDetails[] = [];
+    await Promise.all(changedRecords.map(async record => {
+      const response = await _service.saveRecord(record);
+      if (isError(response)) errors.push(response);
+    }));
+
+    if (errors.length > 0) {
+      if (changedRecords.length === 1) {
+        _service.openErrorDialog(errors[0]);
+      }
+      else {
+        const consolidatedError = getConsolidatedError(errors, 'saving');
+        _service.openErrorDialog(consolidatedError);
+      }
+    }
   },
 );
 
@@ -75,14 +95,27 @@ export const deleteRecords =
       const newRows = rows.filter(row => isNewRow(row) && !recordsToRemove.has(row.key));
 
       const changedRecordsAfterDelete = changedRecords.filter(record =>
-        !recordsToRemove.has(record.id) && record.id.length < 15);
+        !recordsToRemove.has(record.id) && record.id.length < NEW_RECORD_ID_LENGTH_CHECK);
 
       const response = await payload._service.openRecordDeleteDialog();
       if (response.confirmed) {
+        const errors: ErrorDetails[] = [];
         await Promise.all(payload.recordIds.map(async id => {
-          if (id.length > 15) await payload._service.deleteRecord(id);
+          if (id.length > NEW_RECORD_ID_LENGTH_CHECK) {
+            const response = await payload._service.deleteRecord(id);
+            if (isError(response)) errors.push(response);
+          }
         }));
 
+        if (errors.length > 0) {
+          if (payload.recordIds.length === 1) {
+            payload._service.openErrorDialog(errors[0]);
+          }
+          else {
+            const consolidatedError = getConsolidatedError(errors, 'deleting');
+            payload._service.openErrorDialog(consolidatedError);
+          }
+        }
         return thunkApi.fulfillWithValue({ newRows, changedRecordsAfterDelete });
       }
 

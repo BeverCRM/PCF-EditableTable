@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import * as React from 'react';
+import React, { memo, useState } from 'react';
 import {
   DatePicker,
   defaultDatePickerStrings,
@@ -14,6 +14,7 @@ import {
   timePickerStyles,
   datePickerStyles,
   stackComboBox,
+  errorTooltip,
 } from '../../styles/ComponentsStyles';
 import { useAppSelector } from '../../store/hooks';
 import { shallowEqual } from 'react-redux';
@@ -39,14 +40,14 @@ export interface IDatePickerProps {
   value: string | null,
   isRequired: boolean;
   _onChange: any,
-  _onDoubleClick: Function;
   _service: IDataverseService;
 }
 
-export const DateTimeFormat = React.memo(({ fieldName, dateOnly, value,
-  isRequired, _onChange, _onDoubleClick, _service }: IDatePickerProps) => {
+export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
+  isRequired, _onChange, _service }: IDatePickerProps) => {
+  const [isInvalid, setInvalid] = useState(false);
   let timeKey: string | number | undefined;
-  const options = timesList;
+  const options = [...timesList];
 
   const dateFields = useAppSelector(state => state.date.dates, shallowEqual);
   const currentDateMetadata = dateFields.find(dateField => dateField.fieldName === fieldName);
@@ -72,10 +73,11 @@ export const DateTimeFormat = React.memo(({ fieldName, dateOnly, value,
     timeKey = undefined;
   }
 
-  const onParseDateFromString = React.useCallback(
-    (newValue: string): Date => parseDateFromString(_service, newValue),
-    [currentDate],
-  );
+  const checkValidation = () => {
+    if (isRequired && (currentDate === undefined || isNaN(currentDate.getTime()))) {
+      setInvalid(true);
+    }
+  };
 
   const setChangedDateTime = (date: Date | undefined, key: string | number | undefined) => {
     const currentDateTime = setTimeForDate(date, key?.toString());
@@ -110,11 +112,14 @@ export const DateTimeFormat = React.memo(({ fieldName, dateOnly, value,
     let key = option?.key;
     if (!option && value) {
       key = getTimeKeyFromTime(value);
-      options.push({ key: key!, text: value.toUpperCase() });
+      if (key !== '') {
+        options.push({ key: key!, text: value.toUpperCase() });
+      }
     }
     timeKey = key;
-
-    setChangedDateTime(currentDate, key);
+    if (key) {
+      setChangedDateTime(currentDate, key);
+    }
   };
 
   return (
@@ -124,10 +129,11 @@ export const DateTimeFormat = React.memo(({ fieldName, dateOnly, value,
         value={currentDate}
         onSelectDate={onDateChange}
         formatDate={(date?: Date) => date ? formatDateShort(_service, date) : ''}
-        parseDateFromString={onParseDateFromString}
+        parseDateFromString={(newValue: string): Date => parseDateFromString(_service, newValue)}
         strings={defaultDatePickerStrings}
-        onDoubleClick={() => _onDoubleClick()}
         styles={datePickerStyles(dateOnly ? isRequired : false)}
+        onAfterMenuDismiss={() => checkValidation()}
+        onClick={() => setInvalid(false)}
       />
       {!dateOnly &&
         <ComboBox
@@ -136,10 +142,12 @@ export const DateTimeFormat = React.memo(({ fieldName, dateOnly, value,
           onChange={onTimeChange}
           styles={timePickerStyles(isRequired)}
           selectedKey={timeKey}
-          onDoubleClick={() => _onDoubleClick()}
+          onBlur={() => checkValidation()}
         />
       }
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
+      <FontIcon iconName={'StatusErrorFull'}
+        className={errorTooltip(isInvalid, 'Required fields must be filled in.')} />
     </Stack>
   );
 });

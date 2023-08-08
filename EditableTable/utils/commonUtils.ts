@@ -1,0 +1,1 @@
+export const NEW_RECORD_ID_LENGTH_CHECK = 15;

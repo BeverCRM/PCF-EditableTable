@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useCallback } from 'react';
 import { IColumn } from '@fluentui/react';
 
 import { LookupFormat } from '../InputComponents/LookupFormat';
@@ -18,6 +18,7 @@ export interface IGridSetProps {
   row: Row,
   currentColumn: IColumn,
   _service: IDataverseService;
+  index: number | undefined;
 }
 
 export type ParentEntityMetadata = {
@@ -26,11 +27,16 @@ export type ParentEntityMetadata = {
   entityTypeName: string
 };
 
-export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
+export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps) => {
   const dispatch = useAppDispatch();
-  const fieldsRequirementLevels = useAppSelector(state => state.dataset.requirementLevels);
+  const cell = row.columns.find((column: Column) => column.schemaName === currentColumn.key);
 
-  const _changedValue = React.useCallback(
+  const fieldsRequirementLevels = useAppSelector(state => state.dataset.requirementLevels);
+  const fieldRequirementLevel = fieldsRequirementLevels.find(requirementLevel =>
+    requirementLevel.fieldName === currentColumn.key);
+  const isRequired = fieldRequirementLevel?.isRequired || false;
+
+  const _changedValue = useCallback(
     (newValue: any, rawValue?: any, lookupEntityNavigation?: string): void => {
       dispatch(setChangedRecords({
         id: row.key,
@@ -46,12 +52,6 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
       }));
     }, []);
 
-  const cell = row.columns.find((column: Column) => column.schemaName === currentColumn.key);
-
-  const fieldRequirementLevel = fieldsRequirementLevels.find(requirementLevel =>
-    requirementLevel.fieldName === currentColumn.key);
-  const isRequired = fieldRequirementLevel?.isRequired || false;
-
   let parentEntityMetadata: ParentEntityMetadata | undefined;
   let ownerEntityMetadata: string | undefined;
   if (isNewRow(row)) {
@@ -64,8 +64,8 @@ export const GridCell = ({ _service, row, currentColumn }: IGridSetProps) => {
     rowId: row.key,
     isRequired,
     _onChange: _changedValue,
-    _onDoubleClick: React.useCallback(() => _service.openForm(row.key), []),
     _service,
+    index,
     ownerValue: ownerEntityMetadata,
   };
 

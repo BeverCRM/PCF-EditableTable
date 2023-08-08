@@ -19,6 +19,9 @@ export const textFieldStyles = (required: boolean): Partial<ITextFieldStyles> =>
 });
 
 export const datePickerStyles = (required: boolean): Partial<IDatePickerStyles> => ({
+  root: {
+    width: '-webkit-fill-available',
+  },
   wrapper: {
     marginRight: required ? '10px' : '0px',
   },
@@ -31,7 +34,6 @@ export const timePickerStyles = (required: boolean): Partial<IComboBoxStyles> =>
   },
   optionsContainer: { maxHeight: 260 },
   container: {
-    flexShrink: '2 !important',
     marginLeft: '-1px',
     maxWidth: 150,
     marginRight: required ? '10px' : '0px',
@@ -80,6 +82,9 @@ export const lookupSelectedOptionStyles: IButtonStyles = {
 };
 
 export const numberFormatStyles = (required: boolean): Partial<ISpinButtonStyles> => ({
+  root: {
+    minWidth: '40px',
+  },
   arrowButtonsContainer: {
     display: 'none',
   },
@@ -110,4 +115,46 @@ export const asteriskClassStyle = (required: boolean) => mergeStyles({
   right: '1px',
   fontSize: '5.5px',
   display: required ? 'flex' : 'none',
+});
+
+export const errorTooltip = (isInvalid: boolean, errorText: string, index?: number) => mergeStyles({
+  display: isInvalid ? 'inline-block' : 'none',
+  position: 'absolute',
+  right: '18px',
+  top: '12px',
+  fontSize: '16px',
+  color: '#c0172b',
+  cursor: 'pointer',
+  '::before': {
+    content: `'${errorText}'`,
+    position: 'absolute',
+    bottom: '140%',
+    transform: `translateX(${index === 0 ? '100%' : '14%'})`,
+    width: 'max-content',
+    padding: '3px',
+    borderRadius: '4px',
+    textAlign: 'center',
+    display: 'none',
+    right: '100%',
+    marginRight: '5px',
+    background: '#fff',
+    color: '#c0172b',
+    border: '1px solid',
+    cursor: 'default',
+    zIndex: '1',
+  },
+  '::after': {
+    content: '""',
+    display: 'none',
+    position: 'absolute',
+    bottom: '73%',
+    marginLeft: '-13px',
+    border: '5px solid #c0172b transparent transparent transparent',
+  },
+  ':hover::before': {
+    display: 'block',
+  },
+  ':hover::after': {
+    display: 'inline-block',
+  },
 });

@@ -1,11 +1,12 @@
 /* eslint-disable react/display-name */
 import { DefaultButton, FontIcon } from '@fluentui/react';
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
-import * as React from 'react';
+import React, { memo, useState } from 'react';
 import { IDataverseService } from '../../services/DataverseService';
 import { useAppSelector } from '../../store/hooks';
 import {
   asteriskClassStyle,
+  errorTooltip,
   lookupFormatStyles,
   lookupSelectedOptionStyles,
 } from '../../styles/ComponentsStyles';
@@ -20,21 +21,23 @@ export interface ILookupProps {
   parentEntityMetadata: ParentEntityMetadata | undefined;
   isRequired: boolean;
   _onChange: Function;
-  _onDoubleClick: Function;
   _service: IDataverseService;
 }
 
-export const LookupFormat = React.memo(
+export const LookupFormat = memo(
   ({ _service, fieldName, value, parentEntityMetadata,
-    isRequired, _onChange, _onDoubleClick }: ILookupProps) => {
+    isRequired, _onChange }: ILookupProps) => {
     const picker = React.useRef(null);
+    const [isInvalid, setInvalid] = useState(false);
 
     const lookups = useAppSelector(state => state.lookup.lookups);
     const currentLookup = lookups.find(lookup => lookup.logicalName === fieldName);
     const options = currentLookup?.options ?? [];
     const currentOption = value ? [value] : [];
+    const errorText = 'Required fields must be filled in.';
 
-    if (value === undefined && parentEntityMetadata !== undefined) {
+    if (value === undefined &&
+      parentEntityMetadata !== undefined && parentEntityMetadata.entityId !== undefined) {
       if (currentLookup?.reference?.entityNameRef === parentEntityMetadata.entityTypeName) {
         currentOption.push({
           key: parentEntityMetadata.entityId,
@@ -83,7 +86,7 @@ export const LookupFormat = React.memo(
           iconName: 'Cancel',
         }}
         onMenuClick={() => onChange(undefined)}
-        onClick={(event: any) => {
+        onClick={event => {
           if (event.detail === SINGLE_CLICK_CODE) {
             _service.openForm(currentOption[0].key.toString(),
               currentLookup?.reference?.entityNameRef);
@@ -109,13 +112,15 @@ export const LookupFormat = React.memo(
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             picker.current.input.current._updateValue('');
+            setInvalid(isRequired);
           }
         }}
         inputProps={{
-          onDoubleClick: () => _onDoubleClick(),
           disabled: false,
+          onFocus: () => setInvalid(false),
         }}
       />
-      <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
+      <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
+      <FontIcon iconName={'StatusErrorFull'} className={errorTooltip(isInvalid, errorText)} />
     </div>;
   });

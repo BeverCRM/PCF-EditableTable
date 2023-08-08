@@ -1,7 +1,17 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Row } from '../../mappers/dataSetMapper';
-import { IDataverseService } from '../../services/DataverseService';
+import { Row, isNewRow } from '../../mappers/dataSetMapper';
+import { EntityPrivileges, IDataverseService } from '../../services/DataverseService';
 import { AsyncThunkConfig } from '../../utils/types';
+
+export type DatasetColumn = {
+  name: string;
+  fieldName: string;
+  minWidth: number;
+  key: string;
+  isResizable: boolean;
+  data: string;
+  calculatedWidth: number;
+}
 
 export type RequirementLevel = {
   fieldName: string;
@@ -17,13 +27,17 @@ export type Updates = {
 export interface IDatasetState {
   rows: Row[],
   newRows: Row[],
-  requirementLevels: RequirementLevel[]
+  columns: DatasetColumn[],
+  requirementLevels: RequirementLevel[],
+  entityPrivileges: EntityPrivileges,
 }
 
 const initialState: IDatasetState = {
   rows: [],
   newRows: [],
+  columns: [],
   requirementLevels: [],
+  entityPrivileges: <EntityPrivileges>{},
 };
 
 type DatasetPayload = {
@@ -31,12 +45,17 @@ type DatasetPayload = {
   _service: IDataverseService,
 }
 
-export const setRequirementLevels = createAsyncThunk<any[], DatasetPayload, AsyncThunkConfig>(
+export const setRequirementLevels = createAsyncThunk<any[], DatasetPayload>(
   'dataset/setRequirementLevels',
   async payload => await Promise.all(payload.columnKeys.map(async columnKey => {
     const isRequired = await payload._service.getReqirementLevel(columnKey) !== 'None';
     return { fieldName: columnKey, isRequired };
   })),
+);
+
+export const setEntityPrivileges = createAsyncThunk<EntityPrivileges, IDataverseService>(
+  'dataset/setEntityPrivileges',
+  async _service => await _service.getSecurityPrivileges(),
 );
 
 export const datasetSlice = createSlice({
@@ -68,6 +87,10 @@ export const datasetSlice = createSlice({
     removeNewRows: state => {
       state.newRows = [];
     },
+
+    setColumns: (state, action: PayloadAction<DatasetColumn[]>) => {
+      state.columns = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setRequirementLevels.fulfilled, (state, action) => {
@@ -76,6 +99,14 @@ export const datasetSlice = createSlice({
 
     builder.addCase(setRequirementLevels.rejected, state => {
       state.requirementLevels = [];
+    });
+
+    builder.addCase(setEntityPrivileges.fulfilled, (state, action) => {
+      state.entityPrivileges = { ...action.payload };
+    });
+
+    builder.addCase(setEntityPrivileges.rejected, state => {
+      state.entityPrivileges = <EntityPrivileges>{};
     });
   },
 });
@@ -86,6 +117,7 @@ export const {
   addNewRow,
   readdNewRowsAfterDelete,
   removeNewRows,
+  setColumns,
 } = datasetSlice.actions;
 
 export default datasetSlice.reducer;
