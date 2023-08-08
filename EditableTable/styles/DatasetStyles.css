@@ -7,6 +7,7 @@
   position: relative;
   color:black;
   flex-wrap: wrap;
+  display: inline;
 }
 
 .ms-DetailsList {
@@ -90,4 +91,14 @@
 
 div[id^="DialogContainer__"][id$='_popupContainer_innerPopup'] {
   z-index: 10;
+}
+
+.columnsHeader {
+  position: sticky;
+  top: 44px;
+  z-index: 3;
+}
+
+.ms-DetailsList-headerWrapper {
+  display: inline;
 }

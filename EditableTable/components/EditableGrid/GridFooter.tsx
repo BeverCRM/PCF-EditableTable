@@ -9,9 +9,10 @@ type DataSet = ComponentFramework.PropertyTypes.DataSet;
 export interface IGridFooterProps {
     dataset: DataSet;
     selectedCount: number;
+    resetScroll: () => void
 }
 
-export const GridFooter = ({ dataset, selectedCount } : IGridFooterProps) => {
+export const GridFooter = ({ dataset, selectedCount, resetScroll } : IGridFooterProps) => {
   const {
     totalRecords,
     currentPage,
@@ -29,26 +30,36 @@ export const GridFooter = ({ dataset, selectedCount } : IGridFooterProps) => {
     ${selectedCount !== 0 ? `(${selectedCount} Selected)` : ''}`;
 
   return (
-    <div className={footerStyles.content}>
+    <div className={footerStyles.content}
+      style={{ position: 'sticky', bottom: '0', background: 'white', zIndex: '3', left: '0' }}>
       <span>{selected}</span>
       <div>
         <IconButton
           styles={footerButtonStyles}
           iconProps={PreviousIcon}
-          onClick={moveToFirst}
+          onClick={() => {
+            resetScroll();
+            moveToFirst();
+          }}
           disabled={!hasPreviousPage}
         />
         <IconButton
           styles={footerButtonStyles}
           iconProps={BackIcon}
-          onClick={movePrevious}
+          onClick={() => {
+            resetScroll();
+            movePrevious();
+          }}
           disabled={!hasPreviousPage}
         />
         <span>Page {currentPage}</span>
         <IconButton
           styles={footerButtonStyles}
           iconProps={ForwardIcon}
-          onClick={moveNext}
+          onClick={() => {
+            resetScroll();
+            moveNext();
+          }}
           disabled={!hasNextPage}
         />
       </div>
