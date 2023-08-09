@@ -55,11 +55,17 @@ export const stackComboBox : IStackStyles = {
 
 export const lookupFormatStyles = (required: boolean):
 IStyleFunctionOrObject<IBasePickerStyleProps, IBasePickerStyles> => ({
-  text: { minWidth: 30, overflow: 'hidden' },
+  text: {
+    minWidth: 30,
+    overflow: 'hidden',
+    outline: 'none',
+    border: '1px solid black !important',
+  },
   root: {
     minWidth: 30,
     overflow: 'hidden',
     marginRight: required ? '10px' : '0px',
+    backgroundColor: 'white',
   },
   input: { overflow: 'hidden' },
 });
@@ -117,10 +123,11 @@ export const asteriskClassStyle = (required: boolean) => mergeStyles({
   display: required ? 'flex' : 'none',
 });
 
-export const errorTooltip = (isInvalid: boolean, errorText: string, index?: number) => mergeStyles({
+export const errorTooltip =
+(isInvalid: boolean, errorText: string, required: boolean, index?: number) => mergeStyles({
   display: isInvalid ? 'inline-block' : 'none',
   position: 'absolute',
-  right: '18px',
+  right: `${required ? '18px' : '8px'}`,
   top: '12px',
   fontSize: '16px',
   color: '#c0172b',

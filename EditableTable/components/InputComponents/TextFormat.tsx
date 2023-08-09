@@ -4,6 +4,7 @@ import React, { memo, useState } from 'react';
 import { asteriskClassStyle, errorTooltip, textFieldStyles } from '../../styles/ComponentsStyles';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setInvalid } from '../../store/features/ErrorSlice';
+import { isEmailValid, validateUrl } from '../../utils/textUtils';
 
 export type errorProp = {
   isInvalid: boolean,
@@ -15,12 +16,13 @@ export interface ITextProps {
   fieldName: string,
   value: string | undefined,
   ownerValue: string | undefined,
+  type?: string,
   isDisabled?: boolean,
   isRequired: boolean,
   _onChange: Function,
 }
 
-export const TextFormat = memo(({ value, isRequired, isDisabled,
+export const TextFormat = memo(({ value, isRequired, isDisabled, type,
   fieldName, index, ownerValue, _onChange } : ITextProps) => {
   const currentValue = ownerValue !== undefined ? ownerValue : value;
   const errorProp = {
@@ -32,6 +34,15 @@ export const TextFormat = memo(({ value, isRequired, isDisabled,
   const textFields = useAppSelector(state => state.text.textFields);
   const currentTextField = textFields.find(textField => textField.fieldName === fieldName);
   const dispatch = useAppDispatch();
+
+  const onChange = (newValue: string) => {
+    if (type?.includes('URL')) {
+      _onChange(validateUrl(newValue));
+    }
+    else {
+      _onChange(newValue);
+    }
+  };
 
   const checkValidation = (newValue: string) => {
     if (isRequired && newValue === '') {
@@ -48,6 +59,13 @@ export const TextFormat = memo(({ value, isRequired, isDisabled,
       });
       dispatch(setInvalid(true));
     }
+    else if (type?.includes('Email') && !isEmailValid(newValue)) {
+      setErrorProps({
+        isInvalid: true,
+        errorText: 'Enter a valid email address.',
+      });
+      dispatch(setInvalid(true));
+    }
     else {
       dispatch(setInvalid(false));
     }
@@ -61,14 +79,16 @@ export const TextFormat = memo(({ value, isRequired, isDisabled,
         disabled={isDisabled}
         onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
           const elem = event.target as HTMLInputElement;
-          _onChange(elem.value);
+          onChange(elem.value);
           checkValidation(elem.value);
         }}
         onFocus={() => setErrorProps({ isInvalid: false, errorText: '' })}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
-      <FontIcon iconName={'StatusErrorFull'}
-        className={errorTooltip(errorProps.isInvalid, errorProps.errorText, index)} />
+      <FontIcon
+        iconName={'StatusErrorFull'}
+        className={errorTooltip(errorProps.isInvalid, errorProps.errorText, isRequired, index)}
+      />
     </Stack>
   );
 });

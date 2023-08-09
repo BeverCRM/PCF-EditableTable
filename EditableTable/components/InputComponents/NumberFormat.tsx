@@ -105,7 +105,10 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
         onFocus={() => setInvalid(false)}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
-      <FontIcon iconName={'StatusErrorFull'} className={errorTooltip(isInvalid, errorText)} />
+      <FontIcon
+        iconName={'StatusErrorFull'}
+        className={errorTooltip(isInvalid, errorText, isRequired)}
+      />
     </Stack>
   );
 });

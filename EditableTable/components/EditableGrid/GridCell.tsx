@@ -122,7 +122,7 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
       case 'SingleLine.Text':
       case 'Multiple':
       default:
-        return <TextFormat value={cell.formattedValue} {...props} />;
+        return <TextFormat value={cell.formattedValue} type={cell.type} {...props} />;
     }
   }
 
