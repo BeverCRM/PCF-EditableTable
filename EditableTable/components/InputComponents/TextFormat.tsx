@@ -4,7 +4,7 @@ import React, { memo, useState } from 'react';
 import { asteriskClassStyle, errorTooltip, textFieldStyles } from '../../styles/ComponentsStyles';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setInvalid } from '../../store/features/ErrorSlice';
-import { isEmailValid, validateUrl } from '../../utils/commonUtils';
+import { isEmailValid, validateUrl } from '../../utils/textUtils';
 
 export type errorProp = {
   isInvalid: boolean,
