@@ -71,7 +71,10 @@ export const OptionSetFormat = memo(({ fieldName, value, isMultiple, isRequired,
         disabled={disabled}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
-      <FontIcon iconName={'StatusErrorFull'} className={errorTooltip(isInvalid, errorText)} />
+      <FontIcon
+        iconName={'StatusErrorFull'}
+        className={errorTooltip(isInvalid, errorText, isRequired)}
+      />
     </Stack>
   );
 });

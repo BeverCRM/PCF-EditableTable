@@ -122,6 +122,13 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
     }
   };
 
+  const localizedStrings = {
+    ...defaultDatePickerStrings,
+    shortDays: _service.getWeekDayNamesShort(),
+    shortMonths: _service.getMonthNamesShort(),
+    months: _service.getMonthNamesLong(),
+  };
+
   return (
     <Stack styles={stackComboBox}>
       <DatePicker
@@ -130,10 +137,11 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
         onSelectDate={onDateChange}
         formatDate={(date?: Date) => date ? formatDateShort(_service, date) : ''}
         parseDateFromString={(newValue: string): Date => parseDateFromString(_service, newValue)}
-        strings={defaultDatePickerStrings}
+        strings={localizedStrings}
         styles={datePickerStyles(dateOnly ? isRequired : false)}
         onAfterMenuDismiss={() => checkValidation()}
         onClick={() => setInvalid(false)}
+        firstDayOfWeek={_service.getFirstDayOfWeek()}
       />
       {!dateOnly &&
         <ComboBox
@@ -145,9 +153,11 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
           onBlur={() => checkValidation()}
         />
       }
-      <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
-      <FontIcon iconName={'StatusErrorFull'}
-        className={errorTooltip(isInvalid, 'Required fields must be filled in.')} />
+      <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
+      <FontIcon
+        iconName={'StatusErrorFull'}
+        className={errorTooltip(isInvalid, 'Required fields must be filled in.', isRequired)}
+      />
     </Stack>
   );
 });

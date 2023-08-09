@@ -121,6 +121,9 @@ export const LookupFormat = memo(
         }}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
-      <FontIcon iconName={'StatusErrorFull'} className={errorTooltip(isInvalid, errorText)} />
+      <FontIcon
+        iconName={'StatusErrorFull'}
+        className={errorTooltip(isInvalid, errorText, isRequired)}
+      />
     </div>;
   });

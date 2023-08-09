@@ -1,5 +1,6 @@
 .appWrapper {
   position: relative;
+  z-index: 0;
 }
 
 .container {
@@ -102,3 +103,11 @@ div[id^="DialogContainer__"][id$='_popupContainer_innerPopup'] {
 .ms-DetailsList-headerWrapper {
   display: inline;
 }
+.ms-BasePicker-text::after {
+  border: none;
+  border-right: 1px solid black;
+}
+
+.ms-BasePicker-text:active {
+  border: 2px solid rgb(0, 120, 212) !important;
+} 
