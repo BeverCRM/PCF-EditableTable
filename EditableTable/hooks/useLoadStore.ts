@@ -10,7 +10,11 @@ import { setLoading } from '../store/features/LoadingSlice';
 import { useAppDispatch } from '../store/hooks';
 
 import { mapDataSetColumns, mapDataSetRows } from '../mappers/dataSetMapper';
-import { setEntityPrivileges, setRequirementLevels } from '../store/features/DatasetSlice';
+import {
+  setCalculatedFields,
+  setEntityPrivileges,
+  setRequirementLevels,
+} from '../store/features/DatasetSlice';
 import { IDataverseService } from '../services/DataverseService';
 import { getTextMetadata } from '../store/features/TextSlice';
 
@@ -99,6 +103,7 @@ export const useLoadStore = (dataset: DataSet, _service: IDataverseService) => {
     }
 
     dispatch(setRequirementLevels({ columnKeys, _service }));
+    dispatch(setCalculatedFields({ columnKeys, _service }));
     dispatch(setEntityPrivileges(_service));
   }, [dataset]);
 };

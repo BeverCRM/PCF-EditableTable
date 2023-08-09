@@ -18,6 +18,11 @@ export type RequirementLevel = {
   isRequired: boolean;
 }
 
+export type CalculatedField = {
+  fieldName: string;
+  isCalculated: boolean;
+}
+
 export type Updates = {
   rowKey: string;
   columnName: string;
@@ -30,6 +35,7 @@ export interface IDatasetState {
   columns: DatasetColumn[],
   requirementLevels: RequirementLevel[],
   entityPrivileges: EntityPrivileges,
+  calculatedFields: CalculatedField[]
 }
 
 const initialState: IDatasetState = {
@@ -38,12 +44,21 @@ const initialState: IDatasetState = {
   columns: [],
   requirementLevels: [],
   entityPrivileges: <EntityPrivileges>{},
+  calculatedFields: [],
 };
 
 type DatasetPayload = {
   columnKeys: string[],
   _service: IDataverseService,
 }
+
+export const setCalculatedFields = createAsyncThunk<CalculatedField[], DatasetPayload>(
+  'dataset/setCalculatedFields',
+  async payload => await Promise.all(payload.columnKeys.map(async columnKey => {
+    const isCalculated = await payload._service.isCalculatedField(columnKey);
+    return { fieldName: columnKey, isCalculated };
+  })),
+);
 
 export const setRequirementLevels = createAsyncThunk<any[], DatasetPayload>(
   'dataset/setRequirementLevels',
@@ -93,6 +108,14 @@ export const datasetSlice = createSlice({
     },
   },
   extraReducers: builder => {
+    builder.addCase(setCalculatedFields.fulfilled, (state, action) => {
+      state.calculatedFields = [...action.payload];
+    });
+
+    builder.addCase(setCalculatedFields.rejected, state => {
+      state.calculatedFields = [];
+    });
+
     builder.addCase(setRequirementLevels.fulfilled, (state, action) => {
       state.requirementLevels = [...action.payload];
     });
