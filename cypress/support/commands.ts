@@ -4,7 +4,7 @@ declare namespace Cypress {
     login(username: string, password: string): Chainable<void>;
     visitD365Environment(appId: string, entityName: string, recordId: string): Chainable<void>;
     assertFieldValues(data: DateTimeData): Chainable<void>;
-    waitForBeforePseudoElement(): Chainable<void>;
+    waitForPseudoElement(): Chainable<void>;
   }
 }
 
@@ -56,7 +56,7 @@ Cypress.Commands.add('assertFieldValues', data => {
     });
 });
 
-Cypress.Commands.add('waitForBeforePseudoElement', { prevSubject: 'element' }, element => {
+Cypress.Commands.add('waitForPseudoElement', { prevSubject: 'element' }, element => {
   function checkBeforePseudoElement() {
     const beforeContent = window.getComputedStyle(element[0], '::before').content;
     if (beforeContent === 'none') {
