@@ -149,24 +149,6 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
     }
   };
 
-  /* function tabCheck() {
-    const element: HTMLInputElement | null =
-    document.querySelector('[value="000 1"]');
-    element!.tabIndex = -1;
-    // const elem2: HTMLInputElement | null = element?.children[0];
-    // const elem3: HTMLInputElement | null = elem2?.children[0];
-    element?.focus();
-    console.log(document.activeElement);
-    console.log(element);
-  }
-
-  React.useEffect(() => {
-    window.addEventListener('keyup', tabCheck);
-    return () => {
-      window.removeEventListener('keyup', tabCheck);
-    };
-  }, []); */
-
   return <div className='container'>
     <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons}
       style={{ position: 'sticky', top: '0', background: 'white', zIndex: '3', left: '0' }}>
@@ -207,9 +189,6 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
         <div className='nodata'><span>No data available</span></div>
       </Stack>
     }
-    {/* <Stack style={{ position: 'sticky', bottom: '0', background: 'white', zIndex: '3' }} >
-      <GridFooter dataset={dataset} selectedCount={selectedRecordIds.length}></GridFooter>
-    </Stack> */}
     <GridFooter dataset={dataset}
       selectedCount={selectedRecordIds.length}
       resetScroll={resetScroll}></GridFooter>
