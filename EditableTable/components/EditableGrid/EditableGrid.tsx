@@ -150,8 +150,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
   };
 
   return <div className='container'>
-    <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons}
-      style={{ position: 'sticky', top: '0', background: 'white', zIndex: '3', left: '0' }}>
+    <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons}>
       <CommandBar
         refreshButtonHandler={refreshButtonHandler}
         newButtonHandler={newButtonHandler}
@@ -189,8 +188,10 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
         <div className='nodata'><span>No data available</span></div>
       </Stack>
     }
-    <GridFooter dataset={dataset}
+    <GridFooter
+      dataset={dataset}
       selectedCount={selectedRecordIds.length}
-      resetScroll={resetScroll}></GridFooter>
+      resetScroll={resetScroll}
+    ></GridFooter>
   </div>;
 };

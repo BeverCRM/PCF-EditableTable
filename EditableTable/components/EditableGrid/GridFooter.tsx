@@ -30,8 +30,7 @@ export const GridFooter = ({ dataset, selectedCount, resetScroll } : IGridFooter
     ${selectedCount !== 0 ? `(${selectedCount} Selected)` : ''}`;
 
   return (
-    <div className={footerStyles.content}
-      style={{ position: 'sticky', bottom: '0', background: 'white', zIndex: '3', left: '0' }}>
+    <div className={footerStyles.content}>
       <span>{selected}</span>
       <div>
         <IconButton
