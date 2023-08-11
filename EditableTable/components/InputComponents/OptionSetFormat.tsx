@@ -13,18 +13,19 @@ export interface IDropDownProps {
   isTwoOptions?: boolean;
   _onChange: Function;
   isRequired: boolean;
+  isDisabled: boolean;
   _service: IDataverseService;
 }
 
 export const OptionSetFormat = memo(({ fieldName, value, isMultiple, isRequired, isTwoOptions,
-  _onChange, _service }: IDropDownProps) => {
+  isDisabled, _onChange, _service }: IDropDownProps) => {
   const [isInvalid, setInvalid] = useState(false);
   const errorText = 'Required fields must be filled in.';
   let currentValue = value;
   const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);
   const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
   const options = currentDropdown?.options ?? [];
-  const disabled = fieldName === 'statuscode' || fieldName === 'statecode';
+  const disabled = fieldName === 'statuscode' || fieldName === 'statecode' || isDisabled;
 
   if (_service.isStatusField(fieldName) && !currentValue) {
     currentValue = options.find(option =>

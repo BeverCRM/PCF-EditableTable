@@ -17,7 +17,7 @@ export interface ITextProps {
   value: string | undefined,
   ownerValue: string | undefined,
   type?: string,
-  isDisabled?: boolean,
+  isDisabled: boolean,
   isRequired: boolean,
   _onChange: Function,
 }

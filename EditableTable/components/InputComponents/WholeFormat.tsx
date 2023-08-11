@@ -12,10 +12,11 @@ export interface IWholeFormatProps {
   type: string;
   _onChange: Function;
   isRequired: boolean;
+  isDisabled: boolean;
 }
 
-export const WholeFormat = memo(({ value, formattedValue, type,
-  _onChange, isRequired } : IWholeFormatProps) => {
+export const WholeFormat = memo(({ value, formattedValue, type, isDisabled,
+  isRequired, _onChange } : IWholeFormatProps) => {
   const [isInvalid, setInvalid] = useState(false);
   const errorText = 'Required fields must be filled in.';
 
@@ -77,6 +78,7 @@ export const WholeFormat = memo(({ value, formattedValue, type,
         selectedKey={value}
         styles={wholeFormatStyles(isRequired)}
         allowFreeform={type === 'duration'}
+        disabled={isDisabled}
         onBlur={() => checkValidation()}
         onFocus={() => setInvalid(false)}
       />

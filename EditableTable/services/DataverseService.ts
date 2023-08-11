@@ -68,6 +68,7 @@ export interface IDataverseService {
   getReqirementLevel(fieldName: string): Promise<any>;
   getSecurityPrivileges(): Promise<EntityPrivileges>;
   isStatusField(fieldName: string | undefined): boolean;
+  isCalculatedField(fieldName: string | undefined): Promise<boolean>;
   getGlobbalPrecision(): Promise<number>;
   getFirstDayOfWeek(): number;
   getWeekDayNamesShort(): string[];
@@ -414,6 +415,14 @@ export class DataverseService implements IDataverseService {
       write: writePriv,
       delete: deletePriv,
     };
+  }
+
+  public async isCalculatedField(fieldName: string | undefined) {
+    const request = `${this._clientUrl}EntityDefinitions(LogicalName='${
+      this._targetEntityType}')/Attributes(LogicalName='${fieldName}')?$select=IsValidForCreate`;
+    const results = await getFetchResponse(request);
+
+    return !results.IsValidForCreate;
   }
 
   public isStatusField(fieldName: string | undefined) {

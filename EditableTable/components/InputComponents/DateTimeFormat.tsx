@@ -38,12 +38,13 @@ export interface IDatePickerProps {
   fieldName: string,
   dateOnly: boolean,
   value: string | null,
+  isDisabled: boolean;
   isRequired: boolean;
   _onChange: any,
   _service: IDataverseService;
 }
 
-export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
+export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled,
   isRequired, _onChange, _service }: IDatePickerProps) => {
   const [isInvalid, setInvalid] = useState(false);
   let timeKey: string | number | undefined;
@@ -139,9 +140,10 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
         parseDateFromString={(newValue: string): Date => parseDateFromString(_service, newValue)}
         strings={localizedStrings}
         styles={datePickerStyles(dateOnly ? isRequired : false)}
+        firstDayOfWeek={_service.getFirstDayOfWeek()}
+        disabled={isDisabled}
         onAfterMenuDismiss={() => checkValidation()}
         onClick={() => setInvalid(false)}
-        firstDayOfWeek={_service.getFirstDayOfWeek()}
       />
       {!dateOnly &&
         <ComboBox
@@ -150,6 +152,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
           onChange={onTimeChange}
           styles={timePickerStyles(isRequired)}
           selectedKey={timeKey}
+          disabled={isDisabled}
           onBlur={() => checkValidation()}
         />
       }
