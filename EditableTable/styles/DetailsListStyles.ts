@@ -14,6 +14,9 @@ export const detailsHeaderStyles: Partial<IDetailsHeaderStyles> = mergeStyleSets
     fontSize: '12px',
     paddingTop: '0px',
     borderTop: '1px solid rgb(215, 215, 215)',
+    position: 'sticky',
+    top: '44px',
+    zIndex: '3',
   },
 });
 

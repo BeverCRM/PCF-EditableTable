@@ -12,10 +12,14 @@ export const buttonStyles = mergeStyleSets({
   },
   buttons: {
     height: '44px',
-    paddingRight: '20px',
     display: 'flex',
     justifyContent: 'flex-end',
     marginTop: 20,
+    position: 'sticky',
+    top: '0',
+    background: 'white',
+    left: '0',
+    zIndex: 3,
   },
 });
 
