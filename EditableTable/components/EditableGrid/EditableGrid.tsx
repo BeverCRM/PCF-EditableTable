@@ -1,8 +1,10 @@
 import * as React from 'react';
 import {
+  ConstrainMode,
   DetailsList,
   DetailsListLayoutMode,
   IColumn,
+  IDetailsList,
   Stack,
 } from '@fluentui/react';
 
@@ -50,6 +52,12 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
 
   const dispatch = useAppDispatch();
 
+  const detailsListRef = React.createRef<IDetailsList>();
+
+  const resetScroll = () => {
+    detailsListRef.current?.scrollToIndex(0);
+  };
+
   const refreshButtonHandler = () => {
     dispatch(setLoading(true));
     dataset.refresh();
@@ -58,6 +66,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
   };
 
   const newButtonHandler = () => {
+    resetScroll();
     const emptyColumns = columns.map<Column>(column => ({
       schemaName: column.key,
       rawValue: '',
@@ -141,7 +150,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
   };
 
   return <div className='container'>
-    <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons} >
+    <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons}>
       <CommandBar
         refreshButtonHandler={refreshButtonHandler}
         newButtonHandler={newButtonHandler}
@@ -152,6 +161,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       ></CommandBar>
     </Stack>
     <DetailsList
+      componentRef={detailsListRef}
       key={getColumnsTotalWidth(dataset) > width ? 0 : width}
       items={rows}
       columns={columns}
@@ -170,6 +180,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       layoutMode={DetailsListLayoutMode.fixedColumns}
       styles={gridStyles(rows.length)}
       onColumnHeaderClick={_onColumnClick}
+      constrainMode={ ConstrainMode.unconstrained }
     >
     </DetailsList>
     {rows.length === 0 &&
@@ -177,6 +188,10 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
         <div className='nodata'><span>No data available</span></div>
       </Stack>
     }
-    <GridFooter dataset={dataset} selectedCount={selectedRecordIds.length}></GridFooter>
+    <GridFooter
+      dataset={dataset}
+      selectedCount={selectedRecordIds.length}
+      resetScroll={resetScroll}
+    ></GridFooter>
   </div>;
 };

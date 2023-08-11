@@ -18,6 +18,11 @@ export const footerStyles = mergeStyleSets({
     alignItems: 'center',
     paddingLeft: '20px',
     paddingRight: '20px',
+    position: 'sticky',
+    bottom: '0',
+    background: 'white',
+    left: '0',
+    zIndex: 3,
   },
 });
 
