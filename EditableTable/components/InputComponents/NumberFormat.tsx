@@ -63,23 +63,16 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired, isDisab
     if (newValue === '') {
       _onChange(null, '');
     }
-    else {
-      let precision = 0;
-      if (currentCurrency && currentNumber) {
-        if (currentNumber?.precision === 1) {
-          _service.getGlobbalPrecision().then(result => {
-            precision = result;
-            changeNumberFormat(currentCurrency, currentNumber, precision, newValue);
-          });
-        }
-        else if (currentNumber?.precision === 2) {
-          precision = currentNumber?.precisionNumber;
-          changeNumberFormat(currentCurrency, currentNumber, currentCurrency.precision, newValue);
-        }
-        else {
-          changeNumberFormat(currentCurrency, currentNumber, currentNumber.precision, newValue);
-        }
+    else if (currentCurrency && currentNumber) {
+      if (currentNumber?.precision === 2) {
+        changeNumberFormat(currentCurrency, currentNumber, currentCurrency.precision, newValue);
       }
+      else {
+        changeNumberFormat(currentCurrency, currentNumber, currentNumber.precision, newValue);
+      }
+    }
+    else {
+      changeNumberFormat(currentCurrency, currentNumber, currentNumber?.precision, newValue);
     }
   };
 
@@ -100,8 +93,12 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired, isDisab
         disabled={currentNumber?.isBaseCurrency || isDisabled}
         onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
           const elem = event.target as HTMLInputElement;
-          onNumberChange(elem.value);
-          checkValidation(elem.value);
+          console.log('Old Value: ', value);
+          console.log('New Value: ', elem.value);
+          if (value !== elem.value) {
+            onNumberChange(elem.value);
+            checkValidation(elem.value);
+          }
         }}
         onFocus={() => setInvalid(false)}
       />

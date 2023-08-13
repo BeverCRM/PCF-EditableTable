@@ -103,7 +103,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled,
         setChangedDateTime(date, timeKey);
       }
     }
-    else {
+    else if (!(currentDate === undefined && date === null)) {
       _onChange(null);
     }
   };
