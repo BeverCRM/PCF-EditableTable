@@ -130,7 +130,8 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
 
   const _onColumnClick =
   (ev?: React.MouseEvent<HTMLElement, MouseEvent>, column?: IColumn) => {
-    if (column?.fieldName) {
+    if (column?.fieldName && column.data !== 'MultiSelectPicklist') {
+      dispatch(setLoading(true));
       const oldSorting = (dataset.sorting || []).find(sort => sort.name === column.fieldName);
       const newSorting: ComponentFramework.PropertyHelper.DataSetApi.SortStatus = {
         name: column.fieldName,

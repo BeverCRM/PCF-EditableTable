@@ -307,7 +307,7 @@ export class DataverseService implements IDataverseService {
         precision = results.value[0]?.Precision;
         break;
       case 1:
-        precision = await this.getGlobalPrecision();
+        precision = this._isOffline ? results.value[0]?.Precision : await this.getGlobalPrecision();
         break;
       default:
         precision;
@@ -326,7 +326,8 @@ export class DataverseService implements IDataverseService {
   public async getGlobalPrecision() : Promise<number> {
     const request = `${this._clientUrl}organizations?$select=pricingdecimalprecision`;
     const response = await getFetchResponse(request);
-    return this._isOffline ? 1 : response?.value[0].pricingdecimalprecision;
+    return response?.value[0].pricingdecimalprecision;
+    // return this._isOffline ? 1 : response?.value[0].pricingdecimalprecision;
   }
 
   public async getCurrency(recordId: string): Promise<CurrencyData> {
