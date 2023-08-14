@@ -79,8 +79,10 @@ export const TextFormat = memo(({ value, isRequired, isDisabled, type,
         disabled={isDisabled}
         onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
           const elem = event.target as HTMLInputElement;
-          onChange(elem.value);
-          checkValidation(elem.value);
+          if (currentValue !== elem.value) {
+            onChange(elem.value);
+            checkValidation(elem.value);
+          }
         }}
         onFocus={() => setErrorProps({ isInvalid: false, errorText: '' })}
       />

@@ -69,7 +69,7 @@ export interface IDataverseService {
   getSecurityPrivileges(): Promise<EntityPrivileges>;
   isStatusField(fieldName: string | undefined): boolean;
   isCalculatedField(fieldName: string | undefined): Promise<boolean>;
-  getGlobbalPrecision(): Promise<number>;
+  getGlobalPrecision(): Promise<number>;
   getFirstDayOfWeek(): number;
   getWeekDayNamesShort(): string[];
   getMonthNamesShort(): string[];
@@ -81,6 +81,7 @@ export class DataverseService implements IDataverseService {
   private _targetEntityType: string;
   private _clientUrl: string;
   private _parentValue: string | undefined;
+  private _isOffline: boolean;
 
   constructor(context: ComponentFramework.Context<IInputs>) {
     this._context = context;
@@ -88,6 +89,7 @@ export class DataverseService implements IDataverseService {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     this._clientUrl = `${this._context.page.getClientUrl()}/api/data/v9.2/`;
+    this._isOffline = this._context.client.isOffline();
   }
 
   public getCurrentUserName() {
@@ -298,9 +300,22 @@ export class DataverseService implements IDataverseService {
       selection}&$filter=LogicalName eq '${fieldName}'`;
     const results = await getFetchResponse(request);
 
+    let precision = results.value[0]?.PrecisionSource ?? results.value[0]?.Precision ?? 0;
+
+    switch (precision) {
+      case 0:
+        precision = results.value[0]?.Precision;
+        break;
+      case 1:
+        precision = this._isOffline ? results.value[0]?.Precision : await this.getGlobalPrecision();
+        break;
+      default:
+        precision;
+    }
+
     return {
       fieldName,
-      precision: results.value[0]?.PrecisionSource ?? results.value[0]?.Precision ?? 0,
+      precision,
       minValue: results.value[0].MinValue,
       maxValue: results.value[0].MaxValue,
       isBaseCurrency: results.value[0].IsBaseCurrency,
@@ -308,10 +323,11 @@ export class DataverseService implements IDataverseService {
     };
   }
 
-  public async getGlobbalPrecision() : Promise<number> {
+  public async getGlobalPrecision() : Promise<number> {
     const request = `${this._clientUrl}organizations?$select=pricingdecimalprecision`;
     const response = await getFetchResponse(request);
     return response?.value[0].pricingdecimalprecision;
+    // return this._isOffline ? 1 : response?.value[0].pricingdecimalprecision;
   }
 
   public async getCurrency(recordId: string): Promise<CurrencyData> {
@@ -329,11 +345,14 @@ export class DataverseService implements IDataverseService {
   }
 
   public async getCurrencyById(recordId: string): Promise<CurrencyData> {
-    const fetchedCurrency = await this._context.webAPI.retrieveRecord(
-      'transactioncurrency',
-      recordId,
-      '?$select=currencysymbol,currencyprecision',
-    );
+    let fetchedCurrency = undefined;
+    if (!this._isOffline) {
+      fetchedCurrency = await this._context.webAPI.retrieveRecord(
+        'transactioncurrency',
+        recordId,
+        '?$select=currencysymbol,currencyprecision',
+      );
+    }
 
     return {
       symbol: fetchedCurrency?.currencysymbol ??
