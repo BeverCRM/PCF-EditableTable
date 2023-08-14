@@ -93,8 +93,6 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired, isDisab
         disabled={currentNumber?.isBaseCurrency || isDisabled}
         onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
           const elem = event.target as HTMLInputElement;
-          console.log('Old Value: ', value);
-          console.log('New Value: ', elem.value);
           if (value !== elem.value) {
             onNumberChange(elem.value);
             checkValidation(elem.value);

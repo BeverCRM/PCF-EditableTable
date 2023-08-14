@@ -299,8 +299,6 @@ export class DataverseService implements IDataverseService {
       this._targetEntityType}')/Attributes/Microsoft.Dynamics.CRM.${attributeType}?$select=${
       selection}&$filter=LogicalName eq '${fieldName}'`;
     const results = await getFetchResponse(request);
-    console.log(results);
-    console.log('Precisions: ', results.value[0]?.PrecisionSource, results.value[0]?.Precision);
 
     let precision = results.value[0]?.PrecisionSource ?? results.value[0]?.Precision ?? 0;
 
@@ -314,7 +312,6 @@ export class DataverseService implements IDataverseService {
       default:
         precision;
     }
-    console.log(precision);
 
     return {
       fieldName,
