@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { DefaultButton, FontIcon } from '@fluentui/react';
+import { DefaultButton, FontIcon, IconButton } from '@fluentui/react';
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
 import React, { memo, useState } from 'react';
 import { IDataverseService } from '../../services/DataverseService';
@@ -8,6 +8,7 @@ import {
   asteriskClassStyle,
   errorTooltip,
   lookupFormatStyles,
+  lookupRemoveOptionStyles,
   lookupSelectedOptionStyles,
 } from '../../styles/ComponentsStyles';
 import { ParentEntityMetadata } from '../EditableGrid/GridCell';
@@ -80,10 +81,12 @@ export const LookupFormat = memo(
     const _onRenderItem = () =>
       <DefaultButton
         text={currentOption[0].name}
-        split
+        title={currentOption[0].name}
         menuProps={{ items: [] }}
+        split
         menuIconProps={{
           iconName: 'Cancel',
+          // styles: lookupRemoveOptionStyles,
         }}
         onMenuClick={() => onChange(undefined)}
         onClick={event => {
