@@ -87,6 +87,7 @@ export const lookupSelectedOptionStyles: IButtonStyles = {
     right: 0,
     background: 'white',
     zIndex: 3,
+    cursor: 'pointer',
     '::before': {
       position: 'absolute',
       content: '',
@@ -96,6 +97,11 @@ export const lookupSelectedOptionStyles: IButtonStyles = {
       height: '5px',
       color: 'rgb(200, 198, 196)',
     },
+  },
+  splitButtonFlexContainer: {
+    borderLeft: '1px solid rgb(200, 198, 196)',
+    marginLeft: '-5px',
+    marginRight: '-5px',
   },
   label: {
     fontWeight: 400,
@@ -117,6 +123,7 @@ IStyleFunctionOrObject<IIconStyleProps, IIconStyles> = {
       width: '1px',
       height: '5px',
       color: 'rgb(200, 198, 196)',
+      display: 'block',
     },
   },
 };
