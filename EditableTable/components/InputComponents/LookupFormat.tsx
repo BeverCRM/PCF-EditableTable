@@ -8,7 +8,6 @@ import {
   asteriskClassStyle,
   errorTooltip,
   lookupFormatStyles,
-  lookupRemoveOptionStyles,
   lookupSelectedOptionStyles,
 } from '../../styles/ComponentsStyles';
 import { ParentEntityMetadata } from '../EditableGrid/GridCell';
@@ -86,7 +85,6 @@ export const LookupFormat = memo(
         split
         menuIconProps={{
           iconName: 'Cancel',
-          // styles: lookupRemoveOptionStyles,
         }}
         onMenuClick={() => onChange(undefined)}
         onClick={event => {

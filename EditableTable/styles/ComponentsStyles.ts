@@ -108,26 +108,6 @@ export const lookupSelectedOptionStyles: IButtonStyles = {
   },
 };
 
-export const lookupRemoveOptionStyles:
-IStyleFunctionOrObject<IIconStyleProps, IIconStyles> = {
-  root: {
-    position: 'sticky',
-    right: 0,
-    background: 'white',
-    zIndex: 3,
-    '::before': {
-      position: 'absolute',
-      content: '',
-      top: '10px',
-      right: '20px',
-      width: '1px',
-      height: '5px',
-      color: 'rgb(200, 198, 196)',
-      display: 'block',
-    },
-  },
-};
-
 export const numberFormatStyles = (required: boolean): Partial<ISpinButtonStyles> => ({
   root: {
     minWidth: '40px',
@@ -206,14 +186,4 @@ export const errorTooltip =
   ':hover::after': {
     display: 'inline-block',
   },
-});
-
-export const header = mergeStyles({
-  backgroundColor: 'white',
-  fontSize: '12px',
-  paddingTop: '0px',
-  borderTop: '1px solid rgb(215, 215, 215)',
-  position: 'sticky',
-  top: '44px',
-  zIndex: '3',
 });
