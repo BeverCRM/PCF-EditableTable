@@ -65,6 +65,7 @@ export const OptionSetFormat = memo(({ fieldName, value, isMultiple, isRequired,
         options={options}
         multiSelect={isMultiple}
         selectedKey={currentOptions}
+        autoComplete='off'
         onChange={onChange}
         styles={optionSetStyles(isRequired)}
         onMenuDismissed={() => checkValidation()}

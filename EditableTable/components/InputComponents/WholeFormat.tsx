@@ -75,6 +75,7 @@ export const WholeFormat = memo(({ value, formattedValue, type, isDisabled,
       <ComboBox
         options={options}
         onChange={onChange}
+        autoComplete='off'
         selectedKey={value}
         styles={wholeFormatStyles(isRequired)}
         allowFreeform={type === 'duration'}
