@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { DefaultButton, FontIcon, IconButton } from '@fluentui/react';
+import { DefaultButton, FontIcon } from '@fluentui/react';
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
 import React, { memo, useState } from 'react';
 import { IDataverseService } from '../../services/DataverseService';

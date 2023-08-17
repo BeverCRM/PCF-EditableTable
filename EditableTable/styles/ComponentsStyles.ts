@@ -4,8 +4,6 @@ import {
   IButtonStyles,
   IComboBoxStyles,
   IDatePickerStyles,
-  IIconStyleProps,
-  IIconStyles,
   ISpinButtonStyles,
   IStackStyles,
   IStyleFunctionOrObject,
