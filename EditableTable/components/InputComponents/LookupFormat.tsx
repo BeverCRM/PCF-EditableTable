@@ -20,12 +20,13 @@ export interface ILookupProps {
   value: ITag | undefined;
   parentEntityMetadata: ParentEntityMetadata | undefined;
   isRequired: boolean;
+  isSecured: boolean
   _onChange: Function;
   _service: IDataverseService;
 }
 
 export const LookupFormat = memo(
-  ({ _service, fieldName, value, parentEntityMetadata,
+  ({ _service, fieldName, value, parentEntityMetadata, isSecured,
     isRequired, _onChange }: ILookupProps) => {
     const picker = React.useRef(null);
     const [isInvalid, setInvalid] = useState(false);
@@ -116,7 +117,7 @@ export const LookupFormat = memo(
           }
         }}
         inputProps={{
-          disabled: false,
+          disabled: isSecured,
           onFocus: () => setInvalid(false),
         }}
       />

@@ -19,10 +19,11 @@ export interface ITextProps {
   type?: string,
   isDisabled: boolean,
   isRequired: boolean,
+  isSecured: boolean,
   _onChange: Function,
 }
 
-export const TextFormat = memo(({ value, isRequired, isDisabled, type,
+export const TextFormat = memo(({ value, isRequired, isDisabled, type, isSecured,
   fieldName, index, ownerValue, _onChange } : ITextProps) => {
   const currentValue = ownerValue !== undefined ? ownerValue : value;
   const errorProp = {
@@ -76,7 +77,7 @@ export const TextFormat = memo(({ value, isRequired, isDisabled, type,
       <TextField defaultValue={currentValue}
         key={currentValue}
         styles={textFieldStyles(isRequired)}
-        disabled={isDisabled}
+        disabled={isDisabled || isSecured}
         onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
           const elem = event.target as HTMLInputElement;
           if (currentValue !== elem.value) {

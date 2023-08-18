@@ -473,9 +473,7 @@ export class DataverseService implements IDataverseService {
     <entity name="fieldpermission">
       <all-attributes/>
       <filter type="and">
-        <condition attribute="entityname" 
-        operator="${this._context.parameters.dataset.getTargetEntityType}" />
-        <condition attribute="attributelogicalname" operator="${columnName}" />
+        <condition attribute="attributelogicalname" operator="eq" value="${columnName}" />
       </filter>
         <link-entity name="fieldsecurityprofile" from="fieldsecurityprofileid"
           to="fieldsecurityprofileid" intersect="true">
@@ -499,9 +497,7 @@ export class DataverseService implements IDataverseService {
       <entity name="fieldpermission">
         <all-attributes/>
         <filter type="and">
-          <condition attribute="entityname" 
-          operator="${this._context.parameters.dataset.getTargetEntityType}" />
-          <condition attribute="attributelogicalname" operator="${columnName}" />
+          <condition attribute="attributelogicalname" operator="eq" value="${columnName}" />
         </filter>
           <link-entity name="fieldsecurityprofile" from="fieldsecurityprofileid"
             to="fieldsecurityprofileid" intersect="true">

@@ -31,7 +31,7 @@ export type Updates = {
 
 export type FieldSecurity = {
   fieldName: string;
-  gasReadAccess: number;
+  hasUpdateAccess: boolean;
 }
 
 export interface IDatasetState {
@@ -41,7 +41,7 @@ export interface IDatasetState {
   requirementLevels: RequirementLevel[],
   entityPrivileges: EntityPrivileges,
   calculatedFields: CalculatedField[],
-  securedFields:[],
+  securedFields: FieldSecurity[],
 }
 
 const initialState: IDatasetState = {
@@ -85,8 +85,11 @@ export const setSecuredFields = createAsyncThunk<any[], DatasetPayload>(
   async payload => await Promise.all(payload.columnKeys.map(async columnKey => {
     const fieldPermissionRecord =
     await payload._service.getUserRelatedFieldServiceProfile(columnKey);
-    const hasReadAccess = fieldPermissionRecord.entities[0].canread;
-    return { fieldName: columnKey, hasReadAccess };
+    if (fieldPermissionRecord.entities.length > 0) {
+      const hasUpdateAccess = fieldPermissionRecord.entities[0].canupdate;
+      return { fieldName: columnKey, hasReadAccess: hasUpdateAccess === 0 };
+    }
+    return { fieldName: columnKey, hasReadAccess: false };
   })),
 );
 
@@ -148,8 +151,9 @@ export const datasetSlice = createSlice({
     builder.addCase(setEntityPrivileges.rejected, state => {
       state.entityPrivileges = <EntityPrivileges>{};
     });
+
     builder.addCase(setSecuredFields.fulfilled, (state, action) => {
-      // state.securedFields = { ...action.payload };
+      state.securedFields = [...action.payload];
     });
 
     builder.addCase(setSecuredFields.rejected, state => {

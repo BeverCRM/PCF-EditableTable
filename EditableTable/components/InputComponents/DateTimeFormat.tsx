@@ -40,11 +40,12 @@ export interface IDatePickerProps {
   value: string | null,
   isDisabled: boolean;
   isRequired: boolean;
+  isSecured: boolean;
   _onChange: any,
   _service: IDataverseService;
 }
 
-export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled,
+export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled, isSecured,
   isRequired, _onChange, _service }: IDatePickerProps) => {
   const [isInvalid, setInvalid] = useState(false);
   let timeKey: string | number | undefined;
@@ -141,7 +142,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled,
         strings={localizedStrings}
         styles={datePickerStyles(dateOnly ? isRequired : false)}
         firstDayOfWeek={_service.getFirstDayOfWeek()}
-        disabled={isDisabled}
+        disabled={isDisabled || isSecured}
         onAfterMenuDismiss={() => checkValidation()}
         onClick={() => setInvalid(false)}
       />
@@ -152,7 +153,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled,
           onChange={onTimeChange}
           styles={timePickerStyles(isRequired)}
           selectedKey={timeKey}
-          disabled={isDisabled}
+          disabled={isDisabled || isSecured}
           onBlur={() => checkValidation()}
         />
       }
