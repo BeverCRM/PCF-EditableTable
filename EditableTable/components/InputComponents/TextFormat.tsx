@@ -76,6 +76,7 @@ export const TextFormat = memo(({ value, isRequired, isDisabled, type, isSecured
     <Stack>
       <TextField defaultValue={currentValue}
         key={currentValue}
+        title={currentValue}
         styles={textFieldStyles(isRequired)}
         disabled={isDisabled || isSecured}
         onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {

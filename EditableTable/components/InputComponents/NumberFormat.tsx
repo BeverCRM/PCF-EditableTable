@@ -92,6 +92,7 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired, isDisab
         styles={numberFormatStyles(isRequired)}
         value={value}
         disabled={currentNumber?.isBaseCurrency || isDisabled || isSecured}
+        title={value}
         onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
           const elem = event.target as HTMLInputElement;
           if (value !== elem.value) {

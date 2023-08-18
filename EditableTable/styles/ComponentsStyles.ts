@@ -81,6 +81,25 @@ export const lookupSelectedOptionStyles: IButtonStyles = {
   splitButtonMenuButton: {
     borderTop: 'none',
     borderBottom: 'none',
+    position: 'sticky',
+    right: 0,
+    background: 'white',
+    zIndex: 3,
+    cursor: 'pointer',
+    '::before': {
+      position: 'absolute',
+      content: '',
+      top: '10px',
+      right: '20px',
+      width: '1px',
+      height: '5px',
+      color: 'rgb(200, 198, 196)',
+    },
+  },
+  splitButtonFlexContainer: {
+    borderLeft: '1px solid rgb(200, 198, 196)',
+    marginLeft: '-5px',
+    marginRight: '-5px',
   },
   label: {
     fontWeight: 400,
@@ -96,6 +115,7 @@ export const numberFormatStyles = (required: boolean): Partial<ISpinButtonStyles
   },
   spinButtonWrapper: {
     marginRight: required ? '10px' : '0px',
+    pointerEvents: 'all',
   },
 });
 

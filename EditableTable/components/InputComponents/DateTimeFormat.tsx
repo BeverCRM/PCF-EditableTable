@@ -145,6 +145,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled, is
         disabled={isDisabled || isSecured}
         onAfterMenuDismiss={() => checkValidation()}
         onClick={() => setInvalid(false)}
+        title={currentDate?.toDateString()}
       />
       {!dateOnly &&
         <ComboBox
@@ -153,6 +154,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled, is
           onChange={onTimeChange}
           styles={timePickerStyles(isRequired)}
           selectedKey={timeKey}
+          title={timeKey?.toString()}
           disabled={isDisabled || isSecured}
           onBlur={() => checkValidation()}
         />

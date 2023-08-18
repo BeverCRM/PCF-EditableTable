@@ -1,3 +1,4 @@
+import { IDropdownOption } from '@fluentui/react';
 import { IDataverseService } from '../services/DataverseService';
 
 export const formatNumber = (_service: IDataverseService, value: string) =>
@@ -36,3 +37,10 @@ export const parseDateFromString =
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   _service.getContext().formatting.parseDateFromString(value);
+
+export const formatTitle = (options: IDropdownOption[], currentOptions: string[]) =>
+  options.reduce((result, option, index) => result +=
+  `${currentOptions.includes(option.key.toString())
+    ? `${option.text} ${currentOptions.length > index ? ', ' : ''}`
+    : ''
+  }`, '');
