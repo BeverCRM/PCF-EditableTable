@@ -181,7 +181,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       layoutMode={DetailsListLayoutMode.fixedColumns}
       styles={gridStyles(rows.length)}
       onColumnHeaderClick={_onColumnClick}
-      constrainMode={ ConstrainMode.unconstrained }
+      constrainMode={ ConstrainMode.unconstrained}
     >
     </DetailsList>
     {rows.length === 0 &&

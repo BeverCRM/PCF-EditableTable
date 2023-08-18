@@ -80,8 +80,9 @@ export const LookupFormat = memo(
     const _onRenderItem = () =>
       <DefaultButton
         text={currentOption[0].name}
-        split
+        title={currentOption[0].name}
         menuProps={{ items: [] }}
+        split
         menuIconProps={{
           iconName: 'Cancel',
         }}

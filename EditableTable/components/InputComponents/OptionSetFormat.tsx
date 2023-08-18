@@ -5,6 +5,7 @@ import { Stack, ComboBox, IComboBox, IComboBoxOption, FontIcon } from '@fluentui
 import { useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, errorTooltip, optionSetStyles } from '../../styles/ComponentsStyles';
 import { IDataverseService } from '../../services/DataverseService';
+import { formatTitle } from '../../utils/formattingUtils';
 
 export interface IDropDownProps {
   fieldName: string | undefined;
@@ -70,6 +71,7 @@ export const OptionSetFormat = memo(({ fieldName, value, isMultiple, isRequired,
         onMenuDismissed={() => checkValidation()}
         onMenuOpen={() => setInvalid(false)}
         disabled={disabled}
+        title={formatTitle(options, currentOptions)}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
       <FontIcon
