@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Row, isNewRow } from '../../mappers/dataSetMapper';
+import { Row } from '../../mappers/dataSetMapper';
 import { EntityPrivileges, IDataverseService } from '../../services/DataverseService';
-import { AsyncThunkConfig } from '../../utils/types';
 
 export type DatasetColumn = {
   name: string;
@@ -86,10 +85,10 @@ export const setSecuredFields = createAsyncThunk<any[], DatasetPayload>(
     const fieldPermissionRecord =
     await payload._service.getUserRelatedFieldServiceProfile(columnKey);
     if (fieldPermissionRecord.entities.length > 0) {
-      const hasUpdateAccess = fieldPermissionRecord.entities[0].canupdate;
-      return { fieldName: columnKey, hasReadAccess: hasUpdateAccess === 0 };
+      const hasUpdateAccess: number = fieldPermissionRecord.entities[0].canupdate;
+      return { fieldName: columnKey, hasUpdateAccess: hasUpdateAccess === 0 };
     }
-    return { fieldName: columnKey, hasReadAccess: false };
+    return { fieldName: columnKey, hasUpdateAccess: false };
   })),
 );
 
