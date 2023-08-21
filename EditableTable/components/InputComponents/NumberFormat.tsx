@@ -17,11 +17,12 @@ export interface INumberProps {
   rowId?: string;
   isRequired: boolean;
   isDisabled: boolean;
+  isSecured: boolean;
   _onChange: Function;
   _service: IDataverseService;
 }
 
-export const NumberFormat = memo(({ fieldName, value, rowId, isRequired, isDisabled,
+export const NumberFormat = memo(({ fieldName, value, rowId, isRequired, isDisabled, isSecured,
   _onChange, _service } : INumberProps) => {
   const [isInvalid, setInvalid] = useState(false);
   const errorText = 'Required fields must be filled in.';
@@ -90,7 +91,7 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired, isDisab
         precision={currentNumber?.precision ?? 0}
         styles={numberFormatStyles(isRequired)}
         value={value}
-        disabled={currentNumber?.isBaseCurrency || isDisabled}
+        disabled={currentNumber?.isBaseCurrency || isDisabled || isSecured}
         title={value}
         onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
           const elem = event.target as HTMLInputElement;

@@ -15,11 +15,12 @@ export interface IDropDownProps {
   _onChange: Function;
   isRequired: boolean;
   isDisabled: boolean;
+  isSecured: boolean;
   _service: IDataverseService;
 }
 
 export const OptionSetFormat = memo(({ fieldName, value, isMultiple, isRequired, isTwoOptions,
-  isDisabled, _onChange, _service }: IDropDownProps) => {
+  isDisabled, isSecured, _onChange, _service }: IDropDownProps) => {
   const [isInvalid, setInvalid] = useState(false);
   const errorText = 'Required fields must be filled in.';
   let currentValue = value;
@@ -66,11 +67,12 @@ export const OptionSetFormat = memo(({ fieldName, value, isMultiple, isRequired,
         options={options}
         multiSelect={isMultiple}
         selectedKey={currentOptions}
+        autoComplete='off'
         onChange={onChange}
         styles={optionSetStyles(isRequired)}
         onMenuDismissed={() => checkValidation()}
         onMenuOpen={() => setInvalid(false)}
-        disabled={disabled}
+        disabled={disabled || isSecured}
         title={formatTitle(options, currentOptions)}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />

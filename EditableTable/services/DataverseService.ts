@@ -74,6 +74,8 @@ export interface IDataverseService {
   getWeekDayNamesShort(): string[];
   getMonthNamesShort(): string[];
   getMonthNamesLong(): string[];
+  getUserRelatedFieldServiceProfile(columnKey: string):
+  Promise<ComponentFramework.WebApi.RetrieveMultipleResponse>;
 }
 
 export class DataverseService implements IDataverseService {
@@ -463,4 +465,65 @@ export class DataverseService implements IDataverseService {
   public getMonthNamesLong() {
     return this._context.userSettings.dateFormattingInfo.monthNames;
   }
+
+  public async getUserRelatedFieldServiceProfile(columnName: string) :
+  Promise<ComponentFramework.WebApi.RetrieveMultipleResponse> {
+    let fetchXml = `?fetchXml=
+    <fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="true">
+    <entity name="fieldpermission">
+      <all-attributes/>
+      <filter type="and">
+        <condition attribute="attributelogicalname" operator="eq" value="${columnName}" />
+      </filter>
+        <link-entity name="fieldsecurityprofile" from="fieldsecurityprofileid"
+          to="fieldsecurityprofileid" intersect="true">
+          <link-entity name="systemuserprofiles" from="fieldsecurityprofileid"
+            to="fieldsecurityprofileid" visible="false" intersect="true">
+            <link-entity name="systemuser" from="systemuserid" to="systemuserid" alias="ae">
+              <filter type="and">
+                <condition attribute="systemuserid" operator="eq-userid" />
+              </filter>
+            </link-entity>
+          </link-entity>
+        </link-entity>
+    </entity>
+    </fetch>`;
+
+    let response = await this._context.webAPI.retrieveMultipleRecords('fieldpermission', fetchXml);
+
+    if (response.entities.length === 0) {
+      fetchXml = `?fetchXml=
+      <fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="true">
+      <entity name="fieldpermission">
+        <all-attributes/>
+        <filter type="and">
+          <condition attribute="attributelogicalname" operator="eq" value="${columnName}" />
+        </filter>
+          <link-entity name="fieldsecurityprofile" from="fieldsecurityprofileid"
+            to="fieldsecurityprofileid" intersect="true">
+            <link-entity name="teamprofiles" from="fieldsecurityprofileid" 
+              to="fieldsecurityprofileid" visible="false" intersect="true">
+              <link-entity name="team" from="teamid" to="teamid" alias="af">
+                <filter type="and">
+                  <condition attribute="teamid" operator="not-null" />
+                </filter>
+                <link-entity name="teammembership" from="teamid" 
+                  to="teamid" visible="false" intersect="true">
+                    <link-entity name="systemuser" from="systemuserid" to="systemuserid" alias="ag">
+                      <filter type="and">
+                        <condition attribute="systemuserid" operator="eq-userid" />
+                      </filter>
+                    </link-entity>
+                </link-entity>
+              </link-entity>
+            </link-entity>
+          </link-entity>
+      </entity>
+      </fetch>`;
+
+      response = await this._context.webAPI.retrieveMultipleRecords('fieldpermission', fetchXml);
+    }
+    return response;
+  }
+
 }

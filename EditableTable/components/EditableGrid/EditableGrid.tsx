@@ -25,10 +25,8 @@ import {
 import { setLoading } from '../../store/features/LoadingSlice';
 import {
   addNewRow,
-  DatasetColumn,
   readdNewRowsAfterDelete,
   removeNewRows,
-  setColumns,
   setRows,
 } from '../../store/features/DatasetSlice';
 
@@ -115,12 +113,10 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       ...newRows,
       ...mapDataSetRows(dataset),
     ];
-    const columns = mapDataSetColumns(dataset, _service);
     dispatch(setRows(datasetRows));
     dispatch(clearChangedRecords());
     dispatch(readdChangedRecordsAfterDelete());
     dispatch(setLoading(isPendingDelete));
-    dispatch(setColumns(columns as DatasetColumn[]));
   }, [dataset]);
 
   useLoadStore(dataset, _service);
