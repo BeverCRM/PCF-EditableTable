@@ -25,10 +25,8 @@ import {
 import { setLoading } from '../../store/features/LoadingSlice';
 import {
   addNewRow,
-  DatasetColumn,
   readdNewRowsAfterDelete,
   removeNewRows,
-  setColumns,
   setRows,
 } from '../../store/features/DatasetSlice';
 

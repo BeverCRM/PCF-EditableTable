@@ -2,16 +2,6 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Row } from '../../mappers/dataSetMapper';
 import { EntityPrivileges, IDataverseService } from '../../services/DataverseService';
 
-export type DatasetColumn = {
-  name: string;
-  fieldName: string;
-  minWidth: number;
-  key: string;
-  isResizable: boolean;
-  data: string;
-  calculatedWidth: number;
-}
-
 export type RequirementLevel = {
   fieldName: string;
   isRequired: boolean;
@@ -36,7 +26,6 @@ export type FieldSecurity = {
 export interface IDatasetState {
   rows: Row[],
   newRows: Row[],
-  columns: DatasetColumn[],
   requirementLevels: RequirementLevel[],
   entityPrivileges: EntityPrivileges,
   calculatedFields: CalculatedField[],
@@ -46,7 +35,6 @@ export interface IDatasetState {
 const initialState: IDatasetState = {
   rows: [],
   newRows: [],
-  columns: [],
   requirementLevels: [],
   entityPrivileges: <EntityPrivileges>{},
   calculatedFields: [],
@@ -128,9 +116,6 @@ export const datasetSlice = createSlice({
       state.newRows = [];
     },
 
-    setColumns: (state, action: PayloadAction<DatasetColumn[]>) => {
-      state.columns = action.payload;
-    },
   },
   extraReducers: builder => {
     builder.addCase(setCalculatedFields.fulfilled, (state, action) => {
@@ -173,7 +158,6 @@ export const {
   addNewRow,
   readdNewRowsAfterDelete,
   removeNewRows,
-  setColumns,
 } = datasetSlice.actions;
 
 export default datasetSlice.reducer;
