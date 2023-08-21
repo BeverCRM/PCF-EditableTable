@@ -44,7 +44,7 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
   const securedFields = useAppSelector(state => state.dataset.securedFields);
   const securedField = securedFields.find(field =>
     field.fieldName === currentColumn.key);
-  const isSecuredField = securedField?.hasUpdateAccess || false;
+  const hasUpdateAccess = securedField?.hasUpdateAccess || false;
 
   const _changedValue = useCallback(
     (newValue: any, rawValue?: any, lookupEntityNavigation?: string): void => {
@@ -74,7 +74,7 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
     rowId: row.key,
     isRequired,
     isDisabled: isCalculatedField,
-    isSecured: isSecuredField,
+    isSecured: !hasUpdateAccess,
     _onChange: _changedValue,
     _service,
     index,

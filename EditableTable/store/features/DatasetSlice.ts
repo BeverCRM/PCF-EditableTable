@@ -84,11 +84,17 @@ export const setSecuredFields = createAsyncThunk<any[], DatasetPayload>(
   async payload => await Promise.all(payload.columnKeys.map(async columnKey => {
     const fieldPermissionRecord =
     await payload._service.getUserRelatedFieldServiceProfile(columnKey);
+    let hasUpdateAccess = true;
     if (fieldPermissionRecord.entities.length > 0) {
-      const hasUpdateAccess: number = fieldPermissionRecord.entities[0].canupdate;
-      return { fieldName: columnKey, hasUpdateAccess: hasUpdateAccess === 0 };
+      fieldPermissionRecord.entities.forEach(entity => {
+        if (entity.canupdate === 4) {
+          return { fieldName: columnKey, hasUpdateAccess: true };
+        }
+        hasUpdateAccess = false;
+      });
+      return { fieldName: columnKey, hasUpdateAccess };
     }
-    return { fieldName: columnKey, hasUpdateAccess: false };
+    return { fieldName: columnKey, hasUpdateAccess };
   })),
 );
 
