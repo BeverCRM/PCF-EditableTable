@@ -55,11 +55,17 @@ export const stackComboBox : IStackStyles = {
 
 export const lookupFormatStyles = (required: boolean):
 IStyleFunctionOrObject<IBasePickerStyleProps, IBasePickerStyles> => ({
-  text: { minWidth: 30, overflow: 'hidden' },
+  text: {
+    minWidth: 30,
+    overflow: 'hidden',
+    outline: 'none',
+    border: '1px solid black !important',
+  },
   root: {
     minWidth: 30,
     overflow: 'hidden',
     marginRight: required ? '10px' : '0px',
+    backgroundColor: 'white',
   },
   input: { overflow: 'hidden' },
 });
@@ -75,6 +81,25 @@ export const lookupSelectedOptionStyles: IButtonStyles = {
   splitButtonMenuButton: {
     borderTop: 'none',
     borderBottom: 'none',
+    position: 'sticky',
+    right: 0,
+    background: 'white',
+    zIndex: 3,
+    cursor: 'pointer',
+    '::before': {
+      position: 'absolute',
+      content: '',
+      top: '10px',
+      right: '20px',
+      width: '1px',
+      height: '5px',
+      color: 'rgb(200, 198, 196)',
+    },
+  },
+  splitButtonFlexContainer: {
+    borderLeft: '1px solid rgb(200, 198, 196)',
+    marginLeft: '-5px',
+    marginRight: '-5px',
   },
   label: {
     fontWeight: 400,
@@ -90,6 +115,7 @@ export const numberFormatStyles = (required: boolean): Partial<ISpinButtonStyles
   },
   spinButtonWrapper: {
     marginRight: required ? '10px' : '0px',
+    pointerEvents: 'all',
   },
 });
 
@@ -117,10 +143,11 @@ export const asteriskClassStyle = (required: boolean) => mergeStyles({
   display: required ? 'flex' : 'none',
 });
 
-export const errorTooltip = (isInvalid: boolean, errorText: string, index?: number) => mergeStyles({
+export const errorTooltip =
+(isInvalid: boolean, errorText: string, required: boolean, index?: number) => mergeStyles({
   display: isInvalid ? 'inline-block' : 'none',
   position: 'absolute',
-  right: '18px',
+  right: `${required ? '18px' : '8px'}`,
   top: '12px',
   fontSize: '16px',
   color: '#c0172b',

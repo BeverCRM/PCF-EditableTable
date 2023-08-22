@@ -16,11 +16,13 @@ export interface INumberProps {
   value: string;
   rowId?: string;
   isRequired: boolean;
+  isDisabled: boolean;
+  isSecured: boolean;
   _onChange: Function;
   _service: IDataverseService;
 }
 
-export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
+export const NumberFormat = memo(({ fieldName, value, rowId, isRequired, isDisabled, isSecured,
   _onChange, _service } : INumberProps) => {
   const [isInvalid, setInvalid] = useState(false);
   const errorText = 'Required fields must be filled in.';
@@ -62,23 +64,16 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
     if (newValue === '') {
       _onChange(null, '');
     }
-    else {
-      let precision = 0;
-      if (currentCurrency && currentNumber) {
-        if (currentNumber?.precision === 1) {
-          _service.getGlobbalPrecision().then(result => {
-            precision = result;
-            changeNumberFormat(currentCurrency, currentNumber, precision, newValue);
-          });
-        }
-        else if (currentNumber?.precision === 2) {
-          precision = currentNumber?.precisionNumber;
-          changeNumberFormat(currentCurrency, currentNumber, currentCurrency.precision, newValue);
-        }
-        else {
-          changeNumberFormat(currentCurrency, currentNumber, currentNumber.precision, newValue);
-        }
+    else if (currentCurrency && currentNumber) {
+      if (currentNumber?.precision === 2) {
+        changeNumberFormat(currentCurrency, currentNumber, currentCurrency.precision, newValue);
       }
+      else {
+        changeNumberFormat(currentCurrency, currentNumber, currentNumber.precision, newValue);
+      }
+    }
+    else {
+      changeNumberFormat(currentCurrency, currentNumber, currentNumber?.precision, newValue);
     }
   };
 
@@ -96,16 +91,22 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired,
         precision={currentNumber?.precision ?? 0}
         styles={numberFormatStyles(isRequired)}
         value={value}
-        disabled={currentNumber?.isBaseCurrency}
+        disabled={currentNumber?.isBaseCurrency || isDisabled || isSecured}
+        title={value}
         onBlur={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
           const elem = event.target as HTMLInputElement;
-          onNumberChange(elem.value);
-          checkValidation(elem.value);
+          if (value !== elem.value) {
+            onNumberChange(elem.value);
+            checkValidation(elem.value);
+          }
         }}
         onFocus={() => setInvalid(false)}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
-      <FontIcon iconName={'StatusErrorFull'} className={errorTooltip(isInvalid, errorText)} />
+      <FontIcon
+        iconName={'StatusErrorFull'}
+        className={errorTooltip(isInvalid, errorText, isRequired)}
+      />
     </Stack>
   );
 });

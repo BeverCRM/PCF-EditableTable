@@ -12,10 +12,12 @@ export interface IWholeFormatProps {
   type: string;
   _onChange: Function;
   isRequired: boolean;
+  isDisabled: boolean;
+  isSecured: boolean
 }
 
-export const WholeFormat = memo(({ value, formattedValue, type,
-  _onChange, isRequired } : IWholeFormatProps) => {
+export const WholeFormat = memo(({ value, formattedValue, type, isDisabled, isSecured,
+  isRequired, _onChange } : IWholeFormatProps) => {
   const [isInvalid, setInvalid] = useState(false);
   const errorText = 'Required fields must be filled in.';
 
@@ -74,14 +76,20 @@ export const WholeFormat = memo(({ value, formattedValue, type,
       <ComboBox
         options={options}
         onChange={onChange}
+        autoComplete='off'
         selectedKey={value}
+        title={value || ''}
         styles={wholeFormatStyles(isRequired)}
         allowFreeform={type === 'duration'}
+        disabled={isDisabled || isSecured}
         onBlur={() => checkValidation()}
         onFocus={() => setInvalid(false)}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
-      <FontIcon iconName={'StatusErrorFull'} className={errorTooltip(isInvalid, errorText)} />
+      <FontIcon
+        iconName={'StatusErrorFull'}
+        className={errorTooltip(isInvalid, errorText, isRequired)}
+      />
     </Stack>
   );
 });

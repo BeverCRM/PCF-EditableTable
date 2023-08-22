@@ -68,7 +68,14 @@ export interface IDataverseService {
   getReqirementLevel(fieldName: string): Promise<any>;
   getSecurityPrivileges(): Promise<EntityPrivileges>;
   isStatusField(fieldName: string | undefined): boolean;
-  getGlobbalPrecision(): Promise<number>;
+  isCalculatedField(fieldName: string | undefined): Promise<boolean>;
+  getGlobalPrecision(): Promise<number>;
+  getFirstDayOfWeek(): number;
+  getWeekDayNamesShort(): string[];
+  getMonthNamesShort(): string[];
+  getMonthNamesLong(): string[];
+  getUserRelatedFieldServiceProfile(columnKey: string):
+  Promise<ComponentFramework.WebApi.RetrieveMultipleResponse>;
 }
 
 export class DataverseService implements IDataverseService {
@@ -76,6 +83,7 @@ export class DataverseService implements IDataverseService {
   private _targetEntityType: string;
   private _clientUrl: string;
   private _parentValue: string | undefined;
+  private _isOffline: boolean;
 
   constructor(context: ComponentFramework.Context<IInputs>) {
     this._context = context;
@@ -83,6 +91,7 @@ export class DataverseService implements IDataverseService {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     this._clientUrl = `${this._context.page.getClientUrl()}/api/data/v9.2/`;
+    this._isOffline = this._context.client.isOffline();
   }
 
   public getCurrentUserName() {
@@ -293,9 +302,22 @@ export class DataverseService implements IDataverseService {
       selection}&$filter=LogicalName eq '${fieldName}'`;
     const results = await getFetchResponse(request);
 
+    let precision = results.value[0]?.PrecisionSource ?? results.value[0]?.Precision ?? 0;
+
+    switch (precision) {
+      case 0:
+        precision = results.value[0]?.Precision;
+        break;
+      case 1:
+        precision = this._isOffline ? results.value[0]?.Precision : await this.getGlobalPrecision();
+        break;
+      default:
+        precision;
+    }
+
     return {
       fieldName,
-      precision: results.value[0]?.PrecisionSource ?? results.value[0]?.Precision ?? 0,
+      precision,
       minValue: results.value[0].MinValue,
       maxValue: results.value[0].MaxValue,
       isBaseCurrency: results.value[0].IsBaseCurrency,
@@ -303,10 +325,11 @@ export class DataverseService implements IDataverseService {
     };
   }
 
-  public async getGlobbalPrecision() : Promise<number> {
+  public async getGlobalPrecision() : Promise<number> {
     const request = `${this._clientUrl}organizations?$select=pricingdecimalprecision`;
     const response = await getFetchResponse(request);
     return response?.value[0].pricingdecimalprecision;
+    // return this._isOffline ? 1 : response?.value[0].pricingdecimalprecision;
   }
 
   public async getCurrency(recordId: string): Promise<CurrencyData> {
@@ -324,11 +347,14 @@ export class DataverseService implements IDataverseService {
   }
 
   public async getCurrencyById(recordId: string): Promise<CurrencyData> {
-    const fetchedCurrency = await this._context.webAPI.retrieveRecord(
-      'transactioncurrency',
-      recordId,
-      '?$select=currencysymbol,currencyprecision',
-    );
+    let fetchedCurrency = undefined;
+    if (!this._isOffline) {
+      fetchedCurrency = await this._context.webAPI.retrieveRecord(
+        'transactioncurrency',
+        recordId,
+        '?$select=currencysymbol,currencyprecision',
+      );
+    }
 
     return {
       symbol: fetchedCurrency?.currencysymbol ??
@@ -412,8 +438,92 @@ export class DataverseService implements IDataverseService {
     };
   }
 
+  public async isCalculatedField(fieldName: string | undefined) {
+    const request = `${this._clientUrl}EntityDefinitions(LogicalName='${
+      this._targetEntityType}')/Attributes(LogicalName='${fieldName}')?$select=IsValidForCreate`;
+    const results = await getFetchResponse(request);
+
+    return !results.IsValidForCreate;
+  }
+
   public isStatusField(fieldName: string | undefined) {
     return fieldName === 'statuscode' || fieldName === 'statecode';
+  }
+
+  public getFirstDayOfWeek() {
+    return this._context.userSettings.dateFormattingInfo.firstDayOfWeek;
+  }
+
+  public getWeekDayNamesShort() {
+    return this._context.userSettings.dateFormattingInfo.shortestDayNames;
+  }
+
+  public getMonthNamesShort() {
+    return this._context.userSettings.dateFormattingInfo.abbreviatedMonthNames;
+  }
+
+  public getMonthNamesLong() {
+    return this._context.userSettings.dateFormattingInfo.monthNames;
+  }
+
+  public async getUserRelatedFieldServiceProfile(columnName: string) :
+  Promise<ComponentFramework.WebApi.RetrieveMultipleResponse> {
+    let fetchXml = `?fetchXml=
+    <fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="true">
+    <entity name="fieldpermission">
+      <all-attributes/>
+      <filter type="and">
+        <condition attribute="attributelogicalname" operator="eq" value="${columnName}" />
+      </filter>
+        <link-entity name="fieldsecurityprofile" from="fieldsecurityprofileid"
+          to="fieldsecurityprofileid" intersect="true">
+          <link-entity name="systemuserprofiles" from="fieldsecurityprofileid"
+            to="fieldsecurityprofileid" visible="false" intersect="true">
+            <link-entity name="systemuser" from="systemuserid" to="systemuserid" alias="ae">
+              <filter type="and">
+                <condition attribute="systemuserid" operator="eq-userid" />
+              </filter>
+            </link-entity>
+          </link-entity>
+        </link-entity>
+    </entity>
+    </fetch>`;
+
+    let response = await this._context.webAPI.retrieveMultipleRecords('fieldpermission', fetchXml);
+
+    if (response.entities.length === 0) {
+      fetchXml = `?fetchXml=
+      <fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="true">
+      <entity name="fieldpermission">
+        <all-attributes/>
+        <filter type="and">
+          <condition attribute="attributelogicalname" operator="eq" value="${columnName}" />
+        </filter>
+          <link-entity name="fieldsecurityprofile" from="fieldsecurityprofileid"
+            to="fieldsecurityprofileid" intersect="true">
+            <link-entity name="teamprofiles" from="fieldsecurityprofileid" 
+              to="fieldsecurityprofileid" visible="false" intersect="true">
+              <link-entity name="team" from="teamid" to="teamid" alias="af">
+                <filter type="and">
+                  <condition attribute="teamid" operator="not-null" />
+                </filter>
+                <link-entity name="teammembership" from="teamid" 
+                  to="teamid" visible="false" intersect="true">
+                    <link-entity name="systemuser" from="systemuserid" to="systemuserid" alias="ag">
+                      <filter type="and">
+                        <condition attribute="systemuserid" operator="eq-userid" />
+                      </filter>
+                    </link-entity>
+                </link-entity>
+              </link-entity>
+            </link-entity>
+          </link-entity>
+      </entity>
+      </fetch>`;
+
+      response = await this._context.webAPI.retrieveMultipleRecords('fieldpermission', fetchXml);
+    }
+    return response;
   }
 
 }

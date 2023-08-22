@@ -1,6 +1,7 @@
-import { IColumn, ITag } from '@fluentui/react';
+import { IColumn, ITag, TooltipHost } from '@fluentui/react';
 import { IDataverseService } from '../services/DataverseService';
 import { NEW_RECORD_ID_LENGTH_CHECK } from '../utils/commonUtils';
+import React from 'react';
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 
 export type Row = {
@@ -58,6 +59,12 @@ export const mapDataSetColumns =
       isSorted: sortingColumns.some(col => col.name === column.name),
       isSortedDescending: sortingColumns.find(col => col.name === column.name)?.sortDirection === 1,
       showSortIconWhenUnsorted: true,
+      ariaLabel: column.displayName,
+      onRenderHeader: () => <>
+        <TooltipHost content={column.displayName}>
+          <span>{column.displayName}</span>
+        </TooltipHost>
+      </>,
     }));
 };
 

@@ -1,9 +1,10 @@
+import { IDropdownOption } from '@fluentui/react';
 import { IDataverseService } from '../services/DataverseService';
 
 export const formatNumber = (_service: IDataverseService, value: string) =>
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  Number.parseLocale(value.replace(/[^0-9.,]+/g, ''), _service.getContext().client.locale);
+  Number.parseLocale(value.split(' ')[0], _service.getContext().client.locale);
 
 export const formatCurrency =
 (_service: IDataverseService, value: number, precisionSource?: number, symbol?: string) =>
@@ -36,3 +37,10 @@ export const parseDateFromString =
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   _service.getContext().formatting.parseDateFromString(value);
+
+export const formatTitle = (options: IDropdownOption[], currentOptions: string[]) =>
+  options.reduce((result, option, index) => result +=
+  `${currentOptions.includes(option.key.toString())
+    ? `${option.text} ${currentOptions.length > index ? ', ' : ''}`
+    : ''
+  }`, '');

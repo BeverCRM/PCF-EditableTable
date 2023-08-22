@@ -36,6 +36,16 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
     requirementLevel.fieldName === currentColumn.key);
   const isRequired = fieldRequirementLevel?.isRequired || false;
 
+  const calculatedFields = useAppSelector(state => state.dataset.calculatedFields);
+  const calculatedField = calculatedFields.find(field =>
+    field.fieldName === currentColumn.key);
+  const isCalculatedField = calculatedField?.isCalculated || false;
+
+  const securedFields = useAppSelector(state => state.dataset.securedFields);
+  const securedField = securedFields.find(field =>
+    field.fieldName === currentColumn.key);
+  const hasUpdateAccess = securedField?.hasUpdateAccess || false;
+
   const _changedValue = useCallback(
     (newValue: any, rawValue?: any, lookupEntityNavigation?: string): void => {
       dispatch(setChangedRecords({
@@ -63,6 +73,8 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
   const props = { fieldName: currentColumn?.fieldName ? currentColumn?.fieldName : '',
     rowId: row.key,
     isRequired,
+    isDisabled: isCalculatedField,
+    isSecured: !hasUpdateAccess,
     _onChange: _changedValue,
     _service,
     index,
@@ -83,10 +95,10 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
 
       case 'Lookup.Customer':
       case 'Lookup.Owner':
-        return <TextFormat value={cell.formattedValue} isDisabled={true} {...props} />;
+        return <TextFormat value={cell.formattedValue} {...props} isDisabled={true}/>;
 
       case 'OptionSet':
-        return <OptionSetFormat value={cell.rawValue} isMultiple={false} {... props} />;
+        return <OptionSetFormat value={cell.rawValue} isMultiple={false} {...props} />;
 
       case 'TwoOptions':
         return <OptionSetFormat value={cell.rawValue} isMultiple={false} isTwoOptions={true}
@@ -122,7 +134,7 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
       case 'SingleLine.Text':
       case 'Multiple':
       default:
-        return <TextFormat value={cell.formattedValue} {...props} />;
+        return <TextFormat value={cell.formattedValue || ''} type={cell.type} {...props} />;
     }
   }
 

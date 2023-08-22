@@ -20,12 +20,13 @@ export interface ILookupProps {
   value: ITag | undefined;
   parentEntityMetadata: ParentEntityMetadata | undefined;
   isRequired: boolean;
+  isSecured: boolean
   _onChange: Function;
   _service: IDataverseService;
 }
 
 export const LookupFormat = memo(
-  ({ _service, fieldName, value, parentEntityMetadata,
+  ({ _service, fieldName, value, parentEntityMetadata, isSecured,
     isRequired, _onChange }: ILookupProps) => {
     const picker = React.useRef(null);
     const [isInvalid, setInvalid] = useState(false);
@@ -80,8 +81,9 @@ export const LookupFormat = memo(
     const _onRenderItem = () =>
       <DefaultButton
         text={currentOption[0].name}
-        split
+        title={currentOption[0].name}
         menuProps={{ items: [] }}
+        split
         menuIconProps={{
           iconName: 'Cancel',
         }}
@@ -116,11 +118,14 @@ export const LookupFormat = memo(
           }
         }}
         inputProps={{
-          disabled: false,
+          disabled: isSecured,
           onFocus: () => setInvalid(false),
         }}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
-      <FontIcon iconName={'StatusErrorFull'} className={errorTooltip(isInvalid, errorText)} />
+      <FontIcon
+        iconName={'StatusErrorFull'}
+        className={errorTooltip(isInvalid, errorText, isRequired)}
+      />
     </div>;
   });

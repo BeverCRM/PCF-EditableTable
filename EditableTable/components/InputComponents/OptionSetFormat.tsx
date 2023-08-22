@@ -5,6 +5,7 @@ import { Stack, ComboBox, IComboBox, IComboBoxOption, FontIcon } from '@fluentui
 import { useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, errorTooltip, optionSetStyles } from '../../styles/ComponentsStyles';
 import { IDataverseService } from '../../services/DataverseService';
+import { formatTitle } from '../../utils/formattingUtils';
 
 export interface IDropDownProps {
   fieldName: string | undefined;
@@ -13,18 +14,20 @@ export interface IDropDownProps {
   isTwoOptions?: boolean;
   _onChange: Function;
   isRequired: boolean;
+  isDisabled: boolean;
+  isSecured: boolean;
   _service: IDataverseService;
 }
 
 export const OptionSetFormat = memo(({ fieldName, value, isMultiple, isRequired, isTwoOptions,
-  _onChange, _service }: IDropDownProps) => {
+  isDisabled, isSecured, _onChange, _service }: IDropDownProps) => {
   const [isInvalid, setInvalid] = useState(false);
   const errorText = 'Required fields must be filled in.';
   let currentValue = value;
   const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);
   const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
   const options = currentDropdown?.options ?? [];
-  const disabled = fieldName === 'statuscode' || fieldName === 'statecode';
+  const disabled = fieldName === 'statuscode' || fieldName === 'statecode' || isDisabled;
 
   if (_service.isStatusField(fieldName) && !currentValue) {
     currentValue = options.find(option =>
@@ -64,14 +67,19 @@ export const OptionSetFormat = memo(({ fieldName, value, isMultiple, isRequired,
         options={options}
         multiSelect={isMultiple}
         selectedKey={currentOptions}
+        autoComplete='off'
         onChange={onChange}
         styles={optionSetStyles(isRequired)}
         onMenuDismissed={() => checkValidation()}
         onMenuOpen={() => setInvalid(false)}
-        disabled={disabled}
+        disabled={disabled || isSecured}
+        title={formatTitle(options, currentOptions)}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
-      <FontIcon iconName={'StatusErrorFull'} className={errorTooltip(isInvalid, errorText)} />
+      <FontIcon
+        iconName={'StatusErrorFull'}
+        className={errorTooltip(isInvalid, errorText, isRequired)}
+      />
     </Stack>
   );
 });

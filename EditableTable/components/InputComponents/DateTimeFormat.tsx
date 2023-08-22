@@ -38,12 +38,14 @@ export interface IDatePickerProps {
   fieldName: string,
   dateOnly: boolean,
   value: string | null,
+  isDisabled: boolean;
   isRequired: boolean;
+  isSecured: boolean;
   _onChange: any,
   _service: IDataverseService;
 }
 
-export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
+export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled, isSecured,
   isRequired, _onChange, _service }: IDatePickerProps) => {
   const [isInvalid, setInvalid] = useState(false);
   let timeKey: string | number | undefined;
@@ -102,7 +104,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
         setChangedDateTime(date, timeKey);
       }
     }
-    else {
+    else if (!(currentDate === undefined && date === null)) {
       _onChange(null);
     }
   };
@@ -122,6 +124,13 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
     }
   };
 
+  const localizedStrings = {
+    ...defaultDatePickerStrings,
+    shortDays: _service.getWeekDayNamesShort(),
+    shortMonths: _service.getMonthNamesShort(),
+    months: _service.getMonthNamesLong(),
+  };
+
   return (
     <Stack styles={stackComboBox}>
       <DatePicker
@@ -130,10 +139,13 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
         onSelectDate={onDateChange}
         formatDate={(date?: Date) => date ? formatDateShort(_service, date) : ''}
         parseDateFromString={(newValue: string): Date => parseDateFromString(_service, newValue)}
-        strings={defaultDatePickerStrings}
+        strings={localizedStrings}
         styles={datePickerStyles(dateOnly ? isRequired : false)}
+        firstDayOfWeek={_service.getFirstDayOfWeek()}
+        disabled={isDisabled || isSecured}
         onAfterMenuDismiss={() => checkValidation()}
         onClick={() => setInvalid(false)}
+        title={currentDate?.toDateString()}
       />
       {!dateOnly &&
         <ComboBox
@@ -142,12 +154,16 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value,
           onChange={onTimeChange}
           styles={timePickerStyles(isRequired)}
           selectedKey={timeKey}
+          title={timeKey?.toString()}
+          disabled={isDisabled || isSecured}
           onBlur={() => checkValidation()}
         />
       }
-      <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
-      <FontIcon iconName={'StatusErrorFull'}
-        className={errorTooltip(isInvalid, 'Required fields must be filled in.')} />
+      <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
+      <FontIcon
+        iconName={'StatusErrorFull'}
+        className={errorTooltip(isInvalid, 'Required fields must be filled in.', isRequired)}
+      />
     </Stack>
   );
 });

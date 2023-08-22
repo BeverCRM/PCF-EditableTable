@@ -58,7 +58,7 @@ export const CommandBar = (props: ICommandBarProps) => {
       order: 4,
       text: 'Save',
       icon: saveIcon,
-      disabled: isLoading || props.isControlDisabled || !entityPrivileges.write,
+      disabled: isLoading || !isPendingSave || props.isControlDisabled || !entityPrivileges.write,
       onClick: props.saveButtonHandler,
       styles: {
         icon: { color: isPendingSave ? 'blue' : 'black' },
