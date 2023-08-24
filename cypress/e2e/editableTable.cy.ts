@@ -110,8 +110,8 @@ describe('Editable Table', () => {
   });
 
   it('Should click on empty currency lookup field -> display options -> select -> unselect', () => {
-    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
-    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
+    cy.handleSignInIssue('#modalDialogContentContainer_1', '#okButton_1');
+    cy.handleSignInIssue('#modalDialogContentContainer_2', '#okButton_2');
 
     cy.get('div[data-automation-key="transactioncurrencyid"] input').eq(0).click();
     cy.get('button[aria-label="USD"]').should('exist').click();
@@ -123,8 +123,8 @@ describe('Editable Table', () => {
 
   it(`Should click on New button -> remove parent lookup field value ->
     click on Save -> save the record but not show on the grid`, () => {
-    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
-    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
+    cy.handleSignInIssue('#modalDialogContentContainer_1', '#okButton_1');
+    cy.handleSignInIssue('#modalDialogContentContainer_2', '#okButton_2');
 
     cy.get('[data-icon-name="Add"]').should('exist').click();
 
@@ -180,8 +180,8 @@ describe('Editable Table', () => {
 
   it(`Should click on MOS type field -> select values -> unselect values`, () => {
 
-    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
-    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
+    cy.handleSignInIssue('#modalDialogContentContainer_1', '#okButton_1');
+    cy.handleSignInIssue('#modalDialogContentContainer_2', '#okButton_2');
 
     cy.get('[data-icon-name="Add"]').should('exist').click();
 
@@ -229,8 +229,8 @@ describe('Editable Table', () => {
 
   it(`Should set string value in int, float, decimal, currency fields ->
     change the value to zero`, () => {
-    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
-    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
+    cy.handleSignInIssue('#modalDialogContentContainer_1', '#okButton_1');
+    cy.handleSignInIssue('#modalDialogContentContainer_2', '#okButton_2');
 
     cy.get('[data-id="tablist-tab_3"]').should('exist').click();
     cy.get('[data-id="tablist-tab_2"]').should('exist').click();
@@ -304,8 +304,8 @@ describe('Editable Table', () => {
   });
 
   it(`Should set string value in date and time field -> show Invalid Entry error`, () => {
-    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
-    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
+    cy.handleSignInIssue('#modalDialogContentContainer_1', '#okButton_1');
+    cy.handleSignInIssue('#modalDialogContentContainer_2', '#okButton_2');
 
     cy.get('[data-icon-name="Add"]').should('exist').click();
 
@@ -317,8 +317,8 @@ describe('Editable Table', () => {
 
   it(`Should set value in decimal, double fields -> 
     change the value precisions accordingly`, () => {
-    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
-    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
+    cy.handleSignInIssue('#modalDialogContentContainer_1', '#okButton_1');
+    cy.handleSignInIssue('#modalDialogContentContainer_2', '#okButton_2');
 
     cy.get('[data-icon-name="Add"]').should('exist').click();
     cy.wait(2000);
@@ -351,8 +351,8 @@ describe('Editable Table', () => {
 
   it(`Should click on New button -> 
     check if parent lookup, owner, status and status reason are autopopulated`, () => {
-    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
-    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
+    cy.handleSignInIssue('#modalDialogContentContainer_1', '#okButton_1');
+    cy.handleSignInIssue('#modalDialogContentContainer_2', '#okButton_2');
 
     cy.get('[data-icon-name="Add"]').should('exist').click();
     cy.wait(1000);
@@ -368,8 +368,8 @@ describe('Editable Table', () => {
 
   it(`Should change currency -> 
   check for currency field symbol`, () => {
-    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
-    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
+    cy.handleSignInIssue('#modalDialogContentContainer_1', '#okButton_1');
+    cy.handleSignInIssue('#modalDialogContentContainer_2', '#okButton_2');
 
     // create currency test record
     cy.get('[data-icon-name="Add"]').should('exist').click();
@@ -404,8 +404,8 @@ describe('Editable Table', () => {
 
   it(`Should click on New button (without parent lookup in the view) -> Save record -> 
   Navigate to it -> check for parent lookup field`, () => {
-    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
-    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
+    cy.handleSignInIssue('#modalDialogContentContainer_1', '#okButton_1');
+    cy.handleSignInIssue('#modalDialogContentContainer_2', '#okButton_2');
 
     // cy.get('[data-id="tablist-tab_3"]').should('exist').click();
 
@@ -421,8 +421,8 @@ describe('Editable Table', () => {
       cy.visitD365Environment(record.appId, record.entityName, record.recordId);
     });
 
-    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
-    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
+    cy.handleSignInIssue('#modalDialogContentContainer_1', '#okButton_1');
+    cy.handleSignInIssue('#modalDialogContentContainer_2', '#okButton_2');
 
     cy.get('body[data-loaded="1"]').should('exist');
     cy.get('[data-id="tablist-tab_2"]').should('be.visible').click();
