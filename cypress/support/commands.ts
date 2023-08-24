@@ -5,6 +5,7 @@ declare namespace Cypress {
     visitD365Environment(appId: string, entityName: string, recordId: string): Chainable<void>;
     assertFieldValues(data: DateTimeData): Chainable<void>;
     waitForPseudoElement(): Chainable<void>;
+    signInHandler(popupElement: string, buttonElement: string): Chainable<void>;
   }
 }
 
@@ -67,4 +68,16 @@ Cypress.Commands.add('waitForPseudoElement', { prevSubject: 'element' }, element
     }
   }
   checkBeforePseudoElement();
+});
+
+Cypress.Commands.add('signInHandler', (popupElement, buttonElement) => {
+  cy.get('body').then($body => {
+    if ($body.find(popupElement).length) {
+      cy.get(buttonElement).click({ force: true });
+    }
+    else {
+      cy.wait(2000);
+      cy.signInHandler(popupElement, buttonElement);
+    }
+  });
 });

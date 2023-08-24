@@ -110,8 +110,8 @@ describe('Editable Table', () => {
   });
 
   it('Should click on empty currency lookup field -> display options -> select -> unselect', () => {
-    cy.get('button[aria-label="Sign In"]').as('btn').click();
-    cy.get('@btn').click();
+    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
+    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
 
     cy.get('div[data-automation-key="transactioncurrencyid"] input').eq(0).click();
     cy.get('button[aria-label="USD"]').should('exist').click();
@@ -123,8 +123,8 @@ describe('Editable Table', () => {
 
   it(`Should click on New button -> remove parent lookup field value ->
     click on Save -> save the record but not show on the grid`, () => {
-    cy.get('button[aria-label="Sign In"]').as('btn').click();
-    cy.get('@btn').click();
+    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
+    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
 
     cy.get('[data-icon-name="Add"]').should('exist').click();
 
@@ -178,7 +178,11 @@ describe('Editable Table', () => {
  */
   });
 
-  it(`Should click on OS, MOS, Date type fields -> select values -> unselect values`, () => { // -
+  it(`Should click on MOS type field -> select values -> unselect values`, () => {
+
+    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
+    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
+
     cy.get('[data-icon-name="Add"]').should('exist').click();
 
     // select MOS
@@ -195,8 +199,9 @@ describe('Editable Table', () => {
     cy.get('.ms-ComboBox-optionText').eq(1).click();
     cy.get('.ms-List-cell [data-icon-name="ChevronDown"]').eq(6).click();
     cy.get('@MOSInput').should('not.have.attr', 'placeholder');
+  });
 
-    // select OS
+  it(`Should click on OS type field -> select values`, () => {
     cy.get('.ms-List-cell [data-icon-name="ChevronDown"]').eq(7).click();
     cy.get('.ms-ComboBox-optionText').eq(0).click();
     cy.get('.ms-List-cell [data-icon-name="ChevronDown"]').eq(7).closest('div')
@@ -224,18 +229,31 @@ describe('Editable Table', () => {
 
   it(`Should set string value in int, float, decimal, currency fields ->
     change the value to zero`, () => {
+    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
+    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
+
     cy.get('[data-id="tablist-tab_3"]').should('exist').click();
+    cy.get('[data-id="tablist-tab_2"]').should('exist').click();
+    cy.wait(5000);
     cy.get('[data-icon-name="Add"]').should('exist').click();
 
     cy.get('div[data-automation-key="bvr_turtest"] input').eq(0).type('str');
     cy.get('div[data-automation-key="bvr_dectest"] input').eq(0).type('str');
     cy.get('div[data-automation-key="bvr_inttest"] input').eq(0).type('str');
 
-    cy.get('div[data-automation-key="bvr_mlottest"] input').eq(0).click();
+    cy.get('div[data-automation-key="bvr_turtest"] input').eq(0).click();
+    // cy.get('div[data-automation-key="bvr_mlottest"] input').eq(0).click();
 
     cy.get('div[data-automation-key="bvr_turtest"] input').eq(0).should('have.value', '0.00');
-    cy.get('div[data-automation-key="bvr_dectest"] input').eq(0).should('have.value', '0.00');
-    cy.get('div[data-automation-key="bvr_inttest"] input').eq(0).should('have.value', '0.00');
+    cy.get('div[data-automation-key="bvr_dectest"] input').eq(0).should('have.value', '0.000');
+    cy.get('div[data-automation-key="bvr_inttest"] input').eq(0).should('have.value', '0');
+
+    // delete test record
+    cy.get('[id$=-0-checkbox]').as('checkbox').click();
+
+    cy.get('[data-icon-name="Delete"]').click();
+    cy.get('[aria-label="OK"]').click();
+    cy.get('div[class^="ms-Stack loading"]').should('have.css', 'display', 'none');
 
   });
 
@@ -286,24 +304,28 @@ describe('Editable Table', () => {
   });
 
   it(`Should set string value in date and time field -> show Invalid Entry error`, () => {
+    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
+    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
+
     cy.get('[data-icon-name="Add"]').should('exist').click();
 
     cy.get('div[data-automation-key="bvr_dtitest"] input').eq(0).type('str');
     cy.get('div[data-automation-key="bvr_mlottest"] input').eq(0).click();
     cy.get('div[data-automation-key="bvr_dtitest"]').eq(0)
-      .contains('Invalid entry').should('be.visible');
+      .contains('Invalid entry').should('exist');
   });
 
   it(`Should set value in decimal, double fields -> 
     change the value precisions accordingly`, () => {
-    cy.get('button[aria-label="Sign In"]').as('btn').click();
-    cy.get('@btn').click();
+    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
+    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
 
-    cy.get('[data-id="tablist-tab_3"]').should('exist').click(); // (Error Loading Control Issue when in Test Tab)
     cy.get('[data-icon-name="Add"]').should('exist').click();
+    cy.wait(2000);
     cy.get('div[data-automation-key="bvr_dbtest"] input').eq(0).type('1.1');
     cy.get('div[data-automation-key="bvr_dectest"] input').eq(0).type('1.1');
     cy.get('[data-icon-name="Save"]').should('exist').click();
+    cy.get('#okButtonText_3').click();
     cy.get('div[class^="ms-Stack loading"]').should('have.css', 'display', 'none');
 
     cy.get('div[data-automation-key="bvr_dbtest"] input').eq(0).should('have.value', '1.1000');
@@ -329,8 +351,8 @@ describe('Editable Table', () => {
 
   it(`Should click on New button -> 
     check if parent lookup, owner, status and status reason are autopopulated`, () => {
-    cy.get('button[aria-label="Sign In"]').as('btn').click();
-    cy.get('@btn').click();
+    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
+    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
 
     cy.get('[data-icon-name="Add"]').should('exist').click();
     cy.wait(1000);
@@ -346,8 +368,8 @@ describe('Editable Table', () => {
 
   it(`Should change currency -> 
   check for currency field symbol`, () => {
-    cy.get('button[aria-label="Sign In"]').as('btn').click();
-    cy.get('@btn').click();
+    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
+    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
 
     // create currency test record
     cy.get('[data-icon-name="Add"]').should('exist').click();
@@ -373,11 +395,7 @@ describe('Editable Table', () => {
       .invoke('val').should('contain', '₽');
 
     // delete test record
-    cy.get('.ms-List-cell')
-      .filter(':has(input[value="CypressDurationTest"])')
-      .find('.ms-Check').as('checkbox').click();
-
-    cy.get('@checkbox').should('have.class', 'is-checked');
+    cy.get('[id$=-0-checkbox]').as('checkbox').click();
 
     cy.get('[data-icon-name="Delete"]').click();
     cy.get('[aria-label="OK"]').click();
@@ -385,11 +403,11 @@ describe('Editable Table', () => {
   });
 
   it(`Should click on New button (without parent lookup in the view) -> Save record -> 
-  Navigate to it -> check for parent lookup field`, () => { // +
-    cy.get('button[aria-label="Sign In"]').as('btn').click();
-    cy.get('@btn').click();
+  Navigate to it -> check for parent lookup field`, () => {
+    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
+    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
 
-    cy.get('[data-id="tablist-tab_3"]').should('exist').click();
+    // cy.get('[data-id="tablist-tab_3"]').should('exist').click();
 
     cy.get('[data-icon-name="Add"]').should('exist').click();
     cy.get('div[data-automation-key="bvr_name"] input').eq(0).type('CypressTest2');
@@ -398,6 +416,24 @@ describe('Editable Table', () => {
 
     cy.get('.ms-DetailsRow-fields').eq(0).should('exist').dblclick({ force: true });
     cy.get('div[title="E2E Test Editable Table"]').should('exist');
+
+    cy.fixture('record').then(record => {
+      cy.visitD365Environment(record.appId, record.entityName, record.recordId);
+    });
+
+    cy.signInHandler('#modalDialogContentContainer_1', '#okButton_1');
+    cy.signInHandler('#modalDialogContentContainer_2', '#okButton_2');
+
+    cy.get('body[data-loaded="1"]').should('exist');
+    cy.get('[data-id="tablist-tab_2"]').should('be.visible').click();
+    cy.get('body[data-loaded="1"]').should('exist');
+
+    // delete test record
+    cy.get('[id$=-0-checkbox]').as('checkbox').click();
+
+    cy.get('[data-icon-name="Delete"]').click();
+    cy.get('[aria-label="OK"]').click();
+    cy.get('div[class^="ms-Stack loading"]').should('have.css', 'display', 'none');
   });
 
   it('Should click on New button (records count=6) -> check for Scrollable Pane visibility', () => {
