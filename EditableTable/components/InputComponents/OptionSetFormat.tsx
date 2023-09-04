@@ -5,11 +5,11 @@ import { Stack, ComboBox, IComboBox, IComboBoxOption, FontIcon } from '@fluentui
 import { useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, errorTooltip, optionSetStyles } from '../../styles/ComponentsStyles';
 import { IDataverseService } from '../../services/DataverseService';
-import { formatTitle } from '../../utils/formattingUtils';
 
 export interface IDropDownProps {
   fieldName: string | undefined;
   value: string | null;
+  formattedValue: string | undefined;
   isMultiple: boolean;
   isTwoOptions?: boolean;
   _onChange: Function;
@@ -19,8 +19,8 @@ export interface IDropDownProps {
   _service: IDataverseService;
 }
 
-export const OptionSetFormat = memo(({ fieldName, value, isMultiple, isRequired, isTwoOptions,
-  isDisabled, isSecured, _onChange, _service }: IDropDownProps) => {
+export const OptionSetFormat = memo(({ fieldName, value, formattedValue, isMultiple, isRequired,
+  isTwoOptions, isDisabled, isSecured, _onChange, _service }: IDropDownProps) => {
   const [isInvalid, setInvalid] = useState(false);
   const errorText = 'Required fields must be filled in.';
   let currentValue = value;
@@ -73,7 +73,7 @@ export const OptionSetFormat = memo(({ fieldName, value, isMultiple, isRequired,
         onMenuDismissed={() => checkValidation()}
         onMenuOpen={() => setInvalid(false)}
         disabled={disabled || isSecured}
-        title={formatTitle(options, currentOptions)}
+        title={formattedValue}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
       <FontIcon

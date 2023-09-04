@@ -70,8 +70,10 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
       ? _service.getCurrentUserName() : undefined;
   }
 
-  const props = { fieldName: currentColumn?.fieldName ? currentColumn?.fieldName : '',
+  const props = {
+    fieldName: currentColumn?.fieldName ? currentColumn?.fieldName : '',
     rowId: row.key,
+    formattedValue: cell?.formattedValue,
     isRequired,
     isDisabled: isCalculatedField,
     isSecured: !hasUpdateAccess,
@@ -95,7 +97,7 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
 
       case 'Lookup.Customer':
       case 'Lookup.Owner':
-        return <TextFormat value={cell.formattedValue} {...props} isDisabled={true}/>;
+        return <TextFormat value={cell.formattedValue} {...props} isDisabled={true} />;
 
       case 'OptionSet':
         return <OptionSetFormat value={cell.rawValue} isMultiple={false} {...props} />;
@@ -120,10 +122,7 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
         return <NumberFormat value={cell.formattedValue ?? ''} {...props} />;
 
       case 'Whole.Duration':
-        return <WholeFormat
-          value={cell.rawValue}
-          formattedValue={cell.formattedValue}
-          type={'duration'} {...props} />;
+        return <WholeFormat value={cell.rawValue} type={'duration'} {...props} />;
 
       case 'Whole.Language':
         return <WholeFormat value={cell.rawValue} type={'language'} {...props} />;

@@ -78,7 +78,7 @@ export const WholeFormat = memo(({ value, formattedValue, type, isDisabled, isSe
         onChange={onChange}
         autoComplete='off'
         selectedKey={value}
-        title={value || ''}
+        title={formattedValue || ''}
         styles={wholeFormatStyles(isRequired)}
         allowFreeform={type === 'duration'}
         disabled={isDisabled || isSecured}

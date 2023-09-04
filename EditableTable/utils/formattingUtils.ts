@@ -41,6 +41,6 @@ export const parseDateFromString =
 export const formatTitle = (options: IDropdownOption[], currentOptions: string[]) =>
   options.reduce((result, option, index) => result +=
   `${currentOptions.includes(option.key.toString())
-    ? `${option.text} ${currentOptions.length > index ? ', ' : ''}`
+    ? `${option.text} ${currentOptions.length > index && currentOptions.length > 1 ? ', ' : ''}`
     : ''
   }`, '');
