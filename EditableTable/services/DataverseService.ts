@@ -76,6 +76,7 @@ export interface IDataverseService {
   getMonthNamesLong(): string[];
   getUserRelatedFieldServiceProfile(columnKey: string):
   Promise<ComponentFramework.WebApi.RetrieveMultipleResponse>;
+  isRecordEditable(recordId: string): Promise<boolean>;
 }
 
 export class DataverseService implements IDataverseService {
@@ -181,7 +182,7 @@ export class DataverseService implements IDataverseService {
   }
 
   public async getFieldSchemaName(): Promise<string> {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const logicalName = this._context.page.entityTypeName;
     const endpoint = `EntityDefinitions(LogicalName='${logicalName}')/OneToManyRelationships`;
@@ -524,6 +525,12 @@ export class DataverseService implements IDataverseService {
       response = await this._context.webAPI.retrieveMultipleRecords('fieldpermission', fetchXml);
     }
     return response;
+  }
+
+  public async isRecordEditable(recordId: string) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return this._context.parameters.dataset.records[recordId].isEditable();
   }
 
 }

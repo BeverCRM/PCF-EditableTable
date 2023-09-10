@@ -46,6 +46,19 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
     field.fieldName === currentColumn.key);
   const hasUpdateAccess = securedField?.hasUpdateAccess || false;
 
+  let parentEntityMetadata: ParentEntityMetadata | undefined;
+  let ownerEntityMetadata: string | undefined;
+  if (isNewRow(row)) {
+    parentEntityMetadata = _service.getParentMetadata();
+    ownerEntityMetadata = currentColumn.data === 'Lookup.Owner'
+      ? _service.getCurrentUserName() : undefined;
+  }
+
+  const inactiveRecords = useAppSelector(state => state.dataset.inactiveRecords);
+  const inactiveRecord = inactiveRecords.find(record =>
+    record.recordId === row.key);
+  const isInactiveRecord = inactiveRecord?.isInactive || false;
+
   const _changedValue = useCallback(
     (newValue: any, rawValue?: any, lookupEntityNavigation?: string): void => {
       dispatch(setChangedRecords({
@@ -62,20 +75,12 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
       }));
     }, []);
 
-  let parentEntityMetadata: ParentEntityMetadata | undefined;
-  let ownerEntityMetadata: string | undefined;
-  if (isNewRow(row)) {
-    parentEntityMetadata = _service.getParentMetadata();
-    ownerEntityMetadata = currentColumn.data === 'Lookup.Owner'
-      ? _service.getCurrentUserName() : undefined;
-  }
-
   const props = {
     fieldName: currentColumn?.fieldName ? currentColumn?.fieldName : '',
     rowId: row.key,
     formattedValue: cell?.formattedValue,
     isRequired,
-    isDisabled: isCalculatedField,
+    isDisabled: isInactiveRecord || isCalculatedField,
     isSecured: !hasUpdateAccess,
     _onChange: _changedValue,
     _service,

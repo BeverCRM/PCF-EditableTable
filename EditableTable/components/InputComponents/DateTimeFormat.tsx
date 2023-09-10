@@ -14,7 +14,6 @@ import {
   timePickerStyles,
   datePickerStyles,
   stackComboBox,
-  errorTooltip,
 } from '../../styles/ComponentsStyles';
 import { useAppSelector } from '../../store/hooks';
 import { shallowEqual } from 'react-redux';
@@ -33,15 +32,16 @@ import {
 } from '../../utils/formattingUtils';
 import { timesList } from './timeList';
 import { IDataverseService } from '../../services/DataverseService';
+import { ErrorIcon } from '../ErrorIcon';
 
 export interface IDatePickerProps {
-  fieldName: string,
-  dateOnly: boolean,
-  value: string | null,
+  fieldName: string;
+  dateOnly: boolean;
+  value: string | null;
   isDisabled: boolean;
   isRequired: boolean;
   isSecured: boolean;
-  _onChange: any,
+  _onChange: any;
   _service: IDataverseService;
 }
 
@@ -75,9 +75,12 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled, is
     timeKey = undefined;
   }
 
-  const checkValidation = () => {
-    if (isRequired && (currentDate === undefined || isNaN(currentDate.getTime()))) {
+  const checkValidation = (newValue: Date | null | undefined) => {
+    if (isRequired && (newValue === undefined || newValue === null || isNaN(newValue.getTime()))) {
       setInvalid(true);
+    }
+    else {
+      setInvalid(false);
     }
   };
 
@@ -107,6 +110,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled, is
     else if (!(currentDate === undefined && date === null)) {
       _onChange(null);
     }
+    checkValidation(date);
   };
 
   const onTimeChange = (event: React.FormEvent<IComboBox>, option?: IComboBoxOption,
@@ -143,7 +147,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled, is
         styles={datePickerStyles(dateOnly ? isRequired : false)}
         firstDayOfWeek={_service.getFirstDayOfWeek()}
         disabled={isDisabled || isSecured}
-        onAfterMenuDismiss={() => checkValidation()}
+        onAfterMenuDismiss={() => checkValidation(currentDate)}
         onClick={() => setInvalid(false)}
         title={currentDate?.toDateString()}
       />
@@ -156,14 +160,15 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled, is
           selectedKey={timeKey}
           title={timeKey?.toString()}
           disabled={isDisabled || isSecured}
-          onBlur={() => checkValidation()}
+          onBlur={() => checkValidation(currentDate)}
         />
       }
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
-      <FontIcon
-        iconName={'StatusErrorFull'}
-        className={errorTooltip(isInvalid, 'Required fields must be filled in.', isRequired)}
-      />
+      <ErrorIcon id={`dateTimeFormat${Date.now().toString()}`}
+        errorText={'Required fields must be filled in.'}
+        isInvalid={isInvalid}
+        isRequired={isRequired}
+      ></ErrorIcon>
     </Stack>
   );
 });

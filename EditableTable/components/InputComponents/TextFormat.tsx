@@ -1,10 +1,11 @@
 /* eslint-disable react/display-name */
 import { FontIcon, Stack, TextField } from '@fluentui/react';
 import React, { memo, useState } from 'react';
-import { asteriskClassStyle, errorTooltip, textFieldStyles } from '../../styles/ComponentsStyles';
+import { asteriskClassStyle, textFieldStyles } from '../../styles/ComponentsStyles';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setInvalid } from '../../store/features/ErrorSlice';
 import { isEmailValid, validateUrl } from '../../utils/textUtils';
+import { ErrorIcon } from '../ErrorIcon';
 
 export type errorProp = {
   isInvalid: boolean,
@@ -12,22 +13,21 @@ export type errorProp = {
 };
 
 export interface ITextProps {
-  index: number | undefined,
-  fieldName: string,
-  value: string | undefined,
-  ownerValue: string | undefined,
-  type?: string,
-  isDisabled: boolean,
-  isRequired: boolean,
-  isSecured: boolean,
-  _onChange: Function,
+  fieldName: string;
+  value: string | undefined;
+  ownerValue: string | undefined;
+  type?: string;
+  isDisabled: boolean;
+  isRequired: boolean;
+  isSecured: boolean;
+  _onChange: Function;
 }
 
 export const TextFormat = memo(({ value, isRequired, isDisabled, type, isSecured,
-  fieldName, index, ownerValue, _onChange } : ITextProps) => {
+  fieldName, ownerValue, _onChange } : ITextProps) => {
   const currentValue = ownerValue !== undefined ? ownerValue : value;
   const errorProp = {
-    isInvalid: !!(isRequired && currentValue === ''),
+    isInvalid: false,
     errorText: 'Required fields must be filled in.',
   };
 
@@ -83,16 +83,17 @@ export const TextFormat = memo(({ value, isRequired, isDisabled, type, isSecured
           const elem = event.target as HTMLInputElement;
           if (currentValue !== elem.value) {
             onChange(elem.value);
-            checkValidation(elem.value);
           }
+          checkValidation(elem.value);
         }}
         onFocus={() => setErrorProps({ isInvalid: false, errorText: '' })}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
-      <FontIcon
-        iconName={'StatusErrorFull'}
-        className={errorTooltip(errorProps.isInvalid, errorProps.errorText, isRequired, index)}
-      />
+      <ErrorIcon id={`textFormat${Date.now().toString()}`}
+        errorText={errorProps.errorText}
+        isInvalid={errorProps.isInvalid}
+        isRequired={isRequired}
+      ></ErrorIcon>
     </Stack>
   );
 });

@@ -47,6 +47,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
   const newRows: Row[] = useAppSelector(state => state.dataset.newRows);
   const columns = mapDataSetColumns(dataset, _service);
   const isPendingDelete = useAppSelector(state => state.record.isPendingDelete);
+  const isPendingLoad = useAppSelector(state => state.dataset.isPending);
 
   const dispatch = useAppDispatch();
 
@@ -76,6 +77,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       key: Date.now().toString(),
       columns: emptyColumns,
     }));
+    // scrollablePaneContainer height should be added by 50 if less than 400px
   };
 
   const deleteButtonHandler = () => {
@@ -116,8 +118,8 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
     dispatch(setRows(datasetRows));
     dispatch(clearChangedRecords());
     dispatch(readdChangedRecordsAfterDelete());
-    dispatch(setLoading(isPendingDelete));
-  }, [dataset]);
+    dispatch(setLoading(isPendingDelete || isPendingLoad));
+  }, [dataset, isPendingLoad]);
 
   useLoadStore(dataset, _service);
 

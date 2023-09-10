@@ -53,13 +53,16 @@ export const stackComboBox : IStackStyles = {
   },
 };
 
-export const lookupFormatStyles = (required: boolean):
+export const lookupFormatStyles = (required: boolean, isDisabled: boolean):
 IStyleFunctionOrObject<IBasePickerStyleProps, IBasePickerStyles> => ({
   text: {
     minWidth: 30,
     overflow: 'hidden',
     outline: 'none',
-    border: '1px solid black !important',
+    border: !isDisabled ? '1px solid black !important' : '',
+    '::after': {
+      border: isDisabled ? 'none !important' : '1px solid black',
+    },
   },
   root: {
     minWidth: 30,
@@ -143,8 +146,7 @@ export const asteriskClassStyle = (required: boolean) => mergeStyles({
   display: required ? 'flex' : 'none',
 });
 
-export const errorTooltip =
-(isInvalid: boolean, errorText: string, required: boolean, index?: number) => mergeStyles({
+export const error = (isInvalid: boolean, required: boolean) => mergeStyles({
   display: isInvalid ? 'inline-block' : 'none',
   position: 'absolute',
   right: `${required ? '18px' : '8px'}`,
@@ -152,36 +154,4 @@ export const errorTooltip =
   fontSize: '16px',
   color: '#c0172b',
   cursor: 'pointer',
-  '::before': {
-    content: `'${errorText}'`,
-    position: 'absolute',
-    bottom: '140%',
-    transform: `translateX(${index === 0 ? '100%' : '14%'})`,
-    width: 'max-content',
-    padding: '3px',
-    borderRadius: '4px',
-    textAlign: 'center',
-    display: 'none',
-    right: '100%',
-    marginRight: '5px',
-    background: '#fff',
-    color: '#c0172b',
-    border: '1px solid',
-    cursor: 'default',
-    zIndex: '1',
-  },
-  '::after': {
-    content: '""',
-    display: 'none',
-    position: 'absolute',
-    bottom: '73%',
-    marginLeft: '-13px',
-    border: '5px solid #c0172b transparent transparent transparent',
-  },
-  ':hover::before': {
-    display: 'block',
-  },
-  ':hover::after': {
-    display: 'inline-block',
-  },
 });

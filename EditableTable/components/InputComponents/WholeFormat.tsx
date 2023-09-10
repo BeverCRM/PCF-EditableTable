@@ -2,9 +2,10 @@
 import { ComboBox, FontIcon, IComboBox, IComboBoxOption, Stack } from '@fluentui/react';
 import React, { memo, useState } from 'react';
 import { useAppSelector } from '../../store/hooks';
-import { asteriskClassStyle, errorTooltip, wholeFormatStyles } from '../../styles/ComponentsStyles';
+import { asteriskClassStyle, wholeFormatStyles } from '../../styles/ComponentsStyles';
 import { getDurationOption } from '../../utils/durationUtils';
 import { durationList } from './durationList';
+import { ErrorIcon } from '../ErrorIcon';
 
 export interface IWholeFormatProps {
   value: string | null | undefined;
@@ -19,7 +20,6 @@ export interface IWholeFormatProps {
 export const WholeFormat = memo(({ value, formattedValue, type, isDisabled, isSecured,
   isRequired, _onChange } : IWholeFormatProps) => {
   const [isInvalid, setInvalid] = useState(false);
-  const errorText = 'Required fields must be filled in.';
 
   const wholeFormat = useAppSelector(state => state.wholeFormat);
 
@@ -61,7 +61,7 @@ export const WholeFormat = memo(({ value, formattedValue, type, isDisabled, isSe
     }
     else {
       const newOption = durationValidation(value);
-      _onChange(newOption?.key, newOption?.text);
+      _onChange(newOption?.key || null, newOption?.text);
     }
   };
 
@@ -86,10 +86,11 @@ export const WholeFormat = memo(({ value, formattedValue, type, isDisabled, isSe
         onFocus={() => setInvalid(false)}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
-      <FontIcon
-        iconName={'StatusErrorFull'}
-        className={errorTooltip(isInvalid, errorText, isRequired)}
-      />
+      <ErrorIcon id={`wholeFormat${Date.now().toString()}`}
+        errorText={'Required fields must be filled in.'}
+        isInvalid={isInvalid}
+        isRequired={isRequired}
+      ></ErrorIcon>
     </Stack>
   );
 });
