@@ -1,9 +1,13 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import {
+  ColumnActionsMode,
   ConstrainMode,
+  ContextualMenu,
   DetailsList,
   DetailsListLayoutMode,
+  DirectionalHint,
   IColumn,
+  IContextualMenuProps,
   IDetailsList,
   Stack,
 } from '@fluentui/react';
@@ -48,6 +52,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
   const columns = mapDataSetColumns(dataset, _service);
   const isPendingDelete = useAppSelector(state => state.record.isPendingDelete);
   const isPendingLoad = useAppSelector(state => state.dataset.isPending);
+  const [sortMenuProps, setSortMenuProps] = useState<IContextualMenuProps | undefined>(undefined);
 
   const dispatch = useAppDispatch();
 
@@ -126,17 +131,13 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
   const _renderItemColumn = (item: Row, index: number | undefined, column: IColumn | undefined) =>
     <GridCell row={item} currentColumn={column!} _service={_service} index={index}/>;
 
-  const _onColumnClick =
-  (ev?: React.MouseEvent<HTMLElement, MouseEvent>, column?: IColumn) => {
+  const sort = (sortDirection: ComponentFramework.PropertyHelper.DataSetApi.Types.SortDirection,
+    column?: IColumn) => {
     if (column?.fieldName && column.data !== 'MultiSelectPicklist') {
       dispatch(setLoading(true));
-      const oldSorting = (dataset.sorting || []).find(sort => sort.name === column.fieldName);
       const newSorting: ComponentFramework.PropertyHelper.DataSetApi.SortStatus = {
         name: column.fieldName,
-        sortDirection: oldSorting !== null
-          ? oldSorting?.sortDirection === ASC_SORT
-            ? DESC_SORT : ASC_SORT
-          : ASC_SORT,
+        sortDirection,
       };
 
       while (dataset.sorting.length > 0) {
@@ -147,6 +148,51 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       dataset.refresh();
     }
   };
+
+  const onHideSortMenu = React.useCallback(() => setSortMenuProps(undefined), []);
+
+  const getSortMenuProps =
+  (ev?: React.MouseEvent<HTMLElement>, column?: IColumn): IContextualMenuProps => {
+    const items = [
+      { key: 'sortAsc', text: 'Sort Ascending', onClick: () => sort(ASC_SORT, column) },
+      { key: 'sortDesc', text: 'Sort Descending', onClick: () => sort(DESC_SORT, column) },
+    ];
+    return {
+      items,
+      target: ev?.currentTarget as HTMLElement,
+      gapSpace: 2,
+      isBeakVisible: false,
+      directionalHint: DirectionalHint.bottomLeftEdge,
+      onDismiss: onHideSortMenu,
+    };
+  };
+
+  const _onColumnClick = (ev?: React.MouseEvent<HTMLElement, MouseEvent>, column?: IColumn) => {
+    if (column?.columnActionsMode !== ColumnActionsMode.disabled) {
+      setSortMenuProps(getSortMenuProps(ev, column));
+    }
+  };
+
+  // (ev?: React.MouseEvent<HTMLElement, MouseEvent>, column?: IColumn) => {
+  //   if (column?.fieldName && column.data !== 'MultiSelectPicklist') {
+  //     dispatch(setLoading(true));
+  //     const oldSorting = (dataset.sorting || []).find(sort => sort.name === column.fieldName);
+  //     const newSorting: ComponentFramework.PropertyHelper.DataSetApi.SortStatus = {
+  //       name: column.fieldName,
+  //       sortDirection: oldSorting !== null
+  //         ? oldSorting?.sortDirection === ASC_SORT
+  //           ? DESC_SORT : ASC_SORT
+  //         : ASC_SORT,
+  //     };
+
+  //     while (dataset.sorting.length > 0) {
+  //       dataset.sorting.pop();
+  //     }
+  //     dataset.sorting.push(newSorting);
+  //     dataset.paging.reset();
+  //     dataset.refresh();
+  //   }
+  // };
 
   return <div className='container'>
     <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons}>
@@ -182,6 +228,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       constrainMode={ ConstrainMode.unconstrained}
     >
     </DetailsList>
+    {sortMenuProps && <ContextualMenu {...sortMenuProps} />}
     {rows.length === 0 &&
       <Stack horizontalAlign='center' className='noDataContainer'>
         <div className='nodata'><span>No data available</span></div>
