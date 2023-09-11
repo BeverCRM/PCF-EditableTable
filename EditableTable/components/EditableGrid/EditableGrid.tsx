@@ -133,7 +133,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
 
   const sort = (sortDirection: ComponentFramework.PropertyHelper.DataSetApi.Types.SortDirection,
     column?: IColumn) => {
-    if (column?.fieldName && column.data !== 'MultiSelectPicklist') {
+    if (column?.fieldName) {
       dispatch(setLoading(true));
       const newSorting: ComponentFramework.PropertyHelper.DataSetApi.SortStatus = {
         name: column.fieldName,
@@ -172,27 +172,6 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       setSortMenuProps(getSortMenuProps(ev, column));
     }
   };
-
-  // (ev?: React.MouseEvent<HTMLElement, MouseEvent>, column?: IColumn) => {
-  //   if (column?.fieldName && column.data !== 'MultiSelectPicklist') {
-  //     dispatch(setLoading(true));
-  //     const oldSorting = (dataset.sorting || []).find(sort => sort.name === column.fieldName);
-  //     const newSorting: ComponentFramework.PropertyHelper.DataSetApi.SortStatus = {
-  //       name: column.fieldName,
-  //       sortDirection: oldSorting !== null
-  //         ? oldSorting?.sortDirection === ASC_SORT
-  //           ? DESC_SORT : ASC_SORT
-  //         : ASC_SORT,
-  //     };
-
-  //     while (dataset.sorting.length > 0) {
-  //       dataset.sorting.pop();
-  //     }
-  //     dataset.sorting.push(newSorting);
-  //     dataset.paging.reset();
-  //     dataset.refresh();
-  //   }
-  // };
 
   return <div className='container'>
     <Stack horizontal horizontalAlign="end" className={buttonStyles.buttons}>
