@@ -76,6 +76,7 @@ export interface IDataverseService {
   getMonthNamesLong(): string[];
   getUserRelatedFieldServiceProfile(columnKey: string):
   Promise<ComponentFramework.WebApi.RetrieveMultipleResponse>;
+  isFieldSecured(columnName: string) : Promise<boolean>;
   isRecordEditable(recordId: string): Promise<boolean>;
 }
 
@@ -525,6 +526,15 @@ export class DataverseService implements IDataverseService {
       response = await this._context.webAPI.retrieveMultipleRecords('fieldpermission', fetchXml);
     }
     return response;
+  }
+
+  public async isFieldSecured(columnName: string) :
+  Promise<boolean> {
+    const request = `${this._clientUrl}EntityDefinitions(LogicalName='${
+      this._targetEntityType}')/Attributes?$select=IsSecured
+      &$filter=LogicalName eq '${columnName}'`;
+    const result = await getFetchResponse(request);
+    return result.value[0].IsSecured;
   }
 
   public async isRecordEditable(recordId: string) {
