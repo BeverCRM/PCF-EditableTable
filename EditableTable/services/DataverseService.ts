@@ -77,6 +77,7 @@ export interface IDataverseService {
   getUserRelatedFieldServiceProfile(columnKey: string):
   Promise<ComponentFramework.WebApi.RetrieveMultipleResponse>;
   isFieldSecured(columnName: string) : Promise<boolean>;
+  isRecordEditable(recordId: string): Promise<boolean>;
 }
 
 export class DataverseService implements IDataverseService {
@@ -182,7 +183,7 @@ export class DataverseService implements IDataverseService {
   }
 
   public async getFieldSchemaName(): Promise<string> {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const logicalName = this._context.page.entityTypeName;
     const endpoint = `EntityDefinitions(LogicalName='${logicalName}')/OneToManyRelationships`;
@@ -534,6 +535,12 @@ export class DataverseService implements IDataverseService {
       &$filter=LogicalName eq '${columnName}'`;
     const result = await getFetchResponse(request);
     return result.value[0].IsSecured;
+  }
+
+  public async isRecordEditable(recordId: string) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return this._context.parameters.dataset.records[recordId].isEditable();
   }
 
 }

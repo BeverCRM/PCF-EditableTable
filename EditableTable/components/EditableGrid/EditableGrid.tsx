@@ -1,9 +1,13 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import {
+  ColumnActionsMode,
   ConstrainMode,
+  ContextualMenu,
   DetailsList,
   DetailsListLayoutMode,
+  DirectionalHint,
   IColumn,
+  IContextualMenuProps,
   IDetailsList,
   Stack,
 } from '@fluentui/react';
@@ -47,6 +51,8 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
   const newRows: Row[] = useAppSelector(state => state.dataset.newRows);
   const columns = mapDataSetColumns(dataset, _service);
   const isPendingDelete = useAppSelector(state => state.record.isPendingDelete);
+  const isPendingLoad = useAppSelector(state => state.dataset.isPending);
+  const [sortMenuProps, setSortMenuProps] = useState<IContextualMenuProps | undefined>(undefined);
 
   const dispatch = useAppDispatch();
 
@@ -76,6 +82,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       key: Date.now().toString(),
       columns: emptyColumns,
     }));
+    // scrollablePaneContainer height should be added by 50 if less than 400px
   };
 
   const deleteButtonHandler = () => {
@@ -116,25 +123,21 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
     dispatch(setRows(datasetRows));
     dispatch(clearChangedRecords());
     dispatch(readdChangedRecordsAfterDelete());
-    dispatch(setLoading(isPendingDelete));
-  }, [dataset]);
+    dispatch(setLoading(isPendingDelete || isPendingLoad));
+  }, [dataset, isPendingLoad]);
 
   useLoadStore(dataset, _service);
 
   const _renderItemColumn = (item: Row, index: number | undefined, column: IColumn | undefined) =>
     <GridCell row={item} currentColumn={column!} _service={_service} index={index}/>;
 
-  const _onColumnClick =
-  (ev?: React.MouseEvent<HTMLElement, MouseEvent>, column?: IColumn) => {
-    if (column?.fieldName && column.data !== 'MultiSelectPicklist') {
+  const sort = (sortDirection: ComponentFramework.PropertyHelper.DataSetApi.Types.SortDirection,
+    column?: IColumn) => {
+    if (column?.fieldName) {
       dispatch(setLoading(true));
-      const oldSorting = (dataset.sorting || []).find(sort => sort.name === column.fieldName);
       const newSorting: ComponentFramework.PropertyHelper.DataSetApi.SortStatus = {
         name: column.fieldName,
-        sortDirection: oldSorting !== null
-          ? oldSorting?.sortDirection === ASC_SORT
-            ? DESC_SORT : ASC_SORT
-          : ASC_SORT,
+        sortDirection,
       };
 
       while (dataset.sorting.length > 0) {
@@ -143,6 +146,30 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       dataset.sorting.push(newSorting);
       dataset.paging.reset();
       dataset.refresh();
+    }
+  };
+
+  const onHideSortMenu = React.useCallback(() => setSortMenuProps(undefined), []);
+
+  const getSortMenuProps =
+  (ev?: React.MouseEvent<HTMLElement>, column?: IColumn): IContextualMenuProps => {
+    const items = [
+      { key: 'sortAsc', text: 'Sort Ascending', onClick: () => sort(ASC_SORT, column) },
+      { key: 'sortDesc', text: 'Sort Descending', onClick: () => sort(DESC_SORT, column) },
+    ];
+    return {
+      items,
+      target: ev?.currentTarget as HTMLElement,
+      gapSpace: 2,
+      isBeakVisible: false,
+      directionalHint: DirectionalHint.bottomLeftEdge,
+      onDismiss: onHideSortMenu,
+    };
+  };
+
+  const _onColumnClick = (ev?: React.MouseEvent<HTMLElement, MouseEvent>, column?: IColumn) => {
+    if (column?.columnActionsMode !== ColumnActionsMode.disabled) {
+      setSortMenuProps(getSortMenuProps(ev, column));
     }
   };
 
@@ -180,6 +207,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       constrainMode={ ConstrainMode.unconstrained}
     >
     </DetailsList>
+    {sortMenuProps && <ContextualMenu {...sortMenuProps} />}
     {rows.length === 0 &&
       <Stack horizontalAlign='center' className='noDataContainer'>
         <div className='nodata'><span>No data available</span></div>

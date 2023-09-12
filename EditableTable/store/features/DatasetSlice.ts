@@ -1,4 +1,5 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, isAllOf,
+  isAnyOf, isPending, PayloadAction } from '@reduxjs/toolkit';
 import { Row } from '../../mappers/dataSetMapper';
 import { EntityPrivileges, IDataverseService } from '../../services/DataverseService';
 
@@ -23,6 +24,11 @@ export type FieldSecurity = {
   hasUpdateAccess: boolean;
 }
 
+export type InactiveRecord = {
+  recordId: string;
+  isInactive: boolean;
+}
+
 export interface IDatasetState {
   rows: Row[],
   newRows: Row[],
@@ -30,6 +36,8 @@ export interface IDatasetState {
   entityPrivileges: EntityPrivileges,
   calculatedFields: CalculatedField[],
   securedFields: FieldSecurity[],
+  inactiveRecords: InactiveRecord[],
+  isPending: boolean,
 }
 
 const initialState: IDatasetState = {
@@ -39,10 +47,17 @@ const initialState: IDatasetState = {
   entityPrivileges: <EntityPrivileges>{},
   calculatedFields: [],
   securedFields: [],
+  inactiveRecords: [],
+  isPending: true,
 };
 
 type DatasetPayload = {
   columnKeys: string[],
+  _service: IDataverseService,
+}
+
+type RecordsPayload = {
+  recordIds: string[],
   _service: IDataverseService,
 }
 
@@ -95,6 +110,14 @@ export const setSecuredFields = createAsyncThunk<FieldSecurity[], DatasetPayload
     }
 
     return { fieldName: columnKey, hasUpdateAccess };
+  })),
+);
+
+export const setInactiveRecords = createAsyncThunk<InactiveRecord[], RecordsPayload>(
+  'dataset/setInactiveRecords',
+  async payload => await Promise.all(payload.recordIds.map(async recordId => {
+    const isEditable = await payload._service.isRecordEditable(recordId);
+    return { recordId, isInactive: !isEditable };
   })),
 );
 
@@ -160,6 +183,19 @@ export const datasetSlice = createSlice({
 
     builder.addCase(setSecuredFields.rejected, state => {
       state.securedFields = [];
+    });
+
+    builder.addCase(setInactiveRecords.fulfilled, (state, action) => {
+      state.inactiveRecords = [...action.payload];
+    });
+
+    builder.addMatcher(isAnyOf(isPending(setSecuredFields, setRequirementLevels,
+      setCalculatedFields, setEntityPrivileges, setInactiveRecords)), state => {
+      state.isPending = true;
+    });
+
+    builder.addMatcher(isAllOf(setSecuredFields.fulfilled), state => {
+      state.isPending = false;
     });
   },
 });
