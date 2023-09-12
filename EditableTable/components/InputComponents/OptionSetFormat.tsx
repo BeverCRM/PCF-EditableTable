@@ -3,13 +3,14 @@ import React, { memo, useState } from 'react';
 import { Stack, ComboBox, IComboBox, IComboBoxOption, FontIcon } from '@fluentui/react';
 
 import { useAppSelector } from '../../store/hooks';
-import { asteriskClassStyle, errorTooltip, optionSetStyles } from '../../styles/ComponentsStyles';
+import { asteriskClassStyle, optionSetStyles } from '../../styles/ComponentsStyles';
 import { IDataverseService } from '../../services/DataverseService';
-import { formatTitle } from '../../utils/formattingUtils';
+import { ErrorIcon } from '../ErrorIcon';
 
 export interface IDropDownProps {
   fieldName: string | undefined;
   value: string | null;
+  formattedValue: string | undefined;
   isMultiple: boolean;
   isTwoOptions?: boolean;
   _onChange: Function;
@@ -19,10 +20,9 @@ export interface IDropDownProps {
   _service: IDataverseService;
 }
 
-export const OptionSetFormat = memo(({ fieldName, value, isMultiple, isRequired, isTwoOptions,
-  isDisabled, isSecured, _onChange, _service }: IDropDownProps) => {
+export const OptionSetFormat = memo(({ fieldName, value, formattedValue, isMultiple, isRequired,
+  isTwoOptions, isDisabled, isSecured, _onChange, _service }: IDropDownProps) => {
   const [isInvalid, setInvalid] = useState(false);
-  const errorText = 'Required fields must be filled in.';
   let currentValue = value;
   const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);
   const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
@@ -73,13 +73,14 @@ export const OptionSetFormat = memo(({ fieldName, value, isMultiple, isRequired,
         onMenuDismissed={() => checkValidation()}
         onMenuOpen={() => setInvalid(false)}
         disabled={disabled || isSecured}
-        title={formatTitle(options, currentOptions)}
+        title={formattedValue}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
-      <FontIcon
-        iconName={'StatusErrorFull'}
-        className={errorTooltip(isInvalid, errorText, isRequired)}
-      />
+      <ErrorIcon id={`optionSetFormat${Date.now().toString()}`}
+        errorText={'Required fields must be filled in.'}
+        isInvalid={isInvalid}
+        isRequired={isRequired}
+      ></ErrorIcon>
     </Stack>
   );
 });

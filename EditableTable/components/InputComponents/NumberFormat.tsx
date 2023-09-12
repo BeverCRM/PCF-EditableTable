@@ -5,11 +5,11 @@ import { IDataverseService } from '../../services/DataverseService';
 import { useAppSelector } from '../../store/hooks';
 import {
   asteriskClassStyle,
-  errorTooltip,
   numberFormatStyles,
 } from '../../styles/ComponentsStyles';
 import { formatCurrency, formatDecimal, formatNumber } from '../../utils/formattingUtils';
 import { CurrencySymbol, NumberFieldMetadata } from '../../store/features/NumberSlice';
+import { ErrorIcon } from '../ErrorIcon';
 
 export interface INumberProps {
   fieldName: string | undefined;
@@ -25,7 +25,6 @@ export interface INumberProps {
 export const NumberFormat = memo(({ fieldName, value, rowId, isRequired, isDisabled, isSecured,
   _onChange, _service } : INumberProps) => {
   const [isInvalid, setInvalid] = useState(false);
-  const errorText = 'Required fields must be filled in.';
   const numbers = useAppSelector(state => state.number.numberFieldsMetadata);
   const currencySymbols = useAppSelector(state => state.number.currencySymbols);
   const changedRecords = useAppSelector(state => state.record.changedRecords);
@@ -97,16 +96,17 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired, isDisab
           const elem = event.target as HTMLInputElement;
           if (value !== elem.value) {
             onNumberChange(elem.value);
-            checkValidation(elem.value);
           }
+          checkValidation(elem.value);
         }}
         onFocus={() => setInvalid(false)}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
-      <FontIcon
-        iconName={'StatusErrorFull'}
-        className={errorTooltip(isInvalid, errorText, isRequired)}
-      />
+      <ErrorIcon id={`mumberFormat${Date.now().toString()}`}
+        errorText={'Required fields must be filled in.'}
+        isInvalid={isInvalid}
+        isRequired={isRequired}
+      ></ErrorIcon>
     </Stack>
   );
 });

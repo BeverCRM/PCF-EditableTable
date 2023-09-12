@@ -13,6 +13,7 @@ import { mapDataSetColumns, mapDataSetRows } from '../mappers/dataSetMapper';
 import {
   setCalculatedFields,
   setEntityPrivileges,
+  setInactiveRecords,
   setRequirementLevels,
   setSecuredFields,
 } from '../store/features/DatasetSlice';
@@ -33,11 +34,13 @@ export const useLoadStore = (dataset: DataSet, _service: IDataverseService) => {
   React.useEffect(() => {
     const columns = mapDataSetColumns(dataset, _service);
     const datasetRows = mapDataSetRows(dataset);
+    const recordIds = datasetRows.map(row => row.key);
 
-    const columnKeys = columns.map(column => column.key);
+    const columnKeys = columns.filter(column => !column.key.includes('.'))
+      .map(column => column.key);
 
     const getColumnsOfType = (types: string[]): Field[] =>
-      columns.filter(column => types.includes(column.data))
+      columns.filter(column => types.includes(column.data) && !column.key.includes('.'))
         .map(column => ({
           key: column.key,
           fieldName: column.fieldName,
@@ -83,7 +86,6 @@ export const useLoadStore = (dataset: DataSet, _service: IDataverseService) => {
       dispatch(getNumberFieldsMetadata({ numberFields, _service }));
 
       if (numberFields.some(numberColumn => numberColumn.data === 'Currency')) {
-        const recordIds = datasetRows.map(row => row.key);
         dispatch(getCurrencySymbols({ recordIds, _service }));
       }
     }
@@ -107,5 +109,7 @@ export const useLoadStore = (dataset: DataSet, _service: IDataverseService) => {
     dispatch(setCalculatedFields({ columnKeys, _service }));
     dispatch(setSecuredFields({ columnKeys, _service }));
     dispatch(setEntityPrivileges(_service));
+    dispatch(setInactiveRecords({ recordIds, _service }));
+
   }, [dataset]);
 };

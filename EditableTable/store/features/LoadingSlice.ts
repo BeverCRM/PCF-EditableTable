@@ -5,7 +5,7 @@ export interface ILoadingState {
 }
 
 const initialState: ILoadingState = {
-  isLoading: false,
+  isLoading: true,
 };
 
 const LoadingSlice = createSlice({

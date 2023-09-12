@@ -1,4 +1,4 @@
-import { IColumn, ITag, TooltipHost } from '@fluentui/react';
+import { ColumnActionsMode, IColumn, ITag, TooltipHost } from '@fluentui/react';
 import { IDataverseService } from '../services/DataverseService';
 import { NEW_RECORD_ID_LENGTH_CHECK } from '../utils/commonUtils';
 import React from 'react';
@@ -60,6 +60,8 @@ export const mapDataSetColumns =
       isSortedDescending: sortingColumns.find(col => col.name === column.name)?.sortDirection === 1,
       showSortIconWhenUnsorted: true,
       ariaLabel: column.displayName,
+      columnActionsMode: column.dataType === 'MultiSelectPicklist'
+        ? ColumnActionsMode.disabled : ColumnActionsMode.hasDropdown,
       onRenderHeader: () => <>
         <TooltipHost content={column.displayName}>
           <span>{column.displayName}</span>
