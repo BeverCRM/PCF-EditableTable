@@ -82,12 +82,19 @@ export const setEntityPrivileges = createAsyncThunk<EntityPrivileges, IDataverse
   async _service => await _service.getSecurityPrivileges(),
 );
 
-export const setSecuredFields = createAsyncThunk<any[], DatasetPayload>(
+export const setSecuredFields = createAsyncThunk<FieldSecurity[], DatasetPayload>(
   'dataset/setSecuredFields',
   async payload => await Promise.all(payload.columnKeys.map(async columnKey => {
+    let hasUpdateAccess = true;
+    const isFieldSecured = await payload._service.isFieldSecured(columnKey);
+
+    if (!isFieldSecured) {
+      return { fieldName: columnKey, hasUpdateAccess };
+    }
+
     const fieldPermissionRecord =
     await payload._service.getUserRelatedFieldServiceProfile(columnKey);
-    let hasUpdateAccess = true;
+
     if (fieldPermissionRecord.entities.length > 0) {
       fieldPermissionRecord.entities.forEach(entity => {
         if (entity.canupdate === 4) {
@@ -97,6 +104,11 @@ export const setSecuredFields = createAsyncThunk<any[], DatasetPayload>(
       });
       return { fieldName: columnKey, hasUpdateAccess };
     }
+
+    if (fieldPermissionRecord.entities.length === 0 && isFieldSecured) {
+      return { fieldName: columnKey, hasUpdateAccess: false };
+    }
+
     return { fieldName: columnKey, hasUpdateAccess };
   })),
 );
