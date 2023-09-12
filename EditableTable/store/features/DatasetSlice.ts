@@ -182,7 +182,7 @@ export const datasetSlice = createSlice({
       state.isPending = true;
     });
 
-    builder.addMatcher(isAllOf(setSecuredFields.fulfilled), state => {
+    builder.addMatcher(isAnyOf(setSecuredFields.fulfilled, setSecuredFields.rejected), state => {
       state.isPending = false;
     });
   },

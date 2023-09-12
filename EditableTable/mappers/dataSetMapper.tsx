@@ -50,7 +50,8 @@ export const mapDataSetColumns =
     .map<IColumn>((column): IColumn => ({
       name: column.displayName,
       fieldName: column.name,
-      minWidth: 20,
+      minWidth: column.dataType === 'DateAndTime.DateAndTime'
+        ? 55 : 20,
       key: column.name,
       isResizable: true,
       data: column.dataType,

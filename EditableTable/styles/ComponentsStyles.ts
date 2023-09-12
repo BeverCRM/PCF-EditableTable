@@ -111,7 +111,7 @@ export const lookupSelectedOptionStyles: IButtonStyles = {
 
 export const numberFormatStyles = (required: boolean): Partial<ISpinButtonStyles> => ({
   root: {
-    minWidth: '40px',
+    minWidth: '20px',
   },
   arrowButtonsContainer: {
     display: 'none',
@@ -119,6 +119,8 @@ export const numberFormatStyles = (required: boolean): Partial<ISpinButtonStyles
   spinButtonWrapper: {
     marginRight: required ? '10px' : '0px',
     pointerEvents: 'all',
+    minWidth: '20px',
+    overflow: 'hidden',
   },
 });
 
