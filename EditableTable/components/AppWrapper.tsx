@@ -1,5 +1,5 @@
 import { ScrollablePane, Stack } from '@fluentui/react';
-import * as React from 'react';
+import React, { useState } from 'react';
 import { Provider } from 'react-redux';
 import { IDataverseService } from '../services/DataverseService';
 import { containerStackStyles } from '../styles/DetailsListStyles';
@@ -15,10 +15,14 @@ export interface IDataSetProps {
   width: number;
   _store: Store;
   _service: IDataverseService;
+  // _setContainerHeight?:
 }
 
-export const Wrapper = (props: IDataSetProps) =>
-  <Provider store={props._store} >
+export const Wrapper = (props: IDataSetProps) => {
+  const [containerHeight, setContainerHeight] = useState(props.dataset.sortedRecordIds.length);
+  console.log(containerHeight);
+
+  return <Provider store={props._store} >
     <div className='appWrapper' tabIndex={0}>
       <Loading />
       <Stack style={containerStackStyles(props.width, props.dataset.sortedRecordIds.length)} >
@@ -28,3 +32,4 @@ export const Wrapper = (props: IDataSetProps) =>
       </Stack>
     </div>
   </Provider>;
+};

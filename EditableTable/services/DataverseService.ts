@@ -78,6 +78,7 @@ export interface IDataverseService {
   Promise<ComponentFramework.WebApi.RetrieveMultipleResponse>;
   isFieldSecured(columnName: string) : Promise<boolean>;
   isRecordEditable(recordId: string): Promise<boolean>;
+  isOffline(): boolean;
 }
 
 export class DataverseService implements IDataverseService {
@@ -85,7 +86,7 @@ export class DataverseService implements IDataverseService {
   private _targetEntityType: string;
   private _clientUrl: string;
   private _parentValue: string | undefined;
-  private _isOffline: boolean;
+  public _isOffline: boolean;
 
   constructor(context: ComponentFramework.Context<IInputs>) {
     this._context = context;
@@ -331,7 +332,6 @@ export class DataverseService implements IDataverseService {
     const request = `${this._clientUrl}organizations?$select=pricingdecimalprecision`;
     const response = await getFetchResponse(request);
     return response?.value[0].pricingdecimalprecision;
-    // return this._isOffline ? 1 : response?.value[0].pricingdecimalprecision;
   }
 
   public async getCurrency(recordId: string): Promise<CurrencyData> {
@@ -541,6 +541,10 @@ export class DataverseService implements IDataverseService {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return this._context.parameters.dataset.records[recordId].isEditable();
+  }
+
+  public isOffline(): boolean {
+    return this._isOffline;
   }
 
 }
