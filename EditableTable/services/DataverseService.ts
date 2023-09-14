@@ -78,6 +78,7 @@ export interface IDataverseService {
   Promise<ComponentFramework.WebApi.RetrieveMultipleResponse>;
   isFieldSecured(columnName: string) : Promise<boolean>;
   isRecordEditable(recordId: string): Promise<boolean>;
+  checkFieldPermissionEntityAccess(): Promise<boolean>;
 }
 
 export class DataverseService implements IDataverseService {
@@ -173,9 +174,13 @@ export class DataverseService implements IDataverseService {
   }
 
   public openErrorDialog(error: any): Promise<void> {
+    const errorMessage = error.code === 2147746581
+      ? 'You do not have permission to update edited record(s)'
+      : error.message;
+
     const errorDialogOptions: ComponentFramework.NavigationApi.ErrorDialogOptions = {
       errorCode: error.code,
-      message: error.message,
+      message: errorMessage,
       details: error.raw,
     };
 
@@ -541,6 +546,10 @@ export class DataverseService implements IDataverseService {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return this._context.parameters.dataset.records[recordId].isEditable();
+  }
+
+  public async checkFieldPermissionEntityAccess() {
+    return this._context.utils.hasEntityPrivilege('fieldpermission', 2, 0);
   }
 
 }
