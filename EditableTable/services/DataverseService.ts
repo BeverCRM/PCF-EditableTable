@@ -79,6 +79,7 @@ export interface IDataverseService {
   isFieldSecured(columnName: string) : Promise<boolean>;
   isRecordEditable(recordId: string): Promise<boolean>;
   checkFieldPermissionEntityAccess(): Promise<boolean>;
+  isOffline(): boolean;
 }
 
 export class DataverseService implements IDataverseService {
@@ -86,7 +87,7 @@ export class DataverseService implements IDataverseService {
   private _targetEntityType: string;
   private _clientUrl: string;
   private _parentValue: string | undefined;
-  private _isOffline: boolean;
+  public _isOffline: boolean;
 
   constructor(context: ComponentFramework.Context<IInputs>) {
     this._context = context;
@@ -336,7 +337,6 @@ export class DataverseService implements IDataverseService {
     const request = `${this._clientUrl}organizations?$select=pricingdecimalprecision`;
     const response = await getFetchResponse(request);
     return response?.value[0].pricingdecimalprecision;
-    // return this._isOffline ? 1 : response?.value[0].pricingdecimalprecision;
   }
 
   public async getCurrency(recordId: string): Promise<CurrencyData> {
@@ -550,6 +550,10 @@ export class DataverseService implements IDataverseService {
 
   public async checkFieldPermissionEntityAccess() {
     return this._context.utils.hasEntityPrivilege('fieldpermission', 2, 0);
+  }
+
+  public isOffline(): boolean {
+    return this._isOffline;
   }
 
 }

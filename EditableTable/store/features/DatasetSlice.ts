@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, isAllOf,
+import { createAsyncThunk, createSlice,
   isAnyOf, isPending, PayloadAction } from '@reduxjs/toolkit';
 import { Row } from '../../mappers/dataSetMapper';
 import { EntityPrivileges, IDataverseService } from '../../services/DataverseService';
