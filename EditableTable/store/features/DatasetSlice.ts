@@ -86,9 +86,14 @@ export const setSecuredFields = createAsyncThunk<FieldSecurity[], DatasetPayload
   'dataset/setSecuredFields',
   async payload => await Promise.all(payload.columnKeys.map(async columnKey => {
     let hasUpdateAccess = true;
-    const isFieldSecured = await payload._service.isFieldSecured(columnKey);
 
+    const isFieldSecured = await payload._service.isFieldSecured(columnKey);
     if (!isFieldSecured) {
+      return { fieldName: columnKey, hasUpdateAccess };
+    }
+
+    const hasReadAccess = await payload._service.checkFieldPermissionEntityAccess();
+    if (!hasReadAccess) {
       return { fieldName: columnKey, hasUpdateAccess };
     }
 
