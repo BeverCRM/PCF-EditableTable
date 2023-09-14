@@ -40,11 +40,13 @@ import { _onRenderDetailsHeader } from '../../styles/RenderStyles';
 import { buttonStyles } from '../../styles/ButtonStyles';
 import { gridStyles } from '../../styles/DetailsListStyles';
 import { IDataSetProps } from '../AppWrapper';
+import { getContainerHeight } from '../../utils/commonUtils';
 
 const ASC_SORT = 0;
 const DESC_SORT = 1;
 
-export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: IDataSetProps) => {
+export const EditableGrid = ({ _service, _setContainerHeight,
+  dataset, isControlDisabled, width }: IDataSetProps) => {
   const { selection, selectedRecordIds } = useSelection();
 
   const rows: Row[] = useAppSelector(state => state.dataset.rows);
@@ -82,7 +84,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
       key: Date.now().toString(),
       columns: emptyColumns,
     }));
-    // scrollablePaneContainer height should be added by 50 if less than 400px
+    _setContainerHeight(getContainerHeight(rows.length + 1));
   };
 
   const deleteButtonHandler = () => {
@@ -124,6 +126,7 @@ export const EditableGrid = ({ _service, dataset, isControlDisabled, width }: ID
     dispatch(clearChangedRecords());
     dispatch(readdChangedRecordsAfterDelete());
     dispatch(setLoading(isPendingDelete || isPendingLoad));
+    _setContainerHeight(getContainerHeight(rows.length));
   }, [dataset, isPendingLoad]);
 
   useLoadStore(dataset, _service);

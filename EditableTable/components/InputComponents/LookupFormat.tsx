@@ -35,6 +35,7 @@ export const LookupFormat = memo(({ _service, fieldName, value, parentEntityMeta
   const currentLookup = lookups.find(lookup => lookup.logicalName === fieldName);
   const options = currentLookup?.options ?? [];
   const currentOption = value ? [value] : [];
+  const isOffline = _service.isOffline();
 
   if (value === undefined &&
     parentEntityMetadata !== undefined && parentEntityMetadata.entityId !== undefined) {
@@ -106,8 +107,8 @@ export const LookupFormat = memo(({ _service, fieldName, value, parentEntityMeta
       onEmptyResolveSuggestions={initialValues}
       itemLimit={1}
       pickerSuggestionsProps={{ noResultsFoundText: 'No Results Found' }}
-      styles={lookupFormatStyles(isRequired, isSecured || isDisabled)}
-      onRenderItem={ !isSecured && !isDisabled ? _onRenderItem : undefined}
+      styles={lookupFormatStyles(isRequired, isSecured || isDisabled || isOffline)}
+      onRenderItem={ !isSecured && !isDisabled && !isOffline ? _onRenderItem : undefined}
       onBlur={() => {
         if (picker.current) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -116,7 +117,7 @@ export const LookupFormat = memo(({ _service, fieldName, value, parentEntityMeta
           setInvalid(isRequired);
         }
       }}
-      disabled={isSecured || isDisabled}
+      disabled={isSecured || isDisabled || isOffline}
       inputProps={{
         onFocus: () => setInvalid(false),
       }}
