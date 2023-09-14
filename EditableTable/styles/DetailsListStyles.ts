@@ -35,12 +35,3 @@ export const gridStyles = (rowsLength: number): Partial<IDetailsListStyles> => m
     padding: rowsLength === 0 ? '50px' : '0',
   },
 });
-
-export const containerStackStyles = (width: number, rowsLength: number) => {
-  const height = rowsLength === 0
-    ? 282
-    : rowsLength < 10
-      ? (rowsLength * 50) + 160
-      : window.innerHeight - 280;
-  return { width, height };
-};

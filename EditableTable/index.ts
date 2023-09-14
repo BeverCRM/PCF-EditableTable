@@ -30,6 +30,7 @@ export class EditableTable implements ComponentFramework.ReactControl<IInputs, I
         width: context.mode.allocatedWidth,
         _service: this._service,
         _store: this._store,
+        _setContainerHeight: () => {},
       });
     }
     return React.createElement('div');
