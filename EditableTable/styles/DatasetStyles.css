@@ -13,11 +13,11 @@
 
 .ms-DetailsList {
   z-index: 2;
-  cursor: pointer;
 }
 
 .ms-DetailsHeader-cell{
   margin: 0px 4px; 
+  cursor: pointer;
 }
 
 .ms-DetailsRow-cell {
