@@ -13,6 +13,7 @@
 
 .ms-DetailsList {
   z-index: 2;
+  cursor: pointer;
 }
 
 .ms-DetailsHeader-cell{
