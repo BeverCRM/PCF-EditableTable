@@ -1,9 +1,9 @@
 /* eslint-disable react/display-name */
 import { DefaultButton, FontIcon } from '@fluentui/react';
 import { ITag, TagPicker } from '@fluentui/react/lib/Pickers';
-import React, { memo, useState } from 'react';
+import React, { memo } from 'react';
 import { IDataverseService } from '../../services/DataverseService';
-import { useAppSelector } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
   asteriskClassStyle,
   lookupFormatStyles,
@@ -11,11 +11,13 @@ import {
 } from '../../styles/ComponentsStyles';
 import { ParentEntityMetadata } from '../EditableGrid/GridCell';
 import { ErrorIcon } from '../ErrorIcon';
+import { setInvalidFields } from '../../store/features/ErrorSlice';
 
 const MAX_NUMBER_OF_OPTIONS = 100;
 const SINGLE_CLICK_CODE = 1;
 
 export interface ILookupProps {
+  fieldId: string;
   fieldName: string;
   value: ITag | undefined;
   parentEntityMetadata: ParentEntityMetadata | undefined;
@@ -26,10 +28,10 @@ export interface ILookupProps {
   _service: IDataverseService;
 }
 
-export const LookupFormat = memo(({ _service, fieldName, value, parentEntityMetadata,
-  isSecured, isRequired, isDisabled, _onChange }: ILookupProps) => {
+export const LookupFormat = memo(({ fieldId, fieldName, value, parentEntityMetadata,
+  isSecured, isRequired, isDisabled, _onChange, _service }: ILookupProps) => {
   const picker = React.useRef(null);
-  const [isInvalid, setInvalid] = useState(false);
+  const dispatch = useAppDispatch();
 
   const lookups = useAppSelector(state => state.lookup.lookups);
   const currentLookup = lookups.find(lookup => lookup.logicalName === fieldName);
@@ -114,19 +116,16 @@ export const LookupFormat = memo(({ _service, fieldName, value, parentEntityMeta
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           picker.current.input.current._updateValue('');
-          setInvalid(isRequired);
+          dispatch(setInvalidFields({ fieldId, isInvalid: isRequired,
+            errorMessage: 'Required fields must be filled in' }));
         }
       }}
       disabled={isSecured || isDisabled || isOffline}
       inputProps={{
-        onFocus: () => setInvalid(false),
+        onFocus: () => dispatch(setInvalidFields({ fieldId, isInvalid: false, errorMessage: '' })),
       }}
     />
     <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
-    <ErrorIcon id={`lookupFormat${Date.now().toString()}`}
-      errorText={'Required fields must be filled in.'}
-      isInvalid={isInvalid}
-      isRequired={isRequired}
-    ></ErrorIcon>
+    <ErrorIcon id={fieldId} isRequired={isRequired} />
   </div>;
 });

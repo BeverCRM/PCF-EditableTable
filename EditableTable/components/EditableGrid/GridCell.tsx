@@ -78,6 +78,7 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
   const props = {
     fieldName: currentColumn?.fieldName ? currentColumn?.fieldName : '',
     rowId: row.key,
+    fieldId: `${row.key}${currentColumn?.fieldName || ''}`,
     formattedValue: cell?.formattedValue,
     isRequired,
     isDisabled: isInactiveRecord || isCalculatedField,
