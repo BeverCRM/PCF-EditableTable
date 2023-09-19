@@ -41,6 +41,7 @@ import { buttonStyles } from '../../styles/ButtonStyles';
 import { gridStyles } from '../../styles/DetailsListStyles';
 import { IDataSetProps } from '../AppWrapper';
 import { getContainerHeight } from '../../utils/commonUtils';
+import { clearInvalidFields } from '../../store/features/ErrorSlice';
 
 const ASC_SORT = 0;
 const DESC_SORT = 1;
@@ -69,6 +70,7 @@ export const EditableGrid = ({ _service, _setContainerHeight,
     dataset.refresh();
     dispatch(clearChangedRecords());
     dispatch(removeNewRows());
+    dispatch(clearInvalidFields());
   };
 
   const newButtonHandler = () => {

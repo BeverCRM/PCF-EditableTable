@@ -1,13 +1,15 @@
 /* eslint-disable react/display-name */
 import { ComboBox, FontIcon, IComboBox, IComboBoxOption, Stack } from '@fluentui/react';
-import React, { memo, useState } from 'react';
-import { useAppSelector } from '../../store/hooks';
+import React, { memo } from 'react';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, wholeFormatStyles } from '../../styles/ComponentsStyles';
 import { getDurationOption } from '../../utils/durationUtils';
 import { durationList } from './durationList';
 import { ErrorIcon } from '../ErrorIcon';
+import { setInvalidFields } from '../../store/features/ErrorSlice';
 
 export interface IWholeFormatProps {
+  fieldId: string;
   value: string | null | undefined;
   formattedValue?: string;
   type: string;
@@ -17,10 +19,9 @@ export interface IWholeFormatProps {
   isSecured: boolean
 }
 
-export const WholeFormat = memo(({ value, formattedValue, type, isDisabled, isSecured,
+export const WholeFormat = memo(({ fieldId, value, formattedValue, type, isDisabled, isSecured,
   isRequired, _onChange } : IWholeFormatProps) => {
-  const [isInvalid, setInvalid] = useState(false);
-
+  const dispatch = useAppDispatch();
   const wholeFormat = useAppSelector(state => state.wholeFormat);
 
   let options: IComboBoxOption[] = [];
@@ -67,7 +68,8 @@ export const WholeFormat = memo(({ value, formattedValue, type, isDisabled, isSe
 
   const checkValidation = () => {
     if (isRequired && (value === '' || value === null)) {
-      setInvalid(true);
+      dispatch(setInvalidFields({ fieldId, isInvalid: true,
+        errorMessage: 'Required fields must be filled in.' }));
     }
   };
 
@@ -83,14 +85,10 @@ export const WholeFormat = memo(({ value, formattedValue, type, isDisabled, isSe
         allowFreeform={type === 'duration'}
         disabled={isDisabled || isSecured}
         onBlur={() => checkValidation()}
-        onFocus={() => setInvalid(false)}
+        onFocus={() => dispatch(setInvalidFields({ fieldId, isInvalid: false, errorMessage: '' }))}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
-      <ErrorIcon id={`wholeFormat${Date.now().toString()}`}
-        errorText={'Required fields must be filled in.'}
-        isInvalid={isInvalid}
-        isRequired={isRequired}
-      ></ErrorIcon>
+      <ErrorIcon id={fieldId} isRequired={isRequired} />
     </Stack>
   );
 });
