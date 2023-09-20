@@ -27,7 +27,6 @@ export const CommandBar = (props: ICommandBarProps) => {
   const isLoading = useAppSelector(state => state.loading.isLoading);
   const isPendingSave = useAppSelector(state => state.record.isPendingSave);
   const entityPrivileges = useAppSelector(state => state.dataset.entityPrivileges);
-  const isError = useAppSelector(state => state.error.isError);
 
   const buttons: ButtonProps[] = [
     {
@@ -59,8 +58,7 @@ export const CommandBar = (props: ICommandBarProps) => {
       order: 4,
       text: 'Save',
       icon: saveIcon,
-      disabled: isLoading || isError ||
-        !isPendingSave || props.isControlDisabled || !entityPrivileges.write,
+      disabled: isLoading || !isPendingSave || props.isControlDisabled || !entityPrivileges.write,
       onClick: props.saveButtonHandler,
       styles: {
         icon: { color: isPendingSave ? 'blue' : 'black' },
