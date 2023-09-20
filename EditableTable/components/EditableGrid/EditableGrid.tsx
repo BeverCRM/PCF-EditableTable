@@ -22,6 +22,7 @@ import { GridCell } from './GridCell';
 
 import {
   clearChangedRecords,
+  clearChangedRecordsAfterDelete,
   deleteRecords,
   readdChangedRecordsAfterDelete,
   saveRecords,
@@ -69,6 +70,7 @@ export const EditableGrid = ({ _service, _setContainerHeight,
     dispatch(setLoading(true));
     dataset.refresh();
     dispatch(clearChangedRecords());
+    dispatch(clearChangedRecordsAfterDelete());
     dispatch(removeNewRows());
     dispatch(clearInvalidFields());
   };

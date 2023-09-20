@@ -58,12 +58,19 @@ export const saveRecords = createAsyncThunk<void, IDataverseService, AsyncThunkC
   async (_service, thunkApi) => {
     const { changedRecords } = thunkApi.getState().record;
     const { requirementLevels, rows } = thunkApi.getState().dataset;
+    const { isInvalid } = thunkApi.getState().error;
 
     const changedRows = rows.filter(
       (row: Row) => changedRecords.some(changedRecord => changedRecord.id === row.key));
 
+    if (isInvalid) {
+      return thunkApi.rejectWithValue({
+        message: 'Field validation errors must be fixed before saving.' });
+    }
+
     if (isRequiredFieldEmpty(requirementLevels, changedRows, _service)) {
-      return thunkApi.rejectWithValue({ message: 'All required fields must be filled in.' });
+      return thunkApi.rejectWithValue({
+        message: 'All required fields must be filled in before saving.' });
     }
     _service.setParentValue();
 
@@ -165,12 +172,15 @@ const RecordSlice = createSlice({
     readdChangedRecordsAfterDelete: state => {
       state.changedRecords = [...state.changedRecordsAfterDelete];
       state.isPendingSave = !!(state.changedRecordsAfterDelete.length > 0);
-      state.changedRecordsAfterDelete = [];
     },
 
     clearChangedRecords: state => {
       state.changedRecords = [];
       state.isPendingSave = false;
+    },
+
+    clearChangedRecordsAfterDelete: state => {
+      state.changedRecordsAfterDelete = [];
     },
   },
   extraReducers(builder) {
@@ -196,6 +206,7 @@ export const {
   setChangedRecords,
   clearChangedRecords,
   readdChangedRecordsAfterDelete,
+  clearChangedRecordsAfterDelete,
 } = RecordSlice.actions;
 
 export default RecordSlice.reducer;

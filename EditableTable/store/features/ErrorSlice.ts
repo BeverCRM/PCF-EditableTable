@@ -8,12 +8,12 @@ export type InvalidField = {
 
 export interface IErrorState {
   invalidFields: InvalidField[];
-  isError: boolean;
+  isInvalid: boolean;
 }
 
 const initialState: IErrorState = {
   invalidFields: [],
-  isError: false,
+  isInvalid: false,
 };
 
 export const ErrorSlice = createSlice({
@@ -37,16 +37,16 @@ export const ErrorSlice = createSlice({
       }
 
       if (state.invalidFields.some(field => field.isInvalid)) {
-        state.isError = true;
+        state.isInvalid = true;
       }
       else {
-        state.isError = false;
+        state.isInvalid = false;
       }
     },
 
     clearInvalidFields: state => {
       state.invalidFields = [];
-      state.isError = false;
+      state.isInvalid = false;
     },
   },
 });
