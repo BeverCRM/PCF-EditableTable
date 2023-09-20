@@ -179,7 +179,7 @@ const RecordSlice = createSlice({
       state.isPendingSave = false;
     },
 
-    clearChangedRecordsAfterDelete: state => {
+    clearChangedRecordsAfterRefresh: state => {
       state.changedRecordsAfterDelete = [];
     },
   },
@@ -206,7 +206,7 @@ export const {
   setChangedRecords,
   clearChangedRecords,
   readdChangedRecordsAfterDelete,
-  clearChangedRecordsAfterDelete,
+  clearChangedRecordsAfterRefresh,
 } = RecordSlice.actions;
 
 export default RecordSlice.reducer;
