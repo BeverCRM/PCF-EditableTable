@@ -75,10 +75,9 @@ export interface IDataverseService {
   getMonthNamesShort(): string[];
   getMonthNamesLong(): string[];
   getUserRelatedFieldServiceProfile(columnKey: string):
-  Promise<ComponentFramework.WebApi.RetrieveMultipleResponse>;
+  Promise<ComponentFramework.WebApi.RetrieveMultipleResponse | null>;
   isFieldSecured(columnName: string) : Promise<boolean>;
   isRecordEditable(recordId: string): Promise<boolean>;
-  checkFieldPermissionEntityAccess(): Promise<boolean>;
   isOffline(): boolean;
 }
 
@@ -474,32 +473,9 @@ export class DataverseService implements IDataverseService {
   }
 
   public async getUserRelatedFieldServiceProfile(columnName: string) :
-  Promise<ComponentFramework.WebApi.RetrieveMultipleResponse> {
-    let fetchXml = `?fetchXml=
-    <fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="true">
-    <entity name="fieldpermission">
-      <all-attributes/>
-      <filter type="and">
-        <condition attribute="attributelogicalname" operator="eq" value="${columnName}" />
-      </filter>
-        <link-entity name="fieldsecurityprofile" from="fieldsecurityprofileid"
-          to="fieldsecurityprofileid" intersect="true">
-          <link-entity name="systemuserprofiles" from="fieldsecurityprofileid"
-            to="fieldsecurityprofileid" visible="false" intersect="true">
-            <link-entity name="systemuser" from="systemuserid" to="systemuserid" alias="ae">
-              <filter type="and">
-                <condition attribute="systemuserid" operator="eq-userid" />
-              </filter>
-            </link-entity>
-          </link-entity>
-        </link-entity>
-    </entity>
-    </fetch>`;
-
-    let response = await this._context.webAPI.retrieveMultipleRecords('fieldpermission', fetchXml);
-
-    if (response.entities.length === 0) {
-      fetchXml = `?fetchXml=
+  Promise<ComponentFramework.WebApi.RetrieveMultipleResponse | null> {
+    try {
+      let fetchXml = `?fetchXml=
       <fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="true">
       <entity name="fieldpermission">
         <all-attributes/>
@@ -508,36 +484,65 @@ export class DataverseService implements IDataverseService {
         </filter>
           <link-entity name="fieldsecurityprofile" from="fieldsecurityprofileid"
             to="fieldsecurityprofileid" intersect="true">
-            <link-entity name="teamprofiles" from="fieldsecurityprofileid" 
+            <link-entity name="systemuserprofiles" from="fieldsecurityprofileid"
               to="fieldsecurityprofileid" visible="false" intersect="true">
-              <link-entity name="team" from="teamid" to="teamid" alias="af">
+              <link-entity name="systemuser" from="systemuserid" to="systemuserid" alias="ae">
                 <filter type="and">
-                  <condition attribute="teamid" operator="not-null" />
+                  <condition attribute="systemuserid" operator="eq-userid" />
                 </filter>
-                <link-entity name="teammembership" from="teamid" 
-                  to="teamid" visible="false" intersect="true">
-                    <link-entity name="systemuser" from="systemuserid" to="systemuserid" alias="ag">
-                      <filter type="and">
-                        <condition attribute="systemuserid" operator="eq-userid" />
-                      </filter>
-                    </link-entity>
-                </link-entity>
               </link-entity>
             </link-entity>
           </link-entity>
       </entity>
       </fetch>`;
 
-      response = await this._context.webAPI.retrieveMultipleRecords('fieldpermission', fetchXml);
+      let response =
+      await this._context.webAPI.retrieveMultipleRecords('fieldpermission', fetchXml);
+
+      if (response.entities.length === 0) {
+        fetchXml = `?fetchXml=
+        <fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="true">
+        <entity name="fieldpermission">
+          <all-attributes/>
+          <filter type="and">
+            <condition attribute="attributelogicalname" operator="eq" value="${columnName}" />
+          </filter>
+            <link-entity name="fieldsecurityprofile" from="fieldsecurityprofileid"
+              to="fieldsecurityprofileid" intersect="true">
+              <link-entity name="teamprofiles" from="fieldsecurityprofileid" 
+                to="fieldsecurityprofileid" visible="false" intersect="true">
+                <link-entity name="team" from="teamid" to="teamid" alias="af">
+                  <filter type="and">
+                    <condition attribute="teamid" operator="not-null" />
+                  </filter>
+                  <link-entity name="teammembership" from="teamid" 
+                    to="teamid" visible="false" intersect="true">
+                    <link-entity name="systemuser" from="systemuserid" to="systemuserid" alias="ag">
+                      <filter type="and">
+                        <condition attribute="systemuserid" operator="eq-userid" />
+                      </filter>
+                    </link-entity>
+                  </link-entity>
+                </link-entity>
+              </link-entity>
+            </link-entity>
+        </entity>
+        </fetch>`;
+
+        response = await this._context.webAPI.retrieveMultipleRecords('fieldpermission', fetchXml);
+      }
+      return response;
     }
-    return response;
+    catch (error: any) {
+      return null;
+    }
   }
 
   public async isFieldSecured(columnName: string) :
   Promise<boolean> {
     const request = `${this._clientUrl}EntityDefinitions(LogicalName='${
-      this._targetEntityType}')/Attributes?$select=IsSecured
-      &$filter=LogicalName eq '${columnName}'`;
+      // eslint-disable-next-line max-len
+      this._targetEntityType}')/Attributes?$select=IsSecured&$filter=LogicalName eq '${columnName}'`;
     const result = await getFetchResponse(request);
     return result.value[0].IsSecured;
   }
@@ -546,10 +551,6 @@ export class DataverseService implements IDataverseService {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return this._context.parameters.dataset.records[recordId].isEditable();
-  }
-
-  public async checkFieldPermissionEntityAccess() {
-    return this._context.utils.hasEntityPrivilege('fieldpermission', 2, 0);
   }
 
   public isOffline(): boolean {
