@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import React, { memo, useState } from 'react';
+import React, { memo } from 'react';
 import {
   DatePicker,
   defaultDatePickerStrings,
@@ -15,7 +15,7 @@ import {
   datePickerStyles,
   stackComboBox,
 } from '../../styles/ComponentsStyles';
-import { useAppSelector } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { shallowEqual } from 'react-redux';
 import {
   getDateFormatWithHyphen,
@@ -33,8 +33,10 @@ import {
 import { timesList } from './timeList';
 import { IDataverseService } from '../../services/DataverseService';
 import { ErrorIcon } from '../ErrorIcon';
+import { setInvalidFields } from '../../store/features/ErrorSlice';
 
 export interface IDatePickerProps {
+  fieldId: string;
   fieldName: string;
   dateOnly: boolean;
   value: string | null;
@@ -45,12 +47,12 @@ export interface IDatePickerProps {
   _service: IDataverseService;
 }
 
-export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled, isSecured,
+export const DateTimeFormat = memo(({ fieldName, fieldId, dateOnly, value, isDisabled, isSecured,
   isRequired, _onChange, _service }: IDatePickerProps) => {
-  const [isInvalid, setInvalid] = useState(false);
   let timeKey: string | number | undefined;
   const options = [...timesList];
 
+  const dispatch = useAppDispatch();
   const dateFields = useAppSelector(state => state.date.dates, shallowEqual);
   const currentDateMetadata = dateFields.find(dateField => dateField.fieldName === fieldName);
   const dateBehavior = currentDateMetadata?.dateBehavior ?? '';
@@ -77,10 +79,11 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled, is
 
   const checkValidation = (newValue: Date | null | undefined) => {
     if (isRequired && (newValue === undefined || newValue === null || isNaN(newValue.getTime()))) {
-      setInvalid(true);
+      dispatch(setInvalidFields(
+        { fieldId, isInvalid: true, errorMessage: 'Required fields must be filled in.' }));
     }
     else {
-      setInvalid(false);
+      dispatch(setInvalidFields({ fieldId, isInvalid: false, errorMessage: '' }));
     }
   };
 
@@ -148,7 +151,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled, is
         firstDayOfWeek={_service.getFirstDayOfWeek()}
         disabled={isDisabled || isSecured}
         onAfterMenuDismiss={() => checkValidation(currentDate)}
-        onClick={() => setInvalid(false)}
+        onClick={() => dispatch(setInvalidFields({ fieldId, isInvalid: false, errorMessage: '' }))}
         title={currentDate?.toDateString()}
       />
       {!dateOnly &&
@@ -164,11 +167,7 @@ export const DateTimeFormat = memo(({ fieldName, dateOnly, value, isDisabled, is
         />
       }
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
-      <ErrorIcon id={`dateTimeFormat${Date.now().toString()}`}
-        errorText={'Required fields must be filled in.'}
-        isInvalid={isInvalid}
-        isRequired={isRequired}
-      ></ErrorIcon>
+      <ErrorIcon id={fieldId} isRequired={isRequired} />
     </Stack>
   );
 });

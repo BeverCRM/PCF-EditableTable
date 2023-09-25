@@ -22,6 +22,7 @@ import { GridCell } from './GridCell';
 
 import {
   clearChangedRecords,
+  clearChangedRecordsAfterRefresh,
   deleteRecords,
   readdChangedRecordsAfterDelete,
   saveRecords,
@@ -41,6 +42,7 @@ import { buttonStyles } from '../../styles/ButtonStyles';
 import { gridStyles } from '../../styles/DetailsListStyles';
 import { IDataSetProps } from '../AppWrapper';
 import { getContainerHeight } from '../../utils/commonUtils';
+import { clearInvalidFields } from '../../store/features/ErrorSlice';
 
 const ASC_SORT = 0;
 const DESC_SORT = 1;
@@ -68,7 +70,9 @@ export const EditableGrid = ({ _service, _setContainerHeight,
     dispatch(setLoading(true));
     dataset.refresh();
     dispatch(clearChangedRecords());
+    dispatch(clearChangedRecordsAfterRefresh());
     dispatch(removeNewRows());
+    dispatch(clearInvalidFields());
   };
 
   const newButtonHandler = () => {

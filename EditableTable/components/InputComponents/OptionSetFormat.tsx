@@ -1,13 +1,15 @@
 /* eslint-disable react/display-name */
-import React, { memo, useState } from 'react';
+import React, { memo } from 'react';
 import { Stack, ComboBox, IComboBox, IComboBoxOption, FontIcon } from '@fluentui/react';
 
-import { useAppSelector } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { asteriskClassStyle, optionSetStyles } from '../../styles/ComponentsStyles';
 import { IDataverseService } from '../../services/DataverseService';
 import { ErrorIcon } from '../ErrorIcon';
+import { setInvalidFields } from '../../store/features/ErrorSlice';
 
 export interface IDropDownProps {
+  fieldId: string;
   fieldName: string | undefined;
   value: string | null;
   formattedValue: string | undefined;
@@ -20,10 +22,11 @@ export interface IDropDownProps {
   _service: IDataverseService;
 }
 
-export const OptionSetFormat = memo(({ fieldName, value, formattedValue, isMultiple, isRequired,
-  isTwoOptions, isDisabled, isSecured, _onChange, _service }: IDropDownProps) => {
-  const [isInvalid, setInvalid] = useState(false);
+export const OptionSetFormat = memo(({ fieldId, fieldName, value, formattedValue, isMultiple,
+  isRequired, isTwoOptions, isDisabled, isSecured, _onChange, _service }: IDropDownProps) => {
   let currentValue = value;
+  const dispatch = useAppDispatch();
+
   const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);
   const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
   const options = currentDropdown?.options ?? [];
@@ -57,7 +60,8 @@ export const OptionSetFormat = memo(({ fieldName, value, formattedValue, isMulti
 
   const checkValidation = () => {
     if (isRequired && currentOptions.length < 1) {
-      setInvalid(true);
+      dispatch(setInvalidFields({ fieldId, isInvalid: true,
+        errorMessage: 'Required fields must be filled in.' }));
     }
   };
 
@@ -71,16 +75,13 @@ export const OptionSetFormat = memo(({ fieldName, value, formattedValue, isMulti
         onChange={onChange}
         styles={optionSetStyles(isRequired)}
         onMenuDismissed={() => checkValidation()}
-        onMenuOpen={() => setInvalid(false)}
+        onMenuOpen={() =>
+          dispatch(setInvalidFields({ fieldId, isInvalid: false, errorMessage: '' }))}
         disabled={disabled || isSecured}
         title={formattedValue}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
-      <ErrorIcon id={`optionSetFormat${Date.now().toString()}`}
-        errorText={'Required fields must be filled in.'}
-        isInvalid={isInvalid}
-        isRequired={isRequired}
-      ></ErrorIcon>
+      <ErrorIcon id={fieldId} isRequired={isRequired} />
     </Stack>
   );
 });

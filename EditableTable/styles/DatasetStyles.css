@@ -17,6 +17,7 @@
 
 .ms-DetailsHeader-cell{
   margin: 0px 4px; 
+  cursor: pointer;
 }
 
 .ms-DetailsRow-cell {

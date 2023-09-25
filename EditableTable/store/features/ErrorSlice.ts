@@ -1,35 +1,56 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export type InvalidField = {
-  rowId: string;
-  fieldName: string;
+  fieldId: string;
+  isInvalid: boolean;
+  errorMessage: string;
 };
 
 export interface IErrorState {
-  isInvalid: boolean;
   invalidFields: InvalidField[];
-  errorMessage: string;
+  isInvalid: boolean;
 }
 
 const initialState: IErrorState = {
-  isInvalid: false,
   invalidFields: [],
-  errorMessage: '',
+  isInvalid: false,
 };
 
 export const ErrorSlice = createSlice({
   name: 'error',
   initialState,
   reducers: {
-    setInvalid: (state, action: PayloadAction<boolean>) => {
-      state.isInvalid = action.payload;
+    setInvalidFields: (state, action: PayloadAction<InvalidField>) => {
+      const { invalidFields } = state;
+      const field = invalidFields.find(field => field.fieldId === action.payload.fieldId);
+
+      if (field === undefined) {
+        state.invalidFields.push(action.payload);
+      }
+      else {
+        state.invalidFields = invalidFields.map(elem => {
+          if (elem.fieldId === field.fieldId) {
+            return action.payload;
+          }
+          return elem;
+        });
+      }
+
+      if (state.invalidFields.some(field => field.isInvalid)) {
+        state.isInvalid = true;
+      }
+      else {
+        state.isInvalid = false;
+      }
     },
-    setInvalidFields: (state, action: PayloadAction<InvalidField[]>) => {
-      state.invalidFields = action.payload;
+
+    clearInvalidFields: state => {
+      state.invalidFields = [];
+      state.isInvalid = false;
     },
   },
 });
 
-export const { setInvalid, setInvalidFields } = ErrorSlice.actions;
+export const { setInvalidFields, clearInvalidFields } = ErrorSlice.actions;
 
 export default ErrorSlice.reducer;

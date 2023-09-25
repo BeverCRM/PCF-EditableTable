@@ -1,8 +1,8 @@
 /* eslint-disable react/display-name */
 import { FontIcon, SpinButton, Stack } from '@fluentui/react';
-import React, { memo, useState } from 'react';
+import React, { memo } from 'react';
 import { IDataverseService } from '../../services/DataverseService';
-import { useAppSelector } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
   asteriskClassStyle,
   numberFormatStyles,
@@ -10,8 +10,10 @@ import {
 import { formatCurrency, formatDecimal, formatNumber } from '../../utils/formattingUtils';
 import { CurrencySymbol, NumberFieldMetadata } from '../../store/features/NumberSlice';
 import { ErrorIcon } from '../ErrorIcon';
+import { setInvalidFields } from '../../store/features/ErrorSlice';
 
 export interface INumberProps {
+  fieldId: string;
   fieldName: string | undefined;
   value: string;
   rowId?: string;
@@ -22,9 +24,10 @@ export interface INumberProps {
   _service: IDataverseService;
 }
 
-export const NumberFormat = memo(({ fieldName, value, rowId, isRequired, isDisabled, isSecured,
-  _onChange, _service } : INumberProps) => {
-  const [isInvalid, setInvalid] = useState(false);
+export const NumberFormat = memo(({ fieldId, fieldName, value, rowId, isRequired, isDisabled,
+  isSecured, _onChange, _service } : INumberProps) => {
+  const dispatch = useAppDispatch();
+
   const numbers = useAppSelector(state => state.number.numberFieldsMetadata);
   const currencySymbols = useAppSelector(state => state.number.currencySymbols);
   const changedRecords = useAppSelector(state => state.record.changedRecords);
@@ -78,7 +81,8 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired, isDisab
 
   const checkValidation = (newValue: string) => {
     if (isRequired && !newValue) {
-      setInvalid(true);
+      dispatch(setInvalidFields({ fieldId, isInvalid: true,
+        errorMessage: 'Required fields must be filled in.' }));
     }
   };
 
@@ -99,14 +103,10 @@ export const NumberFormat = memo(({ fieldName, value, rowId, isRequired, isDisab
           }
           checkValidation(elem.value);
         }}
-        onFocus={() => setInvalid(false)}
+        onFocus={() => dispatch(setInvalidFields({ fieldId, isInvalid: false, errorMessage: '' }))}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)}/>
-      <ErrorIcon id={`mumberFormat${Date.now().toString()}`}
-        errorText={'Required fields must be filled in.'}
-        isInvalid={isInvalid}
-        isRequired={isRequired}
-      ></ErrorIcon>
+      <ErrorIcon id={fieldId} isRequired={isRequired} />
     </Stack>
   );
 });

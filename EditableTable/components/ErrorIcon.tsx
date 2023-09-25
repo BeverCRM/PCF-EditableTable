@@ -2,31 +2,33 @@
 import { FontIcon, ITooltipProps, TooltipHost } from '@fluentui/react';
 import React, { memo } from 'react';
 import { error } from '../styles/ComponentsStyles';
+import { useAppSelector } from '../store/hooks';
 
 export interface IErrorProps {
   id: string;
-  errorText: string;
-  isInvalid: boolean,
   isRequired: boolean;
 }
 
-export const ErrorIcon = memo(({ id, errorText, isInvalid, isRequired } : IErrorProps) => {
+export const ErrorIcon = memo(({ id, isRequired } : IErrorProps) => {
+  const invalidFields = useAppSelector(state => state.error.invalidFields);
+  const invalidField = invalidFields.find(field => field.fieldId === id);
+
   const tooltipProps: ITooltipProps = {
     onRenderContent: () =>
       <span style={{ margin: 10, padding: 0, color: '#c0172b' }}>
-        {errorText}
+        {invalidField?.errorMessage}
       </span>,
   };
 
   return (
     <TooltipHost
-      content={errorText}
+      content={invalidField?.errorMessage}
       calloutProps={{ target: `#${id}` }}
       tooltipProps={tooltipProps}
     >
       <FontIcon
         iconName={'StatusErrorFull'} id={id}
-        className={error(isInvalid, isRequired)}
+        className={error(invalidField?.isInvalid || false, isRequired)}
       />
     </TooltipHost>
   );

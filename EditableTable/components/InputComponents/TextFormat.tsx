@@ -1,9 +1,9 @@
 /* eslint-disable react/display-name */
 import { FontIcon, Stack, TextField } from '@fluentui/react';
-import React, { memo, useState } from 'react';
+import React, { memo } from 'react';
 import { asteriskClassStyle, textFieldStyles } from '../../styles/ComponentsStyles';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { setInvalid } from '../../store/features/ErrorSlice';
+import { setInvalidFields } from '../../store/features/ErrorSlice';
 import { isEmailValid, validateUrl } from '../../utils/textUtils';
 import { ErrorIcon } from '../ErrorIcon';
 
@@ -13,6 +13,7 @@ export type errorProp = {
 };
 
 export interface ITextProps {
+  fieldId: string;
   fieldName: string;
   value: string | undefined;
   ownerValue: string | undefined;
@@ -23,18 +24,12 @@ export interface ITextProps {
   _onChange: Function;
 }
 
-export const TextFormat = memo(({ value, isRequired, isDisabled, type, isSecured,
+export const TextFormat = memo(({ fieldId, value, isRequired, isDisabled, type, isSecured,
   fieldName, ownerValue, _onChange } : ITextProps) => {
   const currentValue = ownerValue !== undefined ? ownerValue : value;
-  const errorProp = {
-    isInvalid: false,
-    errorText: 'Required fields must be filled in.',
-  };
-
-  const [errorProps, setErrorProps] = useState<errorProp>(errorProp);
+  const dispatch = useAppDispatch();
   const textFields = useAppSelector(state => state.text.textFields);
   const currentTextField = textFields.find(textField => textField.fieldName === fieldName);
-  const dispatch = useAppDispatch();
 
   const onChange = (newValue: string) => {
     if (type?.includes('URL')) {
@@ -47,28 +42,23 @@ export const TextFormat = memo(({ value, isRequired, isDisabled, type, isSecured
 
   const checkValidation = (newValue: string) => {
     if (isRequired && newValue === '') {
-      setErrorProps({
-        isInvalid: true,
-        errorText: 'Required fields must be filled in.',
-      });
-      dispatch(setInvalid(true));
+      dispatch(setInvalidFields(
+        { fieldId, isInvalid: true, errorMessage: 'Required fields must be filled in.' }));
     }
     else if (currentTextField?.textMaxLength && newValue.length > currentTextField?.textMaxLength) {
-      setErrorProps({
-        isInvalid: true,
-        errorText: 'You have exceeded the maximum number of characters in this field.',
-      });
-      dispatch(setInvalid(true));
+      dispatch(setInvalidFields(
+        { fieldId, isInvalid: true,
+          errorMessage: 'You have exceeded the maximum number of characters in this field.' }));
     }
-    else if (type?.includes('Email') && !isEmailValid(newValue)) {
-      setErrorProps({
-        isInvalid: true,
-        errorText: 'Enter a valid email address.',
-      });
-      dispatch(setInvalid(true));
+    else if (type?.includes('Email') && !isEmailValid(newValue) && newValue !== '') {
+      dispatch(setInvalidFields(
+        { fieldId, isInvalid: true, errorMessage: 'Enter a valid email address.' }));
+    }
+    else if (!isRequired && newValue === '') {
+      dispatch(setInvalidFields({ fieldId, isInvalid: false, errorMessage: '' }));
     }
     else {
-      dispatch(setInvalid(false));
+      dispatch(setInvalidFields({ fieldId, isInvalid: false, errorMessage: '' }));
     }
   };
 
@@ -86,14 +76,10 @@ export const TextFormat = memo(({ value, isRequired, isDisabled, type, isSecured
           }
           checkValidation(elem.value);
         }}
-        onFocus={() => setErrorProps({ isInvalid: false, errorText: '' })}
+        onFocus={() => dispatch(setInvalidFields({ fieldId, isInvalid: false, errorMessage: '' }))}
       />
       <FontIcon iconName={'AsteriskSolid'} className={asteriskClassStyle(isRequired)} />
-      <ErrorIcon id={`textFormat${Date.now().toString()}`}
-        errorText={errorProps.errorText}
-        isInvalid={errorProps.isInvalid}
-        isRequired={isRequired}
-      ></ErrorIcon>
+      <ErrorIcon id={fieldId} isRequired={isRequired} />
     </Stack>
   );
 });
