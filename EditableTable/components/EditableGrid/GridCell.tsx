@@ -44,7 +44,7 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
   const securedFields = useAppSelector(state => state.dataset.securedFields);
   const securedField = securedFields.find(field =>
     field.fieldName === currentColumn.key);
-  const hasUpdateAccess = securedField?.hasUpdateAccess || false;
+  let hasUpdateAccess = securedField?.hasUpdateAccess || false;
 
   let parentEntityMetadata: ParentEntityMetadata | undefined;
   let ownerEntityMetadata: string | undefined;
@@ -52,6 +52,7 @@ export const GridCell = ({ _service, row, currentColumn, index }: IGridSetProps)
     parentEntityMetadata = _service.getParentMetadata();
     ownerEntityMetadata = currentColumn.data === 'Lookup.Owner'
       ? _service.getCurrentUserName() : undefined;
+    hasUpdateAccess = securedField?.hasCreateAccess || false;
   }
 
   const inactiveRecords = useAppSelector(state => state.dataset.inactiveRecords);
