@@ -175,7 +175,7 @@ export class DataverseService implements IDataverseService {
 
   public openErrorDialog(error: any): Promise<void> {
     const errorMessage = error.code === 2147746581
-      ? 'You do not have permission to update edited record(s)'
+      ? 'You are missing some privileges, please contact your administrator'
       : error.message;
 
     const errorDialogOptions: ComponentFramework.NavigationApi.ErrorDialogOptions = {

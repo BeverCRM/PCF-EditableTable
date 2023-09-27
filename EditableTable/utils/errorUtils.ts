@@ -16,7 +16,7 @@ export const getConsolidatedError = (errors: ErrorDetails[], type: string): Erro
   recordId: '',
   code: 0o0,
   errorCode: 0o0,
-  message: `${errors.length} records had errors when ${type}`,
+  message: `${errors.length} record(s) had errors when ${type}`,
   raw: consolidateErrorMessages(errors),
   title: `Multiple errors when ${type} records`,
 });

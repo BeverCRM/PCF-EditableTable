@@ -22,6 +22,7 @@ export type Updates = {
 export type FieldSecurity = {
   fieldName: string;
   hasUpdateAccess: boolean;
+  hasCreateAccess: boolean;
 }
 
 export type InactiveRecord = {
@@ -86,34 +87,35 @@ export const setSecuredFields = createAsyncThunk<FieldSecurity[], DatasetPayload
   'dataset/setSecuredFields',
   async payload => await Promise.all(payload.columnKeys.map(async columnKey => {
     let hasUpdateAccess = true;
+    let hasCreateAccess = true;
 
     const isFieldSecured = await payload._service.isFieldSecured(columnKey);
     if (!isFieldSecured) {
-      return { fieldName: columnKey, hasUpdateAccess };
+      return { fieldName: columnKey, hasUpdateAccess, hasCreateAccess };
     }
 
     const fieldPermissionRecord =
     await payload._service.getUserRelatedFieldServiceProfile(columnKey);
 
     if (!fieldPermissionRecord) {
-      return { fieldName: columnKey, hasUpdateAccess };
+      return { fieldName: columnKey, hasUpdateAccess, hasCreateAccess };
     }
 
     if (fieldPermissionRecord.entities.length > 0) {
       fieldPermissionRecord.entities.forEach(entity => {
-        if (entity.canupdate === 4) {
-          return { fieldName: columnKey, hasUpdateAccess: true };
+        if (entity.canupdate === 0) {
+          hasUpdateAccess = false;
         }
-        hasUpdateAccess = false;
+
+        if (entity.cancreate === 0) {
+          hasCreateAccess = false;
+        }
       });
-      return { fieldName: columnKey, hasUpdateAccess };
+
+      return { fieldName: columnKey, hasUpdateAccess, hasCreateAccess };
     }
 
-    if (fieldPermissionRecord.entities.length === 0 && isFieldSecured) {
-      return { fieldName: columnKey, hasUpdateAccess: false };
-    }
-
-    return { fieldName: columnKey, hasUpdateAccess };
+    return { fieldName: columnKey, hasUpdateAccess: false, hasCreateAccess: false };
   })),
 );
 
