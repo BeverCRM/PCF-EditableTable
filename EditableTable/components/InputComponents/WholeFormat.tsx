@@ -25,21 +25,26 @@ export const WholeFormat = memo(({ fieldId, value, formattedValue, type, isDisab
   const wholeFormat = useAppSelector(state => state.wholeFormat);
 
   let options: IComboBoxOption[] = [];
-  switch (type) {
-    case 'timezone':
-      options = wholeFormat.timezones;
-      break;
+  if (!isSecured) {
+    switch (type) {
+      case 'timezone':
+        options = wholeFormat.timezones;
+        break;
 
-    case 'language':
-      options = wholeFormat.languages;
-      break;
+      case 'language':
+        options = wholeFormat.languages;
+        break;
 
-    case 'duration':
-      options = [
-        { key: value, text: formattedValue, hidden: true } as IComboBoxOption,
-        ...durationList,
-      ];
-      break;
+      case 'duration':
+        options = [
+          { key: value, text: formattedValue, hidden: true } as IComboBoxOption,
+          ...durationList,
+        ];
+        break;
+    }
+  }
+  else {
+    options = [ { key: value, text: formattedValue, hidden: true } as IComboBoxOption];
   }
 
   const durationValidation = (value: string | undefined): IComboBoxOption | undefined => {
