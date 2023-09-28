@@ -37,6 +37,12 @@ export const OptionSetFormat = memo(({ fieldId, fieldName, value, formattedValue
       option.text.toLowerCase().includes('active'))?.key.toString() || '';
   }
   const currentOptions: string[] = currentValue ? currentValue.split(',') : [];
+  if (isSecured) {
+    currentOptions.forEach((opt, i) => {
+      const optionNames = formattedValue?.split(';') || [];
+      options.push({ key: opt, text: optionNames[i] || '' });
+    });
+  }
 
   const onChange =
     (event: React.FormEvent<IComboBox>, option?: IComboBoxOption | undefined) => {
