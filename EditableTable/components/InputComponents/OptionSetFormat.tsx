@@ -29,7 +29,7 @@ export const OptionSetFormat = memo(({ fieldId, fieldName, value, formattedValue
 
   const dropdowns = useAppSelector(state => state.dropdown.dropdownFields);
   const currentDropdown = dropdowns.find(dropdown => dropdown.fieldName === fieldName);
-  const options = currentDropdown?.options ?? [];
+  let options = currentDropdown?.options ?? [];
   const disabled = fieldName === 'statuscode' || fieldName === 'statecode' || isDisabled;
 
   if (_service.isStatusField(fieldName) && !currentValue) {
@@ -37,11 +37,10 @@ export const OptionSetFormat = memo(({ fieldId, fieldName, value, formattedValue
       option.text.toLowerCase().includes('active'))?.key.toString() || '';
   }
   const currentOptions: string[] = currentValue ? currentValue.split(',') : [];
-  if (isSecured) {
-    currentOptions.forEach((opt, i) => {
-      const optionNames = formattedValue?.split(';') || [];
-      options.push({ key: opt, text: optionNames[i] || '' });
-    });
+  if (isSecured && options.length < 1) {
+    options = currentOptions.map(opt => ({
+      key: opt, text: formattedValue || '',
+    }));
   }
 
   const onChange =
