@@ -10,6 +10,5 @@ jobs:
     secrets: inherit
     with:
       control-title: Editable Table
-      control-description: Editable Grid with create, delete, save and refresh functionalities. New records are created as a new line in the grid.
+      control-youtube-video-url: https://www.youtube.com/watch?v=O8-jBsG4XfE
       control-tags: Dataset, Grid, Table, Editable
-      # control-youtube-video-url: ''
