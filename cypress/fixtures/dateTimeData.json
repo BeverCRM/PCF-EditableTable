@@ -1,0 +1,79 @@
+{
+  "user1": 
+  [
+    {
+      "value": "DateTimeUITest1",
+      "assertions": [
+        { "selector": "div[data-automation-key=\"bvr_dtltest\"] input", "index": 0, "value": "22.07.2022" },
+        { "selector": "div[data-automation-key=\"bvr_dtltest\"] input", "index": 1, "value": "5:00 AM" },
+        { "selector": "div[data-automation-key=\"bvr_dtl2test\"] input", "index": 0, "value": "23.07.2022" },
+        { "selector": "div[data-automation-key=\"bvr_dtl2test\"] input", "index": 1, "value": "7:00 AM" }
+      ]
+    },
+    {
+      "value": "DateTimeUITest2",
+      "assertions": [
+        { "selector": "div[data-automation-key=\"bvr_dtltest\"] input", "index": 0, "value": "22.01.2022" },
+        { "selector": "div[data-automation-key=\"bvr_dtltest\"] input", "index": 1, "value": "6:00 AM" },
+        { "selector": "div[data-automation-key=\"bvr_dtl2test\"] input", "index": 0, "value": "23.01.2022" },
+        { "selector": "div[data-automation-key=\"bvr_dtl2test\"] input", "index": 1, "value": "8:00 AM" }
+      ]
+    },
+    {
+      "value": "DateTimeTITest1",
+      "assertions": [
+        { "selector": "div[data-automation-key=\"bvr_dtitest\"] input", "index": 0, "value": "22.07.2022" },
+        { "selector": "div[data-automation-key=\"bvr_dtitest\"] input", "index": 1, "value": "1:00 PM" },
+        { "selector": "div[data-automation-key=\"bvr_dti2test\"] input", "index": 0, "value": "23.07.2022" },
+        { "selector": "div[data-automation-key=\"bvr_dti2test\"] input", "index": 1, "value": "3:00 PM" }
+      ]
+    },
+    {
+      "value": "DateTimeTITest2",
+      "assertions": [
+        { "selector": "div[data-automation-key=\"bvr_dtitest\"] input", "index": 0, "value": "22.01.2022" },
+        { "selector": "div[data-automation-key=\"bvr_dtitest\"] input", "index": 1, "value": "1:00 PM" },
+        { "selector": "div[data-automation-key=\"bvr_dti2test\"] input", "index": 0, "value": "23.01.2022" },
+        { "selector": "div[data-automation-key=\"bvr_dti2test\"] input", "index": 1, "value": "3:00 PM" }
+      ]
+    }
+  ],
+  "user2": [
+    {
+      "value": "DateTimeUITest1",
+      "assertions": [
+        { "selector": "div[data-automation-key=\"bvr_dtltest\"] input", "index": 0, "value": "07/22/2022" },
+        { "selector": "div[data-automation-key=\"bvr_dtltest\"] input", "index": 1, "value": "1:00 PM" },
+        { "selector": "div[data-automation-key=\"bvr_dtl2test\"] input", "index": 0, "value": "07/23/2022" },
+        { "selector": "div[data-automation-key=\"bvr_dtl2test\"] input", "index": 1, "value": "3:00 PM" }
+      ]
+    },
+    {
+      "value": "DateTimeUITest2",
+      "assertions": [
+        { "selector": "div[data-automation-key=\"bvr_dtltest\"] input", "index": 0, "value": "01/22/2022" },
+        { "selector": "div[data-automation-key=\"bvr_dtltest\"] input", "index": 1, "value": "1:00 PM" },
+        { "selector": "div[data-automation-key=\"bvr_dtl2test\"] input", "index": 0, "value": "01/23/2022" },
+        { "selector": "div[data-automation-key=\"bvr_dtl2test\"] input", "index": 1, "value": "3:00 PM" }
+      ]
+    },
+    {
+      "value": "DateTimeTITest1",
+      "assertions": [
+        { "selector": "div[data-automation-key=\"bvr_dtitest\"] input", "index": 0, "value": "07/22/2022" },
+        { "selector": "div[data-automation-key=\"bvr_dtitest\"] input", "index": 1, "value": "1:00 PM" },
+        { "selector": "div[data-automation-key=\"bvr_dti2test\"] input", "index": 0, "value": "07/23/2022" },
+        { "selector": "div[data-automation-key=\"bvr_dti2test\"] input", "index": 1, "value": "3:00 PM" }
+      ]
+    },
+    {
+      "value": "DateTimeTITest2",
+      "assertions": [
+        { "selector": "div[data-automation-key=\"bvr_dtitest\"] input", "index": 0, "value": "01/22/2022" },
+        { "selector": "div[data-automation-key=\"bvr_dtitest\"] input", "index": 1, "value": "1:00 PM" },
+        { "selector": "div[data-automation-key=\"bvr_dti2test\"] input", "index": 0, "value": "01/23/2022" },
+        { "selector": "div[data-automation-key=\"bvr_dti2test\"] input", "index": 1, "value": "3:00 PM" }
+      ]
+    }
+  ]
+}
