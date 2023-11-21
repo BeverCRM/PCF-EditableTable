@@ -12,3 +12,4 @@ jobs:
       control-title: Editable Table
       control-youtube-video-url: https://www.youtube.com/watch?v=O8-jBsG4XfE
       control-tags: Dataset, Grid, Table, Editable
+      create-new-release: false
